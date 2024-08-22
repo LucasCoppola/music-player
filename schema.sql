@@ -1,5 +1,3 @@
-create type user_role as enum ('user', 'admin');
-
 create table user (
   id uuid primary key,
   username varchar(50) not null,
@@ -7,7 +5,6 @@ create table user (
   password varchar(255) not null,
   updated_at timestamp not null default(now()),
   created_at timestamp not null default(now()),
-  role user_role not null
 )
 
 create table artist (
