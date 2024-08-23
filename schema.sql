@@ -19,9 +19,8 @@ create table album (
   id uuid primary key,
   title varchar(50) not null,
   release_date timestamp not null,
-  cover_url text not null,
-  updated_at timestamp not null default(now()),
   created_at timestamp not null default(now()),
+  updated_at timestamp not null default(now()),
   artist_id uuid,
   constraint fk_artist_id
    foreign key (artist_id)
@@ -41,7 +40,7 @@ create table playlist (
    on delete cascade
 )
 
-create table track(
+create table song(
   id uuid primary key,
   title varchar(50) not null,
   duration int not null,
@@ -60,67 +59,77 @@ create table track(
    on delete set null
 )
 
-create table playlist_track(
+create table playlist_song(
   playlist_id uuid not null,
-  track_id uuid not null,
+  song_id uuid not null,
   added_at timestamp not null,
   constraint fk_playlist_id
     foreign key (playlist_id)
     references playlist(id)
-  constraint fk_track_id
-    foreign key (track_id)
-    references track(id)
-  constraint unique_playlist_track
-    unique (playlist_id, track_id)
+  constraint fk_song_id
+    foreign key (song_id)
+    references song(id)
+  constraint unique_playlist_song
+    unique (playlist_id, song_id)
 )
 
 create table listening_history (
   id uuid primary key,
   user_id uuid not null,
-  track_id uuid not null,
+  song_id uuid not null,
   played_at timestamp not null,
   constraint fk_user_id
     foreign key (user_id)
     references user(id)
     on delete cascade
-  constraint fk_track_id
-    foreign key (track_id)
-    references track(id)
+  constraint fk_song_id
+    foreign key (song_id)
+    references song(id)
     on delete cascade
 )
 
-create table track_play_count (
+create table song_play_count (
   id uuid primary key,
-  track_id uuid not null,
+  song_id uuid not null,
+  user_id uuid not null,
   play_count int not null default(0),
-  constraint fk_track_id
-    foreign key (track_id)
-    references track(id)
+  constraint fk_song_id
+    foreign key (song_id)
+    references song(id)
+    on delete cascade
+  constraint fk_user_id
+    foreign key (user_id)
+    references user(id)
     on delete cascade
 )
 
 create table album_play_count (
   id uuid primary key,
   album_id uuid not null,
+  user_id uuid not null,
   play_count int not null default(0),
   constraint fk_album_id
     foreign key (album_id)
     references album(id)
+    on delete cascade
+  constraint fk_user_id
+    foreign key (user_id)
+    references user(id)
     on delete cascade
 )
 
 create table favorites (
   id uuid primary key,
   user_id uuid not null,
-  track_id uuid not null,
+  song_id uuid not null,
   created_at timestamp not null default(now()),
   updated_at timestamp not null default(now()),
   constraint fk_user_id
     foreign key (user_id)
     references user(id)
     on delete cascade
-  constraint fk_track_id
-    foreign key (track_id)
-    references track(id)
+  constraint fk_song_id
+    foreign key (song_id)
+    references song(id)
     on delete cascade
 )

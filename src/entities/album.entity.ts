@@ -4,25 +4,29 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Artist } from './artist.entity';
 
-@Entity('users')
-export class User {
+@Entity('albums')
+export class Album {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  username: string;
+  title: string;
 
-  @Column({ unique: true })
-  email: string;
-
-  @Column()
-  password: string;
+  @Column({ type: 'timestamp' })
+  release_date: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  @ManyToOne(() => Artist, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artist_id' })
+  artist: Artist;
 }
