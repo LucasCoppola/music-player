@@ -33,8 +33,18 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+  async findOneById(id: string): Promise<User | null> {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .getOne();
+  }
+
+  async findOneByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email })
+      .getOne();
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

@@ -4,12 +4,14 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import configuration from 'config/configuration';
 
 @Module({
   imports: [
     UsersModule,
     ConfigModule.forRoot({
+      isGlobal: true,
       load: [configuration],
     }),
     TypeOrmModule.forRoot({
@@ -23,6 +25,7 @@ import configuration from 'config/configuration';
       synchronize: configuration().environment === 'development',
       autoLoadEntities: true,
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
