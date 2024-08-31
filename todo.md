@@ -4,7 +4,7 @@
 
   - [x] Login
   - [x] Register
-  - [ ] Unit tests
+  - [x] Unit tests
 
 - **User**:
 

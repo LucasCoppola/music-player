@@ -53,7 +53,7 @@ export class AuthService {
       password: hashedPassword,
       username,
     });
-    const payload = { sub: newUser[0].id, username: newUser[0].username };
+    const payload = { sub: newUser.id, username: newUser.username };
 
     return {
       access_token: await this.jwtService.signAsync(payload, {

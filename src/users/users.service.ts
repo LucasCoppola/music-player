@@ -23,7 +23,7 @@ export class UsersService {
         .returning('*')
         .execute();
 
-      return user.raw as Omit<User, 'password'>;
+      return user.raw[0] as Omit<User, 'password'>;
     } catch (e) {
       throw new InternalServerErrorException('Error creating user', e.message);
     }
