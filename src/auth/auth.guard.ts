@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import configuration from 'config/configuration';
+import configuration from '../../config/configuration';
 import { Request } from 'express';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('You must be logged in');
     }
     return true;
   }
