@@ -5,6 +5,7 @@
   - [x] Login
   - [x] Register
   - [x] Unit tests
+  - [] e2e tests
 
 - **User**:
 

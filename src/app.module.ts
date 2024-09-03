@@ -5,19 +5,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import configuration from 'config/configuration';
+import configuration from '../config/configuration';
 
 @Module({
   imports: [
     UsersModule,
     ConfigModule.forRoot({
+      envFilePath: `.env.${configuration().environment}`,
       isGlobal: true,
       load: [configuration],
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
+      port: 5432,
       host: configuration().database.host,
-      port: configuration().database.port,
       username: configuration().database.username,
       password: configuration().database.password,
       database: configuration().database.name,
