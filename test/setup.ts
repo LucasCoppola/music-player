@@ -5,6 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
+import { EntityManager } from 'typeorm';
 
 let app: INestApplication;
 
@@ -19,7 +20,6 @@ export async function setupTestApp(): Promise<INestApplication> {
       exclude: [{ path: 'healthz', method: RequestMethod.GET }],
     });
     app.useGlobalPipes(new ValidationPipe());
-
     await app.init();
   }
 
@@ -32,4 +32,13 @@ export async function closeTestApp() {
   } else {
     throw new Error('App not initialized');
   }
+}
+
+export async function clearDatabase(app: INestApplication): Promise<void> {
+  const entityManager = app.get<EntityManager>(EntityManager);
+  const tableNames = entityManager.connection.entityMetadatas
+    .map((entity) => entity.tableName)
+    .join(', ');
+
+  await entityManager.query(`truncate ${tableNames} restart identity cascade;`);
 }

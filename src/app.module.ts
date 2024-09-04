@@ -23,7 +23,7 @@ import configuration from '../config/configuration';
       password: configuration().database.password,
       database: configuration().database.name,
       entities: ['dist/**/*.entity{.ts,.js}'],
-      synchronize: configuration().environment === 'development',
+      synchronize: configuration().environment !== 'production',
       autoLoadEntities: true,
     }),
     AuthModule,

@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { closeTestApp, setupTestApp } from '../setup';
+import { clearDatabase, closeTestApp, setupTestApp } from '../setup';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -10,10 +10,11 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
+    await clearDatabase(app);
     await closeTestApp();
   });
 
-  describe('/auth/register (POST)', () => {
+  describe('/api/auth/register (POST)', () => {
     it('should register successfully with valid credentials', async () => {
       const registerAuthDto = {
         username: 'testuser',
@@ -22,7 +23,7 @@ describe('AuthController (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/api/auth/register')
         .send(registerAuthDto)
         .expect(200);
 
@@ -30,7 +31,7 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  describe('/auth/login (POST)', () => {
+  describe('/api/auth/login (POST)', () => {
     it('should login successfully with valid credentials', async () => {
       const loginAuthDto = {
         email: 'test@example.com',
@@ -38,7 +39,7 @@ describe('AuthController (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/api/auth/login')
         .send(loginAuthDto)
         .expect(200);
 
