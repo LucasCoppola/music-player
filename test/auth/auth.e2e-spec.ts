@@ -146,6 +146,17 @@ describe('AuthModule (e2e)', () => {
       expect(response.body).toHaveProperty('username', 'testuser');
     });
 
+    it('should fail to get profile with invalid access_token', async () => {
+      const fake_access_token = 'fake_access_token';
+
+      const response = await request(app.getHttpServer())
+        .get('/api/auth/profile')
+        .set('Authorization', `Bearer ${fake_access_token}`)
+        .expect(401);
+
+      expect(response.body.message).toContain('You must be logged in');
+    });
+
     it('should fail to get profile without access_token', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/auth/profile')

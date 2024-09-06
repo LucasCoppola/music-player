@@ -8,7 +8,7 @@
   - Tests:
     - [x] Service Layer
     - [x] Controller Layer
-    - [] e2e
+    - [x] e2e
 
 - **User**:
 
