@@ -4,8 +4,11 @@
 
   - [x] Login
   - [x] Register
-  - [x] Unit tests
-  - [] e2e tests
+
+  - Tests:
+    - [x] Service Layer
+    - [x] Controller Layer
+    - [] e2e
 
 - **User**:
 

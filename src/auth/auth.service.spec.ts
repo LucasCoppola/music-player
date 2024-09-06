@@ -89,12 +89,13 @@ describe('AuthService', () => {
   });
 
   describe('register', () => {
+    const registerDto = {
+      username: 'newuser',
+      email: 'new@example.com',
+      password: 'password123',
+    };
+
     it('should create a new user and return an access token', async () => {
-      const registerDto = {
-        username: 'newuser',
-        email: 'new@example.com',
-        password: 'password123',
-      };
       const mockNewUser: Omit<User, 'password'> = {
         id: '0c51eea2-8834-4b8f-ac8d-4ec13ba94131',
         username: 'newuser',
@@ -127,11 +128,6 @@ describe('AuthService', () => {
     });
 
     it('should throw ConflictException when email is already in use', async () => {
-      const registerDto = {
-        username: 'existinguser',
-        email: 'existing@example.com',
-        password: 'password123',
-      };
       const existentUser: User = {
         id: 'f07dadf8-45a5-469a-af89-235f484b433e',
         username: 'unrelateduser',
