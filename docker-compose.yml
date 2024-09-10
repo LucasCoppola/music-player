@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:14
-    container_name: postgres_db
+    container_name: postgres_db_${NODE_ENV}
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
@@ -9,7 +9,8 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_${NODE_ENV}:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  postgres_data_development:
+  postgres_data_test:
