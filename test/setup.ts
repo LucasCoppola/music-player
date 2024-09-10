@@ -1,9 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  INestApplication,
-  RequestMethod,
-  ValidationPipe,
-} from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
 import { EntityManager } from 'typeorm';
 
@@ -16,9 +12,6 @@ export async function setupTestApp(): Promise<INestApplication> {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api', {
-      exclude: [{ path: 'healthz', method: RequestMethod.GET }],
-    });
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   }

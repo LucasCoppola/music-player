@@ -13,7 +13,7 @@
 - **User**:
 
   - [x] Create
-  - [ ] Delete user
+  - [x] Delete user
 
 - **Artist**:
 

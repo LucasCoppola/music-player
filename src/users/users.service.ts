@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -14,23 +14,19 @@ export class UsersService {
   async create(createUserDto: Partial<CreateUserDto>) {
     const { email, password, username } = createUserDto;
 
-    try {
-      const user = await this.usersRepository
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({ email, password, username })
-        .returning('*')
-        .execute();
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({ email, password, username })
+      .returning('*')
+      .execute();
 
-      return user.raw[0] as Omit<User, 'password'>;
-    } catch (e) {
-      throw new InternalServerErrorException('Error creating user', e.message);
-    }
+    return user.raw[0] as Omit<User, 'password'>;
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.createQueryBuilder('user').getMany();
   }
 
   async findOneById(id: string): Promise<User | null> {
@@ -47,11 +43,25 @@ export class UsersService {
       .getOne();
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(id, updateUserDto);
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UpdateResult> {
+    const { email, password, username } = updateUserDto;
+    return await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ email, password, username })
+      .where('id = :id', { id })
+      .execute();
   }
 
-  async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+  async remove(id: number): Promise<DeleteResult> {
+    return await this.usersRepository
+      .createQueryBuilder()
+      .delete()
+      .from(User)
+      .where('id = :id', { id })
+      .execute();
   }
 }
