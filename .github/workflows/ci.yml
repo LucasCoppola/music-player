@@ -33,9 +33,9 @@ jobs:
 
       - name: Create .env.test file
         run: |
-          echo "PORT=8080" > .env.test
-          echo "NODE_ENV=test" > .env.test
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env.test
+          echo "PORT=8080" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
 
           echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" > .env.test
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env.test
