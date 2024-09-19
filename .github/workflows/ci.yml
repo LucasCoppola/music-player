@@ -11,16 +11,6 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
 
-    env:
-      PORT: 8080
-      NODE_ENV: test
-
-      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
     steps:
       - name: Check Repository
         uses: actions/checkout@v4
@@ -43,6 +33,10 @@ jobs:
 
       - name: Create .env.test file
         run: |
+          echo "PORT=8080" > .env.test
+          echo "NODE_ENV=test" > .env.test
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env.test
+
           echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" > .env.test
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env.test
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env.test
