@@ -19,7 +19,6 @@ jobs:
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
@@ -37,13 +36,20 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: Start Docker container
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
+      - name: Create .env.test file
         run: |
           echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" > .env.test
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env.test
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env.test
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env.test
-          npm run docker:test:up
+
+      - name: Start Docker containers
+        run: npm run docker:test:up
 
       - name: Start NestJS application in test mode
         run: npm run start:test &
@@ -66,4 +72,5 @@ jobs:
         run: npm run test:e2e
 
       - name: Stop containers
+        if: always()
         run: docker-compose down
