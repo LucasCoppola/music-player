@@ -22,6 +22,30 @@
   - [ ] Get artist by ID
   - [ ] List all artists
 
+- **Song**:
+
+  - [ ] Create song
+  - [ ] Delete song
+  - [ ] Get song
+  - [ ] List songs by album
+  - [ ] List songs by artist
+
+- **Streaming and Playback**:
+
+  - [ ] Stream song via API
+  - [ ] Implement song playback using ffmpeg
+  - [ ] Support different audio formats
+  - [ ] Handle real-time streaming (e.g., buffering, seek, etc.)
+  - [ ] Implement playback controls (play, pause, stop)
+
+- **ffmpeg Integration**:
+
+  - [ ] Install and configure ffmpeg
+  - [ ] Set up ffmpeg for audio processing
+  - [ ] Implement audio transcoding (convert formats)
+  - [ ] Implement audio normalization (volume leveling)
+  - [ ] Generate waveforms or visualizations (optional)
+
 - **Album**:
 
   - [ ] Create album
@@ -64,19 +88,3 @@
   - [ ] Increment album play count
   - [ ] Retrieve song play counts
   - [ ] Retrieve album play counts
-
-- **Streaming and Playback**:
-
-  - [ ] Stream song via API
-  - [ ] Implement song playback using ffmpeg
-  - [ ] Support different audio formats
-  - [ ] Handle real-time streaming (e.g., buffering, seek, etc.)
-  - [ ] Implement playback controls (play, pause, stop)
-
-- **ffmpeg Integration**:
-
-  - [ ] Install and configure ffmpeg
-  - [ ] Set up ffmpeg for audio processing
-  - [ ] Implement audio transcoding (convert formats)
-  - [ ] Implement audio normalization (volume leveling)
-  - [ ] Generate waveforms or visualizations (optional)

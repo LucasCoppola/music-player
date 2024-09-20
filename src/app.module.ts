@@ -5,6 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { AudioModule } from './audio/audio.module';
+import { SongModule } from './song/song.module';
+import { ArtistModule } from './artist/artist.module';
 import configuration from '../config/configuration';
 
 @Module({
@@ -27,6 +30,9 @@ import configuration from '../config/configuration';
       autoLoadEntities: true,
     }),
     AuthModule,
+    AudioModule,
+    SongModule,
+    ArtistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
