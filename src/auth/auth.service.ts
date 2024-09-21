@@ -8,7 +8,7 @@ import { UsersService } from '../users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { ArtistService } from 'src/artist/artist.service';
+import { ArtistService } from '../artist/artist.service';
 import { RegisterArtistDto } from './dto/register-artist.dto';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = { sub: user.id, username: user.username };
+    const payload = { sub: user.id, username: user.username, role: 'user' };
 
     return {
       access_token: await this.jwtService.signAsync(payload, {
@@ -62,7 +62,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = { sub: artist.id, username: artist.username };
+    const payload = {
+      sub: artist.id,
+      username: artist.username,
+      role: 'artist',
+    };
 
     return {
       access_token: await this.jwtService.signAsync(payload, {

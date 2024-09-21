@@ -2,8 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { RegisterAuthDto } from './dto/register-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterArtistDto } from './dto/register-artist.dto';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
@@ -18,7 +19,8 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             login: jest.fn(),
-            register: jest.fn(),
+            registerUser: jest.fn(),
+            registerArtist: jest.fn(),
           },
         },
       ],
@@ -37,9 +39,10 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    const loginAuthDto: LoginAuthDto = {
+    const loginDto: LoginDto = {
       email: 'test@example.com',
       password: 'test123',
+      role: 'user',
     };
 
     it('should call login with correct parameters and return a token', async () => {
@@ -47,8 +50,8 @@ describe('AuthController', () => {
 
       jest.spyOn(authService, 'login').mockResolvedValue(loginResult);
 
-      const result = await authController.login(loginAuthDto);
-      expect(authService.login).toHaveBeenCalledWith(loginAuthDto);
+      const result = await authController.login(loginDto);
+      expect(authService.login).toHaveBeenCalledWith(loginDto);
       expect(result).toEqual(loginResult);
     });
 
@@ -57,44 +60,78 @@ describe('AuthController', () => {
         .spyOn(authService, 'login')
         .mockRejectedValue(new UnauthorizedException('Invalid credentials'));
 
-      await expect(authController.login(loginAuthDto)).rejects.toThrow(
+      await expect(authController.login(loginDto)).rejects.toThrow(
         UnauthorizedException,
       );
     });
   });
 
-  describe('register', () => {
-    const registerAuthDto: RegisterAuthDto = {
+  describe('registerUser', () => {
+    const registerUserDto: RegisterUserDto = {
       email: 'test@example.com',
       password: 'test123',
       username: 'testuser',
     };
 
-    it('should call register with correct parameters and return a token', async () => {
+    it('should call registerUser with correct parameters and return a token', async () => {
       const registerResult = { access_token: 'jwt-token' };
 
-      jest.spyOn(authService, 'register').mockResolvedValue(registerResult);
+      jest.spyOn(authService, 'registerUser').mockResolvedValue(registerResult);
 
-      const result = await authController.register(registerAuthDto);
+      const result = await authController.registerUser(registerUserDto);
 
-      expect(authService.register).toHaveBeenCalledWith(registerAuthDto);
+      expect(authService.registerUser).toHaveBeenCalledWith(registerUserDto);
       expect(result).toEqual(registerResult);
     });
 
     it('should throw ConflictException when email is already in use', async () => {
       jest
-        .spyOn(authService, 'register')
+        .spyOn(authService, 'registerUser')
         .mockRejectedValue(new ConflictException('Email is already in use'));
 
-      await expect(authController.register(registerAuthDto)).rejects.toThrow(
-        ConflictException,
+      await expect(
+        authController.registerUser(registerUserDto),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('registerArtist', () => {
+    const registerArtistDto: RegisterArtistDto = {
+      email: 'artist@example.com',
+      password: 'artist123',
+      username: 'artistuser',
+      bio: 'lorem ipsum dolor sit amet consectetur adipiscing elit',
+    };
+
+    it('should call registerArtist with correct parameters and return a token', async () => {
+      const registerResult = { access_token: 'jwt-token' };
+
+      jest
+        .spyOn(authService, 'registerArtist')
+        .mockResolvedValue(registerResult);
+
+      const result = await authController.registerArtist(registerArtistDto);
+
+      expect(authService.registerArtist).toHaveBeenCalledWith(
+        registerArtistDto,
       );
+      expect(result).toEqual(registerResult);
+    });
+
+    it('should throw ConflictException when email is already in use', async () => {
+      jest
+        .spyOn(authService, 'registerArtist')
+        .mockRejectedValue(new ConflictException('Email is already in use'));
+
+      await expect(
+        authController.registerArtist(registerArtistDto),
+      ).rejects.toThrow(ConflictException);
     });
   });
 
   describe('getProfile', () => {
     it('should return the user profile from the request', () => {
-      const req = { user: { id: 1, username: 'testuser' } };
+      const req = { user: { id: 1, username: 'testuser', role: 'user' } };
 
       const result = authController.getProfile(req);
       expect(result).toEqual(req.user);

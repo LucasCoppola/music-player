@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
+import { ArtistModule } from '../artist/artist.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ArtistModule } from 'src/artist/artist.module';
 
 @Module({
   imports: [

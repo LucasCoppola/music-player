@@ -19,8 +19,8 @@ describe('AuthModule (e2e)', () => {
   });
 
   describe('/api/auth/register (POST)', () => {
-    it('should register successfully with valid credentials', async () => {
-      const registerAuthDto = {
+    it('should register user successfully with valid credentials', async () => {
+      const registerUserDto = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'test123',
@@ -28,14 +28,30 @@ describe('AuthModule (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('access_token');
+    });
+
+    it('should register artist successfully with valid credentials', async () => {
+      const registerArtistDto = {
+        username: 'testartist',
+        email: 'artist@example.com',
+        password: 'test123',
+        bio: 'Test artist bio',
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/register/artist')
+        .send(registerArtistDto)
         .expect(200);
 
       expect(response.body).toHaveProperty('access_token');
     });
 
     it('should fail to register with missing fields', async () => {
-      const registerAuthDto = {
+      const registerUserDto = {
         username: 'testuser',
         // email is missing
         password: 'test123',
@@ -43,14 +59,14 @@ describe('AuthModule (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
         .expect(400);
 
       expect(response.body.message).toContain('email must be an email');
     });
 
     it('should fail to register with duplicate email', async () => {
-      const registerAuthDto = {
+      const registerUserDto = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'test123',
@@ -58,12 +74,12 @@ describe('AuthModule (e2e)', () => {
 
       await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
         .expect(200);
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
         .expect(409);
 
       expect(response.body.message).toContain('Email already in use');
@@ -71,8 +87,8 @@ describe('AuthModule (e2e)', () => {
   });
 
   describe('/api/auth/login (POST)', () => {
-    it('should login successfully with valid credentials', async () => {
-      const registerAuthDto = {
+    it('should login user successfully with valid credentials', async () => {
+      const registerUserDto = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'test123',
@@ -80,45 +96,75 @@ describe('AuthModule (e2e)', () => {
 
       await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
         .expect(200);
 
-      const loginAuthDto = {
+      const loginDto = {
         email: 'test@example.com',
         password: 'test123',
+        role: 'user',
       };
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
-        .send(loginAuthDto)
+        .send(loginDto)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('access_token');
+    });
+
+    it('should login artist successfully with valid credentials', async () => {
+      const registerArtistDto = {
+        username: 'testartist',
+        email: 'artist@example.com',
+        password: 'test123',
+        bio: 'Test artist bio',
+      };
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register/artist')
+        .send(registerArtistDto)
+        .expect(200);
+
+      const loginDto = {
+        email: 'artist@example.com',
+        password: 'test123',
+        role: 'artist',
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .send(loginDto)
         .expect(200);
 
       expect(response.body).toHaveProperty('access_token');
     });
 
     it('should fail to login with incorrect password', async () => {
-      const loginAuthDto = {
+      const loginDto = {
         email: 'test@example.com',
         password: 'wrongpassword',
+        role: 'user',
       };
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
-        .send(loginAuthDto)
+        .send(loginDto)
         .expect(401);
 
       expect(response.body.message).toContain('Invalid email or password');
     });
 
     it('should fail to login with non-existent email', async () => {
-      const loginAuthDto = {
+      const loginDto = {
         email: 'non_existent_email@example.com',
         password: 'test123',
+        role: 'user',
       };
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
-        .send(loginAuthDto)
+        .send(loginDto)
         .expect(401);
 
       expect(response.body.message).toContain('Invalid email or password');
@@ -126,8 +172,8 @@ describe('AuthModule (e2e)', () => {
   });
 
   describe('/api/auth/profile (GET)', () => {
-    it('should get profile successfully', async () => {
-      const registerAuthDto = {
+    it('should get user profile successfully', async () => {
+      const registerUserDto = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'test123',
@@ -135,7 +181,7 @@ describe('AuthModule (e2e)', () => {
 
       const res = await request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(registerAuthDto)
+        .send(registerUserDto)
         .expect(200);
 
       const response = await request(app.getHttpServer())
@@ -144,6 +190,29 @@ describe('AuthModule (e2e)', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('username', 'testuser');
+      expect(response.body).toHaveProperty('role', 'user');
+    });
+
+    it('should get artist profile successfully', async () => {
+      const registerArtistDto = {
+        username: 'testartist',
+        email: 'artist@example.com',
+        password: 'test123',
+        bio: 'Test artist bio',
+      };
+
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/register/artist')
+        .send(registerArtistDto)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get('/api/auth/profile')
+        .set('Authorization', `Bearer ${res.body.access_token}`)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('username', 'testartist');
+      expect(response.body).toHaveProperty('role', 'artist');
     });
 
     it('should fail to get profile with invalid access_token', async () => {
