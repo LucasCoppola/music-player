@@ -12,7 +12,13 @@ export class Artist {
   id: string;
 
   @Column()
-  name: string;
+  username: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  password: string;
 
   @Column()
   bio: string;

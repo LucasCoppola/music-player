@@ -1,11 +1,11 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
 
-export class CreateArtistDto {
+export class RegisterArtistDto {
   @IsString()
   @IsNotEmpty()
   username: string;
 
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
   email: string;
 

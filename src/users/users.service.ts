@@ -11,7 +11,7 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: Partial<CreateUserDto>) {
+  async create(createUserDto: CreateUserDto) {
     const { email, password, username } = createUserDto;
 
     const user = await this.usersRepository

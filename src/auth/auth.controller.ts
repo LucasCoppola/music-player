@@ -9,9 +9,10 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginAuthDto } from './dto/login-auth.dto';
+import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
-import { RegisterAuthDto } from './dto/register-auth.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterArtistDto } from './dto/register-artist.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,14 +20,20 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() loginAuthDto: LoginAuthDto) {
-    return this.authService.login(loginAuthDto);
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  register(@Body() registerAuthDto: RegisterAuthDto) {
-    return this.authService.register(registerAuthDto);
+  registerUser(@Body() registerUserDto: RegisterUserDto) {
+    return this.authService.registerUser(registerUserDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('register/artist')
+  registerArtist(@Body() registerArtistDto: RegisterArtistDto) {
+    return this.authService.registerArtist(registerArtistDto);
   }
 
   @UseGuards(AuthGuard)
