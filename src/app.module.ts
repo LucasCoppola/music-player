@@ -12,7 +12,6 @@ import configuration from '../config/configuration';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({
       envFilePath: `.env.${configuration().environment}`,
       isGlobal: true,
@@ -30,6 +29,7 @@ import configuration from '../config/configuration';
       autoLoadEntities: true,
     }),
     AuthModule,
+    UsersModule,
     AudioModule,
     SongModule,
     ArtistModule,
