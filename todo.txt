@@ -1,0 +1,184 @@
+- **Song**:
+
+## Create a new song
+
+POST /api/songs/upload
+
+- Requires authentication as an artist
+- Request body:
+  ```json
+  {
+    "title": "string",
+    "duration": "integer",
+    "artist_id": "uuid",
+    "album_id": "uuid" (optional)
+  }
+  ```
+
+## GET /api/songs/{songId}/stream
+
+- Streams the audio file, handling byte range requests
+
+## GET /api/songs/{songId}/download
+
+- Provides a way to download the full audio file
+
+## Get all songs
+
+GET /api/songs
+
+- Optional query parameters:
+  - artist_id
+  - album_id
+  - limit
+  - offset
+
+## Get a specific song
+
+GET /api/songs/{songId}
+
+## Update a song
+
+PUT /api/songs/{songId}
+
+- Requires authentication as the artist who created the song
+- Request body:
+  ```json
+  {
+    "title": "string",
+    "duration": "integer",
+    "file_url": "string",
+    "album_id": "uuid" (optional)
+  }
+  ```
+
+## Delete a song
+
+DELETE /api/songs/{songId}
+
+- Requires authentication as the artist who created the song
+
+## Get song play count
+
+GET /api/songs/{songId}/play-count
+
+- Returns total play count across all users
+
+## Get user's play count for a song
+
+GET /api/songs/{songId}/play-count/{userId}
+
+- Requires authentication as the user or an admin
+
+## Increment song play count
+
+POST /api/songs/{songId}/play
+
+- Requires authentication
+- Increments play count for the authenticated user
+- Also creates a record in listening_history
+
+## Add song to favorites
+
+POST /api/songs/{songId}/favorite
+
+- Requires authentication
+
+## Remove song from favorites
+
+DELETE /api/songs/{songId}/favorite
+
+- Requires authentication
+
+## Get all songs in an album
+
+GET /api/albums/{albumId}/songs
+
+## Get all songs by an artist
+
+GET /api/artists/{artistId}/songs
+
+## Add song to playlist
+
+POST /api/playlists/{playlistId}/songs
+
+- Requires authentication as the playlist owner
+- Request body:
+  ```json
+  {
+    "song_id": "uuid"
+  }
+  ```
+
+## Remove song from playlist
+
+DELETE /api/playlists/{playlistId}/songs/{songId}
+
+- Requires authentication as the playlist owner
+
+## Get user's favorite songs
+
+GET /api/users/{userId}/favorites
+
+- Requires authentication as the user or an admin
+
+## Get user's recently played songs
+
+GET /api/users/{userId}/recent-plays
+
+- Requires authentication as the user or an admin
+- Optional query parameters:
+
+  - limit
+  - offset
+
+- **Streaming and Playback**:
+
+  - [ ] Stream song via API
+  - [ ] Implement song playback using ffmpeg
+  - [ ] Support different audio formats
+  - [ ] Handle real-time streaming (e.g., buffering, seek, etc.)
+  - [ ] Implement playback controls (play, pause, stop)
+
+- **ffmpeg Integration**:
+
+  - [ ] Install and configure ffmpeg
+  - [ ] Set up ffmpeg for audio processing
+  - [ ] Implement audio transcoding (convert formats)
+  - [ ] Implement audio normalization (volume leveling)
+  - [ ] Generate waveforms or visualizations (optional)
+
+- **Album**:
+
+  - [ ] Create album
+  - [ ] Delete album
+  - [ ] Get album by ID
+  - [ ] List albums by artist
+
+- **Playlist**:
+
+  - [ ] Create playlist
+  - [ ] Add songs
+  - [ ] Remove songs
+  - [ ] Get playlist
+  - [ ] List user playlists
+  - [ ] Delete playlist
+
+- **Favorites**:
+
+  - [ ] Add song
+  - [ ] Remove song
+  - [ ] List favorite songs
+
+- **Listening History**:
+
+  - [ ] Log song play
+  - [ ] Retrieve listening history by user
+  - [ ] Retrieve listening history by song
+
+- **Play Counts**:
+
+  - [ ] Increment song play count
+  - [ ] Increment album play count
+  - [ ] Retrieve song play counts
+  - [ ] Retrieve album play counts

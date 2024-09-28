@@ -1,15 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { SongService } from './song.service';
-import { CreateSongDto } from './dto/create-song.dto';
-import { UpdateSongDto } from './dto/update-song.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as fs from 'fs';
 
-@Controller('song')
+@Controller('songs')
 export class SongController {
   constructor(private readonly songService: SongService) {}
 
-  @Post()
-  create(@Body() createSongDto: CreateSongDto) {
-    return this.songService.create(createSongDto);
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('song', {
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          const uploadPath = './uploads/songs';
+          if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+          }
+          cb(null, uploadPath);
+        },
+        filename: (req, file, cb) => {
+          const filename = `${Date.now()}-${file.originalname}`;
+          cb(null, filename);
+        },
+      }),
+    }),
+  )
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return this.songService.uploadFile(file);
   }
 
   @Get()
@@ -23,7 +51,7 @@ export class SongController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSongDto: UpdateSongDto) {
+  update(@Param('id') id: string, @Body() updateSongDto: any) {
     return this.songService.update(+id, updateSongDto);
   }
 
