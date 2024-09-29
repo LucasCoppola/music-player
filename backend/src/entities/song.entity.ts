@@ -24,7 +24,7 @@ export class Song {
   duration: number;
 
   @Column()
-  file_url: string;
+  file_path: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
