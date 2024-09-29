@@ -18,12 +18,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
+        working-directory: ./backend
         run: npm install
 
       - name: Run unit tests
+        working-directory: ./backend
         run: npm run test
 
       - name: Install Docker Compose
@@ -32,6 +34,7 @@ jobs:
           sudo apt-get install docker-compose -y
 
       - name: Create .env.test file
+        working-directory: ./backend
         run: |
           echo "PORT=8080" >> .env.test
           echo "NODE_ENV=test" >> .env.test
@@ -43,9 +46,11 @@ jobs:
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env.test
 
       - name: Start Docker containers
+        working-directory: ./backend
         run: npm run docker:test:up
 
       - name: Start NestJS application in test mode
+        working-directory: ./backend
         run: npm run start:test &
 
       - name: Wait for application health check
@@ -63,8 +68,10 @@ jobs:
           exit 1
 
       - name: Run e2e tests
+        working-directory: ./backend
         run: npm run test:e2e
 
       - name: Stop containers
+        working-directory: ./backend
         if: always()
         run: docker-compose --env-file .env.test down
