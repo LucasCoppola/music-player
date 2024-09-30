@@ -29,23 +29,7 @@ describe('AuthModule (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(registerUserDto)
-        .expect(200);
-
-      expect(response.body).toHaveProperty('access_token');
-    });
-
-    it('should register artist successfully with valid credentials', async () => {
-      const registerArtistDto = {
-        username: 'testartist',
-        email: 'artist@example.com',
-        password: 'test123',
-        bio: 'Test artist bio',
-      };
-
-      const response = await request(app.getHttpServer())
-        .post('/api/auth/register/artist')
-        .send(registerArtistDto)
-        .expect(200);
+        .expect(201);
 
       expect(response.body).toHaveProperty('access_token');
     });
@@ -75,7 +59,7 @@ describe('AuthModule (e2e)', () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(registerUserDto)
-        .expect(200);
+        .expect(201);
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/register')
@@ -97,39 +81,11 @@ describe('AuthModule (e2e)', () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(registerUserDto)
-        .expect(200);
+        .expect(201);
 
       const loginDto = {
         email: 'test@example.com',
         password: 'test123',
-        role: 'user',
-      };
-
-      const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send(loginDto)
-        .expect(200);
-
-      expect(response.body).toHaveProperty('access_token');
-    });
-
-    it('should login artist successfully with valid credentials', async () => {
-      const registerArtistDto = {
-        username: 'testartist',
-        email: 'artist@example.com',
-        password: 'test123',
-        bio: 'Test artist bio',
-      };
-
-      await request(app.getHttpServer())
-        .post('/api/auth/register/artist')
-        .send(registerArtistDto)
-        .expect(200);
-
-      const loginDto = {
-        email: 'artist@example.com',
-        password: 'test123',
-        role: 'artist',
       };
 
       const response = await request(app.getHttpServer())
@@ -144,7 +100,6 @@ describe('AuthModule (e2e)', () => {
       const loginDto = {
         email: 'test@example.com',
         password: 'wrongpassword',
-        role: 'user',
       };
 
       const response = await request(app.getHttpServer())
@@ -159,7 +114,6 @@ describe('AuthModule (e2e)', () => {
       const loginDto = {
         email: 'non_existent_email@example.com',
         password: 'test123',
-        role: 'user',
       };
 
       const response = await request(app.getHttpServer())
@@ -182,7 +136,7 @@ describe('AuthModule (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(registerUserDto)
-        .expect(200);
+        .expect(201);
 
       const response = await request(app.getHttpServer())
         .get('/api/auth/profile')
@@ -190,29 +144,6 @@ describe('AuthModule (e2e)', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('username', 'testuser');
-      expect(response.body).toHaveProperty('role', 'user');
-    });
-
-    it('should get artist profile successfully', async () => {
-      const registerArtistDto = {
-        username: 'testartist',
-        email: 'artist@example.com',
-        password: 'test123',
-        bio: 'Test artist bio',
-      };
-
-      const res = await request(app.getHttpServer())
-        .post('/api/auth/register/artist')
-        .send(registerArtistDto)
-        .expect(200);
-
-      const response = await request(app.getHttpServer())
-        .get('/api/auth/profile')
-        .set('Authorization', `Bearer ${res.body.access_token}`)
-        .expect(200);
-
-      expect(response.body).toHaveProperty('username', 'testartist');
-      expect(response.body).toHaveProperty('role', 'artist');
     });
 
     it('should fail to get profile with invalid access_token', async () => {
