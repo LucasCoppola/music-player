@@ -11,8 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { RegisterArtistDto } from './dto/register-artist.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,14 +25,8 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  registerUser(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.registerUser(registerUserDto);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('register/artist')
-  registerArtist(@Body() registerArtistDto: RegisterArtistDto) {
-    return this.authService.registerArtist(registerArtistDto);
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @UseGuards(AuthGuard)

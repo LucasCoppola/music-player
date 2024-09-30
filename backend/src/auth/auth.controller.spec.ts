@@ -3,8 +3,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { LoginDto } from './dto/login.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { RegisterArtistDto } from './dto/register-artist.dto';
+import { RegisterDto } from './dto/register.dto';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
@@ -19,8 +18,7 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             login: jest.fn(),
-            registerUser: jest.fn(),
-            registerArtist: jest.fn(),
+            register: jest.fn(),
           },
         },
       ],
@@ -42,7 +40,6 @@ describe('AuthController', () => {
     const loginDto: LoginDto = {
       email: 'test@example.com',
       password: 'test123',
-      role: 'user',
     };
 
     it('should call login with correct parameters and return a token', async () => {
@@ -66,72 +63,38 @@ describe('AuthController', () => {
     });
   });
 
-  describe('registerUser', () => {
-    const registerUserDto: RegisterUserDto = {
+  describe('register', () => {
+    const registerDto: RegisterDto = {
       email: 'test@example.com',
       password: 'test123',
       username: 'testuser',
     };
 
-    it('should call registerUser with correct parameters and return a token', async () => {
+    it('should call register with correct parameters and return a token', async () => {
       const registerResult = { access_token: 'jwt-token' };
 
-      jest.spyOn(authService, 'registerUser').mockResolvedValue(registerResult);
+      jest.spyOn(authService, 'register').mockResolvedValue(registerResult);
 
-      const result = await authController.registerUser(registerUserDto);
+      const result = await authController.register(registerDto);
 
-      expect(authService.registerUser).toHaveBeenCalledWith(registerUserDto);
+      expect(authService.register).toHaveBeenCalledWith(registerDto);
       expect(result).toEqual(registerResult);
     });
 
     it('should throw ConflictException when email is already in use', async () => {
       jest
-        .spyOn(authService, 'registerUser')
+        .spyOn(authService, 'register')
         .mockRejectedValue(new ConflictException('Email is already in use'));
 
-      await expect(
-        authController.registerUser(registerUserDto),
-      ).rejects.toThrow(ConflictException);
-    });
-  });
-
-  describe('registerArtist', () => {
-    const registerArtistDto: RegisterArtistDto = {
-      email: 'artist@example.com',
-      password: 'artist123',
-      username: 'artistuser',
-      bio: 'lorem ipsum dolor sit amet consectetur adipiscing elit',
-    };
-
-    it('should call registerArtist with correct parameters and return a token', async () => {
-      const registerResult = { access_token: 'jwt-token' };
-
-      jest
-        .spyOn(authService, 'registerArtist')
-        .mockResolvedValue(registerResult);
-
-      const result = await authController.registerArtist(registerArtistDto);
-
-      expect(authService.registerArtist).toHaveBeenCalledWith(
-        registerArtistDto,
+      await expect(authController.register(registerDto)).rejects.toThrow(
+        ConflictException,
       );
-      expect(result).toEqual(registerResult);
-    });
-
-    it('should throw ConflictException when email is already in use', async () => {
-      jest
-        .spyOn(authService, 'registerArtist')
-        .mockRejectedValue(new ConflictException('Email is already in use'));
-
-      await expect(
-        authController.registerArtist(registerArtistDto),
-      ).rejects.toThrow(ConflictException);
     });
   });
 
   describe('getProfile', () => {
     it('should return the user profile from the request', () => {
-      const req = { user: { id: 1, username: 'testuser', role: 'user' } };
+      const req = { user: { id: 1, username: 'testuser' } };
 
       const result = authController.getProfile(req);
       expect(result).toEqual(req.user);
