@@ -1,6 +1,6 @@
 export default function NowPlaying({ imageUrl }: { imageUrl: string }) {
   return (
-    <div className="w-56 h-screen p-3 border-l border-zinc-800 bg-[#121212] flex-shrink-0">
+    <div className="w-56 h-[100dvh] p-4 bg-[#121212]">
       <h2 className="mb-3 text-sm font-semibold text-gray-200">Now Playing</h2>
       <img
         src={imageUrl}
