@@ -1,20 +1,5 @@
 - **Song**:
 
-## Create a new song
-
-POST /api/songs/upload
-
-- Requires authentication as an artist
-- Request body:
-  ```json
-  {
-    "title": "string",
-    "duration": "integer",
-    "artist_id": "uuid",
-    "album_id": "uuid" (optional)
-  }
-  ```
-
 ## GET /api/songs/{songId}/stream
 
 - Streams the audio file, handling byte range requests
