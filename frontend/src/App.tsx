@@ -1,7 +1,7 @@
 import Sidebar from "./components/sidebar";
 import NowPlaying from "./components/now-playing";
 import PlaybackControls from "./components/playback-controls";
-import Tracks from "./components/tracks";
+import TracksTable from "./components/tracks-table";
 
 export default function App() {
   const imageUrl =
@@ -11,10 +11,8 @@ export default function App() {
     <div className="dark flex flex-col h-screen text-gray-200 bg-[#0A0A0A]">
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <div className="flex flex-1 bg-[#0A0A0A] pb-[69px] pt-2">
-          <Tracks imageUrl={imageUrl} />
-          <NowPlaying imageUrl={imageUrl} />
-        </div>
+        <TracksTable imageUrl={imageUrl} />
+        <NowPlaying imageUrl={imageUrl} />
       </div>
       <PlaybackControls imageUrl={imageUrl} />
     </div>
