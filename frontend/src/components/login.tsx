@@ -13,8 +13,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 export default function Login() {
-  const username = "lucascp021";
-
   return (
     <div className="dark">
       <Dialog>
@@ -38,7 +36,7 @@ export default function Login() {
           <form className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" value={username} required />
+              <Input id="username" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

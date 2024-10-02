@@ -3,12 +3,15 @@ import Login from "./login";
 import SearchInput from "./search";
 import { Button } from "./ui/button";
 import UploadSong from "./upload-song";
+import UserDropdown from "./user-dropdown";
 
 export default function Sidebar() {
+  const isLoggedIn = true;
+
   return (
     <div className="w-56 p-4 bg-[#121212] flex flex-col space-y-6">
-      <div className="space-y-3">
-        <Login />
+      <div className="space-y-2">
+        {isLoggedIn ? <UserDropdown /> : <Login />}
         <SearchInput />
       </div>
 

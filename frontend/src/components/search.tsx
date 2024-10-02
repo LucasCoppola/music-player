@@ -10,7 +10,7 @@ export default function SearchInput() {
     <div className="relative">
       <Input
         type="search"
-        className="bg-[#1A1A1A] border-[#333] text-xs h-8 focus-visible:ring-0 pr-8 [&::-webkit-search-cancel-button]:appearance-none"
+        className="bg-[#1A1A1A] border-[#333] text-xs h-8 focus-visible:ring-1 pr-8 [&::-webkit-search-cancel-button]:appearance-none"
         style={{
           WebkitAppearance: "none",
           MozAppearance: "none",
