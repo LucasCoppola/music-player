@@ -19,7 +19,7 @@ export default function UploadSong() {
           <Button
             variant="outline"
             size="sm"
-            className="w-full justify-start bg-[#181818]"
+            className="w-full justify-start bg-[#1A1A1A] border-[#333]"
           >
             <Upload className="mr-2 h-4 w-4" />
             Upload Song
