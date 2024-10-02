@@ -19,7 +19,7 @@ export default function Sidebar() {
 
       <div className="flex items-center justify-between dark">
         <span className="text-xs font-semibold text-gray-400">Playlists</span>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
+        <Button variant="ghost" size="icon" className="h-5 w-5">
           <Plus className="h-3 w-3" />
           <span className="sr-only">Add Playlist</span>
         </Button>

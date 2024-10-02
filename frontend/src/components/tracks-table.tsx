@@ -1,5 +1,14 @@
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Pause, Play, Plus } from "lucide-react";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "./ui/dropdown-menu";
 
 const tracks = [
   {
@@ -515,6 +524,22 @@ const tracks = [
   },
 ];
 
+const playlists = [
+  {
+    name: "Vibe",
+    tracks: tracks.slice(0, 10),
+  },
+
+  {
+    name: "Vibe",
+    tracks: tracks.slice(10, 20),
+  },
+  {
+    name: "Vibe",
+    tracks: tracks.slice(20, 30),
+  },
+];
+
 export default function TracksTable({ imageUrl }: { imageUrl: string }) {
   return (
     <table className="w-full text-xs">
@@ -546,6 +571,9 @@ function TrackRow({
   imageUrl: string;
   index: number;
 }) {
+  const isCurrentTrack = true;
+  const isPlaying = false;
+
   return (
     <tr className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative">
       <td className="py-[2px] pl-3 pr-2 tabular-nums w-10 text-center text-gray-400">
@@ -570,14 +598,46 @@ function TrackRow({
       </td>
       <td className="py-[2px] px-2 text-right">
         <div className="opacity-0 group-hover:opacity-100">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-5 w-5 text-gray-400 hover:text-white focus:text-white"
-          >
-            <Ellipsis className="size-4" />
-            <span className="sr-only">Track options</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 text-gray-400 hover:text-white focus:text-white"
+              >
+                <Ellipsis className="size-4" />
+                <span className="sr-only">Track options</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 dark">
+              <DropdownMenuItem className="text-xs">
+                {isCurrentTrack && isPlaying ? (
+                  <>
+                    <Pause className="mr-2 size-3 stroke-[1.5]" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 size-3 stroke-[1.5]" />
+                    Play
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="text-xs">
+                  <Plus className="mr-2 size-3" />
+                  Add to Playlist
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-48">
+                  {playlists.map((playlist, i) => (
+                    <DropdownMenuItem className="text-xs" key={i}>
+                      {playlist.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </td>
     </tr>
