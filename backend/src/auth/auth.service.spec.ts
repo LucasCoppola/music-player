@@ -70,7 +70,7 @@ describe('AuthService', () => {
         mockUser.password,
       );
       expect(jwtService.signAsync).toHaveBeenCalledWith(
-        { sub: mockUser.id, username: mockUser.username, role: 'user' },
+        { sub: mockUser.id, username: mockUser.username },
         { expiresIn: '1h' },
       );
     });
