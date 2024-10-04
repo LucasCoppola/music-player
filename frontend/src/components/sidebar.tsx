@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import Login from "./login";
+import Auth from "./auth/auth";
 import SearchInput from "./search";
 import { Button } from "./ui/button";
 import UploadSong from "./upload-song";
@@ -8,12 +8,12 @@ import { playlists } from "@/lib/consts";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 export default function Sidebar() {
-  const isLoggedIn = true;
+  const isLoggedIn = false;
 
   return (
     <div className="w-56 p-4 bg-[#121212] flex flex-col h-full">
       <div className="space-y-2">
-        {isLoggedIn ? <UserDropdown /> : <Login />}
+        {isLoggedIn ? <UserDropdown /> : <Auth />}
         <SearchInput />
       </div>
 
