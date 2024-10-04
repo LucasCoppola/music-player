@@ -8,10 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { buttonVariants } from "./ui/button";
+import { AuthState } from "@/context/auth-context";
 
-export default function UserDropdown() {
-  const username = "shadcn";
-  const email = "nCqQ8@example.com";
+export default function UserDropdown({ authState }: { authState: AuthState }) {
+  const { username, email } = authState;
   const imageUrl = "https://github.com/shadcn.png";
 
   return (

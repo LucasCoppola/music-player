@@ -29,10 +29,10 @@ export default function Auth() {
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <Login />
+              <Login setIsOpen={setIsOpen} />
             </TabsContent>
             <TabsContent value="signup">
-              <SignUp />
+              <SignUp setIsOpen={setIsOpen} />
             </TabsContent>
           </Tabs>
         </DialogContent>

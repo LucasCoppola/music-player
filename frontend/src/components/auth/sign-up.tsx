@@ -4,6 +4,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "../../context/auth-context";
+import { getProfile } from "@/lib/utils";
 
 type FormData = {
   username: string;
@@ -11,7 +13,12 @@ type FormData = {
   password: string;
 };
 
-export default function SignUp() {
+export default function SignUp({
+  setIsOpen,
+}: {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -61,7 +68,15 @@ export default function SignUp() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      document.cookie = `accessToken=${data.access_token}; path=/; Secure; SameSite=Strict`;
+
+      const profile = await getProfile(data.access_token);
+
+      console.log(profile);
+
+      login(data.access_token, profile.username, profile.email);
+      setIsOpen(false);
       toast.success("Account created successfully.");
     },
     onError: (error) => {

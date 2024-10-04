@@ -2,7 +2,11 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-export default function Login() {
+export default function Login({
+  setIsOpen,
+}: {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       <div className="grid gap-4 py-4">
