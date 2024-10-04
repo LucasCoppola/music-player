@@ -4,7 +4,7 @@ import { Dialog, DialogTrigger, DialogContent } from "../ui/dialog";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Login from "./login";
-import SignUp from "./sing-up";
+import SignUp from "./sign-up";
 
 export default function Auth() {
   const [isOpen, setIsOpen] = useState(false);
