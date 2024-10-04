@@ -70,7 +70,11 @@ describe('AuthService', () => {
         mockUser.password,
       );
       expect(jwtService.signAsync).toHaveBeenCalledWith(
-        { sub: mockUser.id, username: mockUser.username },
+        {
+          sub: mockUser.id,
+          username: mockUser.username,
+          email: mockUser.email,
+        },
         { expiresIn: '1h' },
       );
     });
@@ -127,7 +131,11 @@ describe('AuthService', () => {
         username: registerDto.username,
       });
       expect(jwtService.signAsync).toHaveBeenCalledWith(
-        { sub: mockNewUser.id, username: mockNewUser.username },
+        {
+          sub: mockNewUser.id,
+          username: mockNewUser.username,
+          email: mockNewUser.email,
+        },
         { expiresIn: '1h' },
       );
     });
