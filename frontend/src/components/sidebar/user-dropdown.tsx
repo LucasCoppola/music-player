@@ -6,8 +6,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { buttonVariants } from "./ui/button";
+} from "@/components/ui/dropdown-menu";
+import { buttonVariants } from "@/components/ui/button";
 import { AuthState } from "@/context/auth-context";
 
 export default function UserDropdown({

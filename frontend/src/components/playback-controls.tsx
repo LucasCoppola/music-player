@@ -1,7 +1,9 @@
 import { HeartIcon, Play, SkipBack, SkipForward, Volume } from "lucide-react";
 import { Button } from "./ui/button";
 
-export default function PlaybackControls({ imageUrl }: { imageUrl: string }) {
+export default function PlaybackControls() {
+  const imageUrl =
+    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   return (
     <div className="bg-[#181818] border-t border-[#282828] flex flex-col pb-[calc(0.5rem+env(safe-area-inset-bottom))] p-2">
       <div className="flex items-center justify-between">

@@ -1,5 +1,5 @@
 import { Ellipsis, Pause, Play, Plus } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -8,10 +8,12 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import { playlists, tracks } from "@/lib/consts";
 
-export default function TracksTable({ imageUrl }: { imageUrl: string }) {
+export default function TracksTable() {
+  const imageUrl =
+    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   return (
     <table className="w-full text-xs">
       <thead className="sticky top-0 bg-[#0A0A0A] z-10 border-b border-[#282828]">
