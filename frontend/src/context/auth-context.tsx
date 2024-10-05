@@ -1,56 +1,29 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useContext } from "react";
+import type { RegisterFormData } from "../components/auth/sign-up";
+import { LoginFormData } from "@/components/auth/login";
 
-type AuthContext = {
-  authState: AuthState;
-  login: (token: string, username: string, email: string) => void;
+export type AuthContext = {
+  authState: AuthState | null;
+  register: (formData: RegisterFormData) => Promise<void>;
+  login: (formData: LoginFormData) => Promise<void>;
   logout: () => void;
+  isAuthenticated: boolean;
 };
 
 export type AuthState = {
-  isLoggedIn: boolean;
-  token: string | null;
-  username: string | null;
-  email: string | null;
+  userId: string;
+  username: string;
+  email: string;
+  imageUrl: string | null;
 };
 
-const AuthContext = createContext<AuthContext>({
-  authState: {
-    isLoggedIn: false,
-    token: null,
-    username: null,
-    email: null,
-  },
-  login: () => {},
+export const AuthContext = createContext<AuthContext>({
+  authState: null,
+  register: () => Promise.resolve(),
+  login: () => Promise.resolve(),
   logout: () => {},
+  isAuthenticated: false,
 });
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({
-    isLoggedIn: false,
-    token: null,
-    username: null,
-    email: null,
-  });
-
-  function login(token: string, username: string, email: string) {
-    setAuthState({ isLoggedIn: true, token, username, email });
-  }
-
-  function logout() {
-    setAuthState({
-      isLoggedIn: false,
-      token: null,
-      username: null,
-      email: null,
-    });
-  }
-
-  return (
-    <AuthContext.Provider value={{ authState, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
 
 export function useAuth() {
   return useContext(AuthContext);
