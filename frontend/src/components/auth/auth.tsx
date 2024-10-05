@@ -1,6 +1,12 @@
 import { LogIn } from "lucide-react";
 import { Button } from "../ui/button";
-import { Dialog, DialogTrigger, DialogContent } from "../ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "../ui/dialog";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Login from "./login";
@@ -23,11 +29,16 @@ export default function Auth() {
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[400px] dark text-foreground">
+          <DialogDescription className="sr-only">
+            Sign up or login to your account.
+          </DialogDescription>
           <Tabs defaultValue="login" className="w-full pt-3">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+            <DialogTitle>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+            </DialogTitle>
             <TabsContent value="login">
               <Login setIsOpen={setIsOpen} />
             </TabsContent>
