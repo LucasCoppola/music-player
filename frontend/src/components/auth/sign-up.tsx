@@ -5,6 +5,11 @@ import { Label } from "../ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from "@/lib/validation";
 
 export type RegisterFormData = {
   username: string;
@@ -30,32 +35,19 @@ export default function SignUp({
   });
 
   function validateForm() {
-    let isValid = true;
-    const newErrors = { username: "", email: "", password: "" };
-
-    if (formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters long";
-      isValid = false;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
-      isValid = false;
-    }
-
+    const newErrors = {
+      username: validateUsername(formData.username),
+      email: validateEmail(formData.email),
+      password: validatePassword(formData.password),
+    };
     setErrors(newErrors);
-    return isValid;
+    return !newErrors.username && !newErrors.email && !newErrors.password;
   }
 
   const signUpMutation = useMutation({
     mutationFn: async (registerFormData: RegisterFormData) =>
       await register(registerFormData),
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       setIsOpen(false);
       toast.success("Account created successfully.");
     },
