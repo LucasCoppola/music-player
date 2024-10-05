@@ -17,13 +17,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const response = await fetch("http://localhost:8080/api/auth/profile", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${storedToken}`,
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/auth/profile`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${storedToken}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const data = await response.json();
@@ -53,13 +56,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function register(formData: RegisterFormData) {
     const { username, email, password } = formData;
-    const response = await fetch("http://localhost:8080/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
       },
-      body: JSON.stringify({ username, email, password }),
-    });
+    );
 
     if (!response.ok) {
       const data = await response.json();
@@ -82,13 +88,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function login(formData: LoginFormData) {
     const { email, password } = formData;
-    const response = await fetch("http://localhost:8080/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/auth/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       },
-      body: JSON.stringify({ email, password }),
-    });
+    );
 
     if (!response.ok) {
       const data = await response.json();
