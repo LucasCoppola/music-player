@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
@@ -7,8 +7,10 @@ import TracksTable from "./tracks-table";
 import { EditableTitle } from "./editable-title";
 
 export default function Playlist() {
+  const { playlistId } = useParams("/playlist/$playlistId");
+
   const playlist = {
-    id: "1",
+    id: playlistId,
     name: "Playlist 1",
     coverUrl: "https://picsum.photos/200/300",
     trackCount: 10,
@@ -19,7 +21,7 @@ export default function Playlist() {
     <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0A0A] pb-[69px]">
       <div className="flex items-center justify-between p-3 bg-[#0A0A0A]">
         <div className="flex items-center space-x-1">
-          <Link href="/">
+          <Link to="/">
             <Button variant="ghost" size="icon" className="h-7 w-7">
               <ChevronLeft className="w-4 h-4" />
             </Button>
