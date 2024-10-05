@@ -5,7 +5,6 @@ import { Label } from "../ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
-import { validateEmail, validatePassword } from "@/lib/validation";
 
 export type LoginFormData = {
   email: string;
@@ -22,19 +21,6 @@ export default function Login({
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
-
-  function validateForm() {
-    const newErrors = {
-      email: validateEmail(formData.email),
-      password: validatePassword(formData.password),
-    };
-    setErrors(newErrors);
-    return !newErrors.email && !newErrors.password;
-  }
 
   const loginMutation = useMutation({
     mutationFn: async (loginFormData: LoginFormData) =>
@@ -51,7 +37,7 @@ export default function Login({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (formData.email && formData.password) {
       loginMutation.mutate(formData);
     }
   }
@@ -69,10 +55,8 @@ export default function Login({
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
+            required
           />
-          {errors.email && (
-            <span className="text-red-500 text-xs">{errors.email}</span>
-          )}
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
@@ -83,10 +67,8 @@ export default function Login({
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
             }
+            required
           />
-          {errors.password && (
-            <span className="text-red-500 text-xs">{errors.password}</span>
-          )}
         </div>
       </div>
       <Button
