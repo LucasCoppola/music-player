@@ -3,8 +3,14 @@ name: ci
 on:
   push:
     branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/**"
   pull_request:
     branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/**"
 
 jobs:
   tests:
