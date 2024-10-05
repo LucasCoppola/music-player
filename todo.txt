@@ -117,7 +117,7 @@ GET /api/users/{userId}/recent-plays
   - limit
   - offset
 
-- **Streaming and Playback**:
+## Streaming and Playback
 
   - [ ] Stream song via API
   - [ ] Implement song playback using ffmpeg
@@ -125,7 +125,7 @@ GET /api/users/{userId}/recent-plays
   - [ ] Handle real-time streaming (e.g., buffering, seek, etc.)
   - [ ] Implement playback controls (play, pause, stop)
 
-- **ffmpeg Integration**:
+## ffmpeg integration
 
   - [ ] Install and configure ffmpeg
   - [ ] Set up ffmpeg for audio processing
@@ -133,14 +133,7 @@ GET /api/users/{userId}/recent-plays
   - [ ] Implement audio normalization (volume leveling)
   - [ ] Generate waveforms or visualizations (optional)
 
-- **Album**:
-
-  - [ ] Create album
-  - [ ] Delete album
-  - [ ] Get album by ID
-  - [ ] List albums by artist
-
-- **Playlist**:
+## Playlists
 
   - [ ] Create playlist
   - [ ] Add songs
@@ -149,21 +142,19 @@ GET /api/users/{userId}/recent-plays
   - [ ] List user playlists
   - [ ] Delete playlist
 
-- **Favorites**:
+## Favorites
 
   - [ ] Add song
   - [ ] Remove song
   - [ ] List favorite songs
 
-- **Listening History**:
+## Listening History
 
   - [ ] Log song play
   - [ ] Retrieve listening history by user
   - [ ] Retrieve listening history by song
 
-- **Play Counts**:
+## Play Count
 
   - [ ] Increment song play count
-  - [ ] Increment album play count
   - [ ] Retrieve song play counts
-  - [ ] Retrieve album play counts

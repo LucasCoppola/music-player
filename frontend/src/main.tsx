@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <App />
-        <Toaster />
+        <Toaster richColors theme="light" />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

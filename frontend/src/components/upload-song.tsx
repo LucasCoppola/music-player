@@ -10,8 +10,20 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { toast } from "sonner";
 
-export default function UploadSong() {
+export default function UploadSong({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean;
+}) {
+  function handleUpload(e: React.MouseEvent) {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast.info("Please login to upload songs.");
+    }
+  }
+
   return (
     <div className="dark">
       <Dialog>
@@ -19,7 +31,8 @@ export default function UploadSong() {
           <Button
             variant="outline"
             size="sm"
-            className="w-full justify-start bg-[#1A1A1A] border-[#333]"
+            className={`w-full justify-start bg-[#1A1A1A] border-[#333] ${!isAuthenticated && "opacity-50 cursor-not-allowed"}`}
+            onClick={handleUpload}
           >
             <Upload className="mr-2 h-4 w-4" />
             Upload Song

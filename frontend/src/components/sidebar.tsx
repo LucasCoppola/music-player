@@ -44,7 +44,7 @@ export default function Sidebar() {
       </ScrollArea>
 
       <div className="mt-4">
-        <UploadSong />
+        <UploadSong isAuthenticated={isAuthenticated} />
       </div>
     </div>
   );
