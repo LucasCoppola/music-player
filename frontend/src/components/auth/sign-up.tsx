@@ -4,10 +4,9 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useAuth } from "../../context/auth-context";
-import { getProfile } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
 
-type FormData = {
+export type RegisterFormData = {
   username: string;
   email: string;
   password: string;
@@ -18,7 +17,7 @@ export default function SignUp({
 }: {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -54,28 +53,9 @@ export default function SignUp({
   }
 
   const signUpMutation = useMutation({
-    mutationFn: async (userData: FormData) => {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw data;
-      }
-      return response.json();
-    },
+    mutationFn: async (registerFormData: RegisterFormData) =>
+      await register(registerFormData),
     onSuccess: async (data) => {
-      document.cookie = `accessToken=${data.access_token}; path=/; Secure; SameSite=Strict`;
-
-      const profile = await getProfile(data.access_token);
-
-      console.log(profile);
-
-      login(data.access_token, profile.username, profile.email);
       setIsOpen(false);
       toast.success("Account created successfully.");
     },

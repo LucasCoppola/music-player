@@ -10,9 +10,14 @@ import {
 import { buttonVariants } from "./ui/button";
 import { AuthState } from "@/context/auth-context";
 
-export default function UserDropdown({ authState }: { authState: AuthState }) {
-  const { username, email } = authState;
-  const imageUrl = "https://github.com/shadcn.png";
+export default function UserDropdown({
+  authState,
+  logout,
+}: {
+  authState: AuthState;
+  logout: () => void;
+}) {
+  const { username, email, imageUrl } = authState;
 
   return (
     <DropdownMenu>
@@ -27,7 +32,10 @@ export default function UserDropdown({ authState }: { authState: AuthState }) {
           )}
         >
           <img
-            src={imageUrl}
+            src={
+              imageUrl ??
+              `https://api.dicebear.com/7.x/notionists/png?seed=${username}`
+            }
             alt="Avatar"
             className="size-7 rounded-full border mr-2"
           />
@@ -49,7 +57,7 @@ export default function UserDropdown({ authState }: { authState: AuthState }) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => logout()}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

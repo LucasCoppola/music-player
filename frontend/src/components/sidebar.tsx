@@ -6,16 +6,16 @@ import UploadSong from "./upload-song";
 import UserDropdown from "./user-dropdown";
 import { playlists } from "@/lib/consts";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "@/context/auth-context";
 
 export default function Sidebar() {
-  const { authState } = useAuth();
+  const { authState, isAuthenticated, logout } = useAuth();
 
   return (
     <div className="w-56 p-4 bg-[#121212] flex flex-col h-full">
       <div className="space-y-2">
-        {authState.isLoggedIn ? (
-          <UserDropdown authState={authState} />
+        {isAuthenticated && authState ? (
+          <UserDropdown authState={authState} logout={logout} />
         ) : (
           <Auth />
         )}
