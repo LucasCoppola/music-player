@@ -8,8 +8,6 @@ const TOKEN_KEY = "auth_token";
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState | null>(null);
 
-  const isAuthenticated = !!localStorage.getItem(TOKEN_KEY);
-
   const getProfile = useCallback(async () => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
     if (isTokenInvalid(storedToken)) {
@@ -49,6 +47,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: data.email,
           imageUrl: data.imageUrl,
           userId: data.sub,
+          token: storedToken,
+          isAuthenticated: true,
         });
       });
     }
@@ -82,6 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: userData.email,
         imageUrl: userData.imageUrl,
         userId: userData.sub,
+        token: access_token,
+        isAuthenticated: true,
       });
     }
   }
@@ -114,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: userData.email,
         imageUrl: userData.imageUrl,
         userId: userData.sub,
+        token: access_token,
+        isAuthenticated: true,
       });
     }
   }
@@ -124,9 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{ authState, register, login, logout, isAuthenticated }}
-    >
+    <AuthContext.Provider value={{ authState, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

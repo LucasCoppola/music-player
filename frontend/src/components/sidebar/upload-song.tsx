@@ -15,7 +15,7 @@ import { toast } from "sonner";
 export default function UploadSong({
   isAuthenticated,
 }: {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | undefined;
 }) {
   function handleUpload(e: React.MouseEvent) {
     if (!isAuthenticated) {

@@ -12,12 +12,12 @@ import { cn } from "@/lib/utils";
 
 export default function Sidebar() {
   const pathname = "/";
-  const { authState, isAuthenticated, logout } = useAuth();
+  const { authState, logout } = useAuth();
 
   return (
     <div className="w-56 p-4 bg-[#121212] flex flex-col h-full">
       <div className="space-y-2">
-        {isAuthenticated && authState ? (
+        {authState?.isAuthenticated ? (
           <UserDropdown authState={authState} logout={logout} />
         ) : (
           <Auth />
@@ -63,7 +63,7 @@ export default function Sidebar() {
       </ScrollArea>
 
       <div className="mt-4">
-        <UploadSong isAuthenticated={isAuthenticated} />
+        <UploadSong isAuthenticated={authState?.isAuthenticated} />
       </div>
     </div>
   );
