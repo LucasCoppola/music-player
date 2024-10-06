@@ -6,12 +6,21 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  Request,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { RegisterDto } from './dto/register.dto';
+import { Request } from 'express';
+
+export type UserPayload = {
+  sub: string;
+  username: string;
+  email: string;
+  iat: number;
+  exp: number;
+};
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +40,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req: Request) {
     return req.user;
   }
 }
