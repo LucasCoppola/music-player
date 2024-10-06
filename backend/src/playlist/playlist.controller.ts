@@ -31,8 +31,8 @@ export class PlaylistController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.playlistService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.playlistService.findOne(req.user.sub, id);
   }
 
   @Patch(':id')

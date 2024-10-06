@@ -49,8 +49,17 @@ export class PlaylistService {
     return playlists;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} playlist`;
+  async findOne(user_id: string, id: string): Promise<Playlist> {
+    const user = this.usersService.findOneById(user_id);
+    if (!user) throw new NotFoundException('User not found');
+
+    const playlist = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .where('playlist.id = :id', { id })
+      .andWhere('playlist.user_id = :user_id', { user_id })
+      .getOne();
+
+    return playlist;
   }
 
   update(id: number, updatePlaylistDto: UpdatePlaylistDto) {
