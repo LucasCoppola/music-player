@@ -6,8 +6,8 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AudioModule } from './audio/audio.module';
-import { SongModule } from './song/song.module';
 import { PlaylistModule } from './playlist/playlist.module';
+import { TrackModule } from './track/track.module';
 import configuration from '../config/configuration';
 
 @Module({
@@ -31,8 +31,8 @@ import configuration from '../config/configuration';
     AuthModule,
     UsersModule,
     AudioModule,
-    SongModule,
     PlaylistModule,
+    TrackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,7 +9,7 @@ import {
 import { Playlist } from './playlist.entity';
 
 @Entity('songs')
-export class Song {
+export class Track {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -28,6 +28,6 @@ export class Song {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @ManyToMany(() => Playlist, (playlist) => playlist.songs)
+  @ManyToMany(() => Playlist, (playlist) => playlist.tracks)
   playlists: Playlist[];
 }

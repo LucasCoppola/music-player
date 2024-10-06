@@ -10,7 +10,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { User } from './user.entity';
-import { Song } from './song.entity';
+import { Track } from './track.entity';
 
 @Entity('playlists')
 export class Playlist {
@@ -30,17 +30,17 @@ export class Playlist {
   @JoinColumn({ name: 'user_id' })
   artist: User;
 
-  @ManyToMany(() => Song, (song) => song.playlists)
+  @ManyToMany(() => Track, (track) => track.playlists)
   @JoinTable({
-    name: 'playlist_songs',
+    name: 'playlist_tracks',
     joinColumn: {
       name: 'playlist_id',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'song_id',
+      name: 'track_id',
       referencedColumnName: 'id',
     },
   })
-  songs: Song[];
+  tracks: Track[];
 }

@@ -5,11 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Song } from './song.entity';
+import { Track } from './track.entity';
 import { User } from './user.entity';
 
-@Entity('song_play_count')
-export class SongPlayCount {
+@Entity('track_play_count')
+export class TrackPlayCount {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -20,7 +20,7 @@ export class SongPlayCount {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Song, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'song_id' })
-  song: Song;
+  @ManyToOne(() => Track, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'track_id' })
+  track: Track;
 }

@@ -6,24 +6,25 @@ import {
   Patch,
   Param,
   Delete,
-  UseInterceptors,
   UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { SongService } from './song.service';
+import { TrackService } from './track.service';
+import { UpdateTrackDto } from './dto/update-track.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
-@Controller('songs')
-export class SongController {
-  constructor(private readonly songService: SongService) {}
+@Controller('tracks')
+export class TrackController {
+  constructor(private readonly trackService: TrackService) {}
 
   @Post('upload')
   @UseInterceptors(
-    FileInterceptor('song', {
+    FileInterceptor('track', {
       storage: diskStorage({
         destination: (req, file, cb) => {
-          const uploadPath = './uploads/songs';
+          const uploadPath = './uploads/tracks';
           if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
           }
@@ -37,26 +38,26 @@ export class SongController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.songService.uploadFile(file);
+    return this.trackService.uploadFile(file);
   }
 
   @Get()
   findAll() {
-    return this.songService.findAll();
+    return this.trackService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.songService.findOne(+id);
+    return this.trackService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSongDto: any) {
-    return this.songService.update(+id, updateSongDto);
+  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
+    return this.trackService.update(+id, updateTrackDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.songService.remove(+id);
+    return this.trackService.remove(+id);
   }
 }

@@ -5,7 +5,7 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
-import { Song } from './song.entity';
+import { Track } from './track.entity';
 import { User } from './user.entity';
 
 @Entity('favorites')
@@ -20,7 +20,7 @@ export class Favorites {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Song, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'album_id' })
-  song: Song;
+  @ManyToOne(() => Track, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'track_id' })
+  track: Track;
 }
