@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { Link } from "lucide-react";
 import { buttonVariants } from "./ui/button";
+import { Link } from "@tanstack/react-router";
 
 export function NotFound() {
   return (
