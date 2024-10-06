@@ -20,6 +20,9 @@ export class Playlist {
   @Column()
   title: string;
 
+  @Column({ nullable: true })
+  image_path: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
@@ -28,7 +31,7 @@ export class Playlist {
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  artist: User;
+  owner_id: string;
 
   @ManyToMany(() => Track, (track) => track.playlists)
   @JoinTable({
