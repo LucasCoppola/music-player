@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Request } from 'express';
 
 @Controller('playlists')
 @UseGuards(AuthGuard)
@@ -24,8 +26,8 @@ export class PlaylistController {
   }
 
   @Get()
-  findAll() {
-    return this.playlistService.findAll();
+  findAll(@Req() req: Request) {
+    return this.playlistService.findAll(req.user.sub);
   }
 
   @Get(':id')

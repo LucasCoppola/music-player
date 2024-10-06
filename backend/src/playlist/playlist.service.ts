@@ -37,8 +37,16 @@ export class PlaylistService {
     return insertedPlaylist.raw[0];
   }
 
-  findAll() {
-    return `This action returns all playlist`;
+  async findAll(user_id: string): Promise<Playlist[]> {
+    const user = this.usersService.findOneById(user_id);
+    if (!user) throw new NotFoundException('User not found');
+
+    const playlists = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .where('playlist.user_id = :user_id', { user_id })
+      .getMany();
+
+    return playlists;
   }
 
   findOne(id: number) {
