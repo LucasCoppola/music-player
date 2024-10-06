@@ -4,15 +4,16 @@ import SearchInput from "./search";
 import { buttonVariants } from "@/components/ui/button";
 import UploadSong from "./upload-song";
 import UserDropdown from "./user-dropdown";
-import { playlists } from "@/lib/consts";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/auth-context";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { usePlaylist } from "@/hooks/use-playlists";
 
 export default function Sidebar() {
   const pathname = "/";
   const { authState, logout } = useAuth();
+  const { data: playlists } = usePlaylist();
 
   return (
     <div className="w-56 p-4 bg-[#121212] flex flex-col h-full">
@@ -52,13 +53,16 @@ export default function Sidebar() {
       </div>
 
       <ScrollArea className="flex-grow mt-2">
-        <div className="space-y-2 pb-4">
-          {playlists.map((playlist, i) => (
-            <div key={i} className="text-xs">
-              {playlist.name}
-            </div>
-          ))}
-        </div>
+        {authState?.isAuthenticated && (
+          <div className="space-y-2 pb-4">
+            {playlists &&
+              playlists.map((playlist, i) => (
+                <div key={i} className="text-xs">
+                  {playlist.title}
+                </div>
+              ))}
+          </div>
+        )}
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 

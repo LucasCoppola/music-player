@@ -3,15 +3,17 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Button } from "../ui/button";
 import { ChevronLeft, ChevronRight, Shuffle } from "lucide-react";
 import { CoverImage } from "./cover-image";
-import TracksTable from "./tracks-table";
 import { EditableTitle } from "./editable-title";
+import TracksTable from "./tracks-table";
 
 export default function Playlist() {
-  const { playlistId } = useParams("/playlist/$playlistId");
+  const { playlistId } = useParams({
+    from: "/playlist/$playlistId",
+  });
 
   const playlist = {
     id: playlistId,
-    name: "Playlist 1",
+    name: "Playlist",
     coverUrl: "https://picsum.photos/200/300",
     trackCount: 10,
     duration: "3:20",
@@ -45,7 +47,7 @@ export default function Playlist() {
       </div>
 
       <div className="flex items-center py-3 px-4 space-x-3 bg-[#0A0A0A]">
-        <CoverImage url={playlist.coverUrl} playlistId={playlist.id} />
+        <CoverImage url={null} playlistId={playlist.id} />
         <div>
           <EditableTitle playlistId={playlist.id} initialName={playlist.name} />
           <p className="text-xs sm:text-sm text-gray-400">

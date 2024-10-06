@@ -9,7 +9,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "../ui/dropdown-menu";
-import { playlists, tracks } from "@/lib/consts";
+import { tracks } from "@/lib/consts";
+import { usePlaylist } from "@/hooks/use-playlists";
 
 export default function TracksTable() {
   const imageUrl =
@@ -44,6 +45,7 @@ function TrackRow({
   imageUrl: string;
   index: number;
 }) {
+  const { data: playlists } = usePlaylist();
   const isCurrentTrack = true;
   const isPlaying = false;
 
@@ -102,11 +104,12 @@ function TrackRow({
                   Add to Playlist
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-48">
-                  {playlists.map((playlist, i) => (
-                    <DropdownMenuItem className="text-xs" key={i}>
-                      {playlist.name}
-                    </DropdownMenuItem>
-                  ))}
+                  {playlists &&
+                    playlists.map((playlist, i) => (
+                      <DropdownMenuItem className="text-xs" key={i}>
+                        {playlist.title}
+                      </DropdownMenuItem>
+                    ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
             </DropdownMenuContent>
