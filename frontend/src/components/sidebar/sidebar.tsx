@@ -6,42 +6,45 @@ import UploadSong from "./upload-song";
 import UserDropdown from "./user-dropdown";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/auth-context";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePlaylist } from "@/hooks/use-playlists";
 
 export default function Sidebar() {
-  const pathname = "/";
   const { authState, logout } = useAuth();
+  const pathname = useLocation({
+    select: (location) => location.pathname,
+  });
   const { data: playlists } = usePlaylist();
+  const playlistId = "39bb7bcb-3bf4-44b5-b4a3-9fe36da6a6bd";
 
   return (
-    <div className="w-56 p-4 bg-[#121212] flex flex-col h-full">
-      <div className="space-y-2">
-        {authState?.isAuthenticated ? (
-          <UserDropdown authState={authState} logout={logout} />
-        ) : (
-          <Auth />
-        )}
-        <SearchInput />
+    <div className="w-56 bg-[#121212] flex flex-col h-full">
+      <div className="m-4 mb-6">
+        <div className="space-y-2">
+          {authState?.isAuthenticated ? (
+            <UserDropdown authState={authState} logout={logout} />
+          ) : (
+            <Auth />
+          )}
+          <SearchInput />
+        </div>
+      </div>
+      <div className="mb-6">
+        <Link
+          to="/"
+          className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
+            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/" ? "bg-[#1A1A1A]" : ""}`}
+        >
+          All Tracks
+        </Link>
       </div>
 
-      <Link
-        to="/"
-        className={`block mt-6 py-1 px-4 -mx-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${
-          pathname === "/" ? "bg-[#1A1A1A]" : ""
-        }`}
-      >
-        All Tracks
-      </Link>
-
-      <div className="flex items-center justify-between dark mt-6">
+      <div className="flex items-center justify-between dark mb-4 px-4">
         <span className="text-xs font-semibold text-gray-400">Playlists</span>
         <Link
           to="/playlist/$playlistId"
-          params={{
-            playlistId: "dc7c5dfb-af71-4fe1-8b73-48d9397ab2f3",
-          }}
+          params={{ playlistId }}
           className={cn(
             buttonVariants({ variant: "ghost", size: "icon" }),
             "h-5 w-5",
@@ -52,21 +55,29 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      <ScrollArea className="flex-grow mt-2">
+      <ScrollArea className="h-[calc(100dvh-180px)]">
         {authState?.isAuthenticated && (
-          <div className="space-y-2 pb-4">
+          <ul className="space-y-0.5 text-xs mt-[1px]">
             {playlists &&
               playlists.map((playlist, i) => (
-                <div key={i} className="text-xs">
-                  {playlist.title}
-                </div>
+                <li key={i} className="group relative">
+                  <Link
+                    to={`/playlist/${playlist.id}`}
+                    className={`block py-1 px-4 cursor-pointer hover:bg-[#1A1A1A] text-[#d1d5db] 
+                      focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 
+                      ${pathname === `/playlist/${playlist.id}` ? "bg-[#1A1A1A]" : ""}`}
+                    tabIndex={0}
+                  >
+                    {playlist.title}
+                  </Link>
+                </li>
               ))}
-          </div>
+          </ul>
         )}
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="mt-4">
+      <div className="m-4">
         <UploadSong isAuthenticated={authState?.isAuthenticated} />
       </div>
     </div>
