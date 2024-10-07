@@ -15,7 +15,7 @@ export class PlaylistService {
   ) {}
 
   async create(createPlaylistDto: CreatePlaylistDto): Promise<Playlist> {
-    const { title, owner_id } = createPlaylistDto;
+    const { id, title, owner_id } = createPlaylistDto;
 
     const user = await this.usersService.findOneById(owner_id);
 
@@ -28,6 +28,7 @@ export class PlaylistService {
       .insert()
       .into(Playlist)
       .values({
+        id,
         title,
         owner_id: user.id,
       })
@@ -44,6 +45,7 @@ export class PlaylistService {
     const playlists = await this.playlistRepository
       .createQueryBuilder('playlist')
       .where('playlist.user_id = :user_id', { user_id })
+      .orderBy('playlist.created_at', 'DESC')
       .getMany();
 
     return playlists;
