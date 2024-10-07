@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />
-        <Toaster richColors theme="light" />
+        <Toaster richColors theme="dark" />
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

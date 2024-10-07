@@ -10,7 +10,7 @@ import {
   DropdownMenuSubContent,
 } from "../ui/dropdown-menu";
 import { tracks } from "@/lib/consts";
-import { usePlaylist } from "@/hooks/use-playlists";
+import { usePlaylists } from "@/hooks/use-playlists";
 
 export default function TracksTable() {
   const imageUrl =
@@ -45,7 +45,7 @@ function TrackRow({
   imageUrl: string;
   index: number;
 }) {
-  const { data: playlists } = usePlaylist();
+  const { data: playlists } = usePlaylists();
   const isCurrentTrack = true;
   const isPlaying = false;
 

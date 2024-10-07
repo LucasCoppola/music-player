@@ -1,5 +1,6 @@
 import { useAuth } from "@/context/auth-context";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 type Playlist = {
   id: string;
@@ -9,7 +10,7 @@ type Playlist = {
   image_path: string;
 };
 
-export function usePlaylist() {
+export function usePlaylists() {
   const { authState } = useAuth();
 
   return useQuery({
@@ -55,5 +56,48 @@ export function usePlaylistById(playlistId: string) {
       return await response.json();
     },
     enabled: !!authState?.token && !!playlistId,
+  });
+}
+
+export function useCreatePlaylist() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+      if (!authState?.token) throw new Error("Unauthorized");
+
+      const newPlaylist = {
+        id,
+        title,
+        owner_id: authState?.userId,
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authState.token}`,
+          },
+          body: JSON.stringify(newPlaylist),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create playlist");
+      }
+
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      toast.success("Playlist created successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to create playlist", e);
+      toast.error("Failed to create playlist");
+    },
   });
 }

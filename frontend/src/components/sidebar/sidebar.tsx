@@ -8,15 +8,21 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/auth-context";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { usePlaylist } from "@/hooks/use-playlists";
+import { useCreatePlaylist, usePlaylists } from "@/hooks/use-playlists";
 
 export default function Sidebar() {
   const { authState, logout } = useAuth();
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
-  const { data: playlists } = usePlaylist();
-  const playlistId = "39bb7bcb-3bf4-44b5-b4a3-9fe36da6a6bd";
+  const { data: playlists } = usePlaylists();
+
+  const newPlaylist = {
+    id: crypto.randomUUID(),
+    title: "New Playlist",
+  };
+
+  const { mutate: createPlaylist } = useCreatePlaylist();
 
   return (
     <div className="w-56 bg-[#121212] flex flex-col h-full">
@@ -44,11 +50,12 @@ export default function Sidebar() {
         <span className="text-xs font-semibold text-gray-400">Playlists</span>
         <Link
           to="/playlist/$playlistId"
-          params={{ playlistId }}
+          params={{ playlistId: newPlaylist.id }}
           className={cn(
             buttonVariants({ variant: "ghost", size: "icon" }),
             "h-5 w-5",
           )}
+          onClick={() => createPlaylist(newPlaylist)}
         >
           <Plus className="h-3 w-3" />
           <span className="sr-only">Add Playlist</span>
