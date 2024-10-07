@@ -3,7 +3,7 @@ import { PlaylistService } from './playlist.service';
 import { PlaylistController } from './playlist.controller';
 import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Playlist } from 'src/entities/playlist.entity';
+import { Playlist } from '../entities/playlist.entity';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
