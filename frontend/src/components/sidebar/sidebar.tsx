@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import Auth from "../auth/auth";
 import SearchInput from "./search";
 import { buttonVariants } from "@/components/ui/button";
-import UploadSong from "./upload-song";
+import UploadTrack from "./upload-track";
 import UserDropdown from "./user-dropdown";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/auth-context";
@@ -85,7 +85,7 @@ export default function Sidebar() {
       </ScrollArea>
 
       <div className="m-4">
-        <UploadSong isAuthenticated={authState?.isAuthenticated} />
+        <UploadTrack isAuthenticated={authState?.isAuthenticated} />
       </div>
     </div>
   );
