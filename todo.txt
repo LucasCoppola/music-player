@@ -1,3 +1,8 @@
+- [] Improve Error Handling 
+  - [] Users
+  - [] Playlists
+  - [] Auth
+
 - [] Track resource - disk storage  
 - [] Image resource - disk storage
 

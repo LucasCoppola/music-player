@@ -8,19 +8,31 @@ import {
 } from 'typeorm';
 import { Playlist } from './playlist.entity';
 
-@Entity('songs')
+@Entity('tracks')
 export class Track {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
+  user_id: string;
+
+  @Column()
   title: string;
 
   @Column()
-  duration: number;
+  artist: string;
 
   @Column()
-  file_path: string;
+  mimetype: string;
+
+  @Column()
+  size: number;
+
+  @Column()
+  track_file_path: string;
+
+  @Column({ nullable: true })
+  image_file_path: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

@@ -11,13 +11,19 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { CreateTrackDto } from './dto/create-track.dto';
+import { Request } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('tracks')
+@UseGuards(AuthGuard)
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
@@ -40,17 +46,22 @@ export class TrackController {
     )
     file: Express.Multer.File,
   ) {
-    return this.trackService.uploadFile(file);
+    return await this.trackService.uploadFile(file);
+  }
+
+  @Post()
+  async create(@Body() createTrackDto: CreateTrackDto, @Req() req: Request) {
+    return await this.trackService.create(createTrackDto, req.user.sub);
   }
 
   @Get()
-  findAll() {
-    return this.trackService.findAll();
+  async findAll(@Req() req: Request) {
+    return await this.trackService.findAll(req.user.sub);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.trackService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() req: Request) {
+    return await this.trackService.findOne(id, req.user.sub);
   }
 
   @Patch(':id')
