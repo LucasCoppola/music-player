@@ -1,10 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import * as fs from 'node:fs';
 
 @Injectable()
 export class TrackService {
-  uploadFile(file: Express.Multer.File) {
-    return { file: file.path, message: 'File uploaded successfully' };
+  async uploadFile(file: Express.Multer.File) {
+    const uploadPath = './uploads/tracks';
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+
+    await fs.promises.writeFile(
+      `${uploadPath}/${Date.now()}-${file.originalname}`,
+      file.buffer,
+    );
+
+    return {
+      message: 'File uploaded successfully',
+      filename: file.originalname,
+      mimetype: file.mimetype,
+      size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+    };
   }
 
   findAll() {

@@ -8,12 +8,14 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as fs from 'node:fs';
+import { memoryStorage } from 'multer';
 
 @Controller('tracks')
 export class TrackController {
@@ -22,22 +24,22 @@ export class TrackController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('track', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const uploadPath = './uploads/tracks';
-          if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-          }
-          cb(null, uploadPath);
-        },
-        filename: (req, file, cb) => {
-          const filename = `${Date.now()}-${file.originalname}`;
-          cb(null, filename);
-        },
-      }),
+      storage: memoryStorage(),
     }),
   )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5 MB
+          new FileTypeValidator({
+            fileType: 'audio/mpeg',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
     return this.trackService.uploadFile(file);
   }
 
