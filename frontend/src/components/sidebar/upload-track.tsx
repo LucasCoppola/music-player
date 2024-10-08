@@ -10,8 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useUploadTrackFile } from "@/hooks/use-tracks";
+import { useCreateTrack, useUploadTrackFile } from "@/hooks/use-tracks";
 import { useState } from "react";
+import { Input } from "../ui/input";
+
+type TrackFormData = {
+  file: File | null;
+  title: string;
+  artist: string;
+};
 
 export default function UploadTrack({
   isAuthenticated,
@@ -19,15 +26,25 @@ export default function UploadTrack({
   isAuthenticated: boolean | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [trackFormData, setTrackFormData] = useState<TrackFormData>({
+    file: null,
+    title: "",
+    artist: "",
+  });
   const [isFileSizeOk, setIsFileSizeOk] = useState<boolean | null>(null);
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [artistError, setArtistError] = useState<string | null>(null);
 
   const uploadTrack = useUploadTrackFile();
+  const createTrack = useCreateTrack();
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
+      setTrackFormData((prevState) => ({
+        ...prevState,
+        file: selectedFile,
+      }));
       if (selectedFile.size > 5 * 1024 * 1024) {
         setIsFileSizeOk(false);
       } else {
@@ -37,18 +54,41 @@ export default function UploadTrack({
   }
 
   async function handleUpload() {
-    if (!file) {
+    setTitleError(null);
+    setArtistError(null);
+
+    if (!trackFormData.file) {
       return;
     }
 
-    uploadTrack.mutate({ file });
-    setFile(null);
-  }
+    if (!trackFormData.title) {
+      setTitleError("Title is required");
+      return;
+    }
+    if (!trackFormData.artist) {
+      setArtistError("Artist is required");
+      return;
+    }
 
-  function formatFileSize(bytes: number) {
-    if (bytes < 1024) return bytes + " bytes";
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    else return (bytes / 1048576).toFixed(1) + " MB";
+    const { track_file_path, mimetype, size_in_kb } =
+      await uploadTrack.mutateAsync({
+        file: trackFormData.file,
+      });
+
+    createTrack.mutate({
+      title: trackFormData.title,
+      artist: trackFormData.artist,
+      track_file_path,
+      mimetype,
+      size_in_kb,
+    });
+
+    setTrackFormData({
+      file: null,
+      title: "",
+      artist: "",
+    });
+    setOpen(false);
   }
 
   return (
@@ -67,7 +107,7 @@ export default function UploadTrack({
             }}
           >
             <Upload className="mr-2 h-4 w-4" />
-            Upload Song
+            Upload Track
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[450px] dark text-foreground">
@@ -100,15 +140,22 @@ export default function UploadTrack({
                 />
               </Label>
             </div>
-            {file && (
+            {trackFormData.file && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{file.name}</span>
+                  <span className="text-sm font-medium">
+                    {trackFormData.file.name}
+                  </span>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6"
-                    onClick={() => setFile(null)}
+                    onClick={() =>
+                      setTrackFormData((prevState) => ({
+                        ...prevState,
+                        file: null,
+                      }))
+                    }
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -118,16 +165,50 @@ export default function UploadTrack({
                   <span
                     className={`${isFileSizeOk === false ? "text-red-500" : "text-green-500"}`}
                   >
-                    {formatFileSize(file.size)}
+                    {formatFileSize(trackFormData.file.size)}
                   </span>
                 </p>
               </div>
             )}
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={trackFormData.title}
+                onChange={(e) =>
+                  setTrackFormData((prevState) => ({
+                    ...prevState,
+                    title: e.target.value,
+                  }))
+                }
+                placeholder="Enter track title"
+              />
+              {titleError && (
+                <p className="text-xs text-red-500">{titleError}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="artist">Artist</Label>
+              <Input
+                id="artist"
+                value={trackFormData.artist}
+                onChange={(e) =>
+                  setTrackFormData((prevState) => ({
+                    ...prevState,
+                    artist: e.target.value,
+                  }))
+                }
+                placeholder="Enter artist name"
+              />
+              {artistError && (
+                <p className="text-xs text-red-500">{artistError}</p>
+              )}
+            </div>
           </div>
           <Button
             onClick={handleUpload}
-            disabled={!file || uploadTrack.isPending}
-            className="w-full"
+            disabled={!trackFormData.file || uploadTrack.isPending}
+            className="w-full mt-2"
           >
             {uploadTrack.isPending ? "Uploading..." : "Upload"}
           </Button>
@@ -135,4 +216,10 @@ export default function UploadTrack({
       </Dialog>
     </div>
   );
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return bytes + " bytes";
+  else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+  else return (bytes / 1048576).toFixed(1) + " MB";
 }
