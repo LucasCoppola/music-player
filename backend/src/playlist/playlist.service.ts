@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,50 +19,65 @@ export class PlaylistService {
 
     const user = await this.usersService.findOneById(owner_id);
 
-    const insertedPlaylist = await this.playlistRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Playlist)
-      .values({
-        id,
-        title,
-        owner_id: user.id,
-      })
-      .returning('*')
-      .execute();
+    try {
+      const insertedPlaylist = await this.playlistRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Playlist)
+        .values({
+          id,
+          title,
+          owner_id: user.id,
+        })
+        .returning('*')
+        .execute();
 
-    return insertedPlaylist.raw[0];
+      return insertedPlaylist.raw[0];
+    } catch (error) {
+      console.log('Error creating playlist: ', error);
+      throw new InternalServerErrorException('Failed to create playlist');
+    }
   }
 
   async findAll(user_id: string): Promise<Playlist[]> {
     const user = await this.usersService.findOneById(user_id);
 
-    const playlists = await this.playlistRepository
-      .createQueryBuilder('playlist')
-      .where('playlist.user_id = :user_id', { user_id: user.id })
-      .orderBy('playlist.created_at', 'DESC')
-      .getMany();
+    try {
+      const playlists = await this.playlistRepository
+        .createQueryBuilder('playlist')
+        .where('playlist.user_id = :user_id', { user_id: user.id })
+        .orderBy('playlist.created_at', 'DESC')
+        .getMany();
 
-    return playlists;
+      return playlists;
+    } catch (error) {
+      console.log('Error finding playlists: ', error);
+      throw new InternalServerErrorException('Failed to find playlists');
+    }
   }
 
   async findOne(user_id: string, id: string): Promise<Playlist> {
     const user = await this.usersService.findOneById(user_id);
 
-    const playlist = await this.playlistRepository
-      .createQueryBuilder('playlist')
-      .where('playlist.id = :id', { id })
-      .andWhere('playlist.user_id = :user_id', { user_id: user.id })
-      .getOne();
+    try {
+      const playlist = await this.playlistRepository
+        .createQueryBuilder('playlist')
+        .where('playlist.id = :id', { id })
+        .andWhere('playlist.user_id = :user_id', { user_id: user.id })
+        .getOne();
 
-    return playlist;
+      return playlist;
+    } catch (error) {
+      console.log('Error finding playlist: ', error);
+      throw new InternalServerErrorException('Failed to find playlist');
+    }
   }
 
-  update(id: number, updatePlaylistDto: UpdatePlaylistDto) {
+  update(id: string, updatePlaylistDto: UpdatePlaylistDto) {
     return `This action updates a #${id} playlist`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} playlist`;
   }
 }

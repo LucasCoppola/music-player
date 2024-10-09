@@ -40,11 +40,11 @@ export class PlaylistController {
     @Param('id') id: string,
     @Body() updatePlaylistDto: UpdatePlaylistDto,
   ) {
-    return this.playlistService.update(+id, updatePlaylistDto);
+    return this.playlistService.update(id, updatePlaylistDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.playlistService.remove(+id);
+    return this.playlistService.remove(id);
   }
 }
