@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useCreateTrack, useUploadTrackFile } from "@/hooks/use-tracks";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { validateTrackArtist, validateTrackTitle } from "@/lib/validation";
 
 type TrackFormData = {
   file: File | null;
@@ -31,42 +32,45 @@ export default function UploadTrack({
     title: "",
     artist: "",
   });
+  const [errors, setErrors] = useState({
+    title: "",
+    artist: "",
+  });
   const [isFileSizeOk, setIsFileSizeOk] = useState<boolean | null>(null);
-  const [titleError, setTitleError] = useState<string | null>(null);
-  const [artistError, setArtistError] = useState<string | null>(null);
 
   const uploadTrack = useUploadTrackFile();
   const createTrack = useCreateTrack();
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0];
+
     if (selectedFile) {
       setTrackFormData((prevState) => ({
         ...prevState,
         file: selectedFile,
       }));
-      if (selectedFile.size > 5 * 1024 * 1024) {
-        setIsFileSizeOk(false);
-      } else {
-        setIsFileSizeOk(true);
-      }
+
+      const limitSize = 5 * 1024 * 1024; // 5 MB
+      setIsFileSizeOk(selectedFile.size <= limitSize);
     }
   }
 
-  async function handleUpload() {
-    setTitleError(null);
-    setArtistError(null);
+  function validateForm() {
+    const newErrors = {
+      title: validateTrackTitle(trackFormData.title),
+      artist: validateTrackArtist(trackFormData.artist),
+    };
+    setErrors(newErrors);
+    return !newErrors.title && !newErrors.artist;
+  }
+
+  async function handleUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
 
     if (!trackFormData.file) {
-      return;
-    }
-
-    if (!trackFormData.title) {
-      setTitleError("Title is required");
-      return;
-    }
-    if (!trackFormData.artist) {
-      setArtistError("Artist is required");
       return;
     }
 
@@ -117,101 +121,104 @@ export default function UploadTrack({
               Add a new track to your library.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 pt-4">
-            <div className="flex items-center justify-center">
-              <Label htmlFor="audio-upload" className="cursor-pointer">
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 bg-[#1A1A1A] rounded-full flex items-center justify-center">
-                    <Music />
+          <form onSubmit={handleUpload} className="space-y-4">
+            <div className="grid gap-4 pt-4">
+              <div className="flex items-center justify-center">
+                <Label htmlFor="audio-upload" className="cursor-pointer">
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 bg-[#1A1A1A] rounded-full flex items-center justify-center">
+                      <Music />
+                    </div>
+                    <span className="mt-2 text-sm text-muted-foreground">
+                      Select an audio file
+                    </span>
+                    <span className="mt-1 text-sm text-muted-foreground">
+                      Max. 5 MB
+                    </span>
                   </div>
-                  <span className="mt-2 text-sm text-muted-foreground">
-                    Select an audio file
-                  </span>
-                  <span className="mt-1 text-sm text-muted-foreground">
-                    Max. 5 MB
-                  </span>
-                </div>
-                <input
-                  id="audio-upload"
-                  type="file"
-                  accept="audio/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </Label>
-            </div>
-            {trackFormData.file && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    {trackFormData.file.name}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() =>
-                      setTrackFormData((prevState) => ({
-                        ...prevState,
-                        file: null,
-                      }))
-                    }
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  File size:{" "}
-                  <span
-                    className={`${isFileSizeOk === false ? "text-red-500" : "text-green-500"}`}
-                  >
-                    {formatFileSize(trackFormData.file.size)}
-                  </span>
-                </p>
+                  <input
+                    id="audio-upload"
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </Label>
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={trackFormData.title}
-                onChange={(e) =>
-                  setTrackFormData((prevState) => ({
-                    ...prevState,
-                    title: e.target.value,
-                  }))
-                }
-                placeholder="Enter track title"
-              />
-              {titleError && (
-                <p className="text-xs text-red-500">{titleError}</p>
+              {trackFormData.file && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      {trackFormData.file.name}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() =>
+                        setTrackFormData((prevState) => ({
+                          ...prevState,
+                          file: null,
+                        }))
+                      }
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    File size:{" "}
+                    <span
+                      className={`${isFileSizeOk === false ? "text-red-500" : "text-green-500"}`}
+                    >
+                      {formatFileSize(trackFormData.file.size)}
+                    </span>
+                  </p>
+                </div>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={trackFormData.title}
+                  onChange={(e) =>
+                    setTrackFormData((prevState) => ({
+                      ...prevState,
+                      title: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter track title"
+                />
+                {errors.title && (
+                  <p className="text-xs text-red-500">{errors.title}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="artist">Artist</Label>
+                <Input
+                  id="artist"
+                  value={trackFormData.artist}
+                  onChange={(e) =>
+                    setTrackFormData((prevState) => ({
+                      ...prevState,
+                      artist: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter artist name"
+                />
+                {errors.artist && (
+                  <p className="text-xs text-red-500">{errors.artist}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="artist">Artist</Label>
-              <Input
-                id="artist"
-                value={trackFormData.artist}
-                onChange={(e) =>
-                  setTrackFormData((prevState) => ({
-                    ...prevState,
-                    artist: e.target.value,
-                  }))
-                }
-                placeholder="Enter artist name"
-              />
-              {artistError && (
-                <p className="text-xs text-red-500">{artistError}</p>
-              )}
-            </div>
-          </div>
-          <Button
-            onClick={handleUpload}
-            disabled={!trackFormData.file || uploadTrack.isPending}
-            className="w-full mt-2"
-          >
-            {uploadTrack.isPending ? "Uploading..." : "Upload"}
-          </Button>
+            <Button
+              type="submit"
+              disabled={!trackFormData.file || uploadTrack.isPending}
+              className="w-full mt-2"
+            >
+              {uploadTrack.isPending ? "Uploading..." : "Upload"}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

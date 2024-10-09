@@ -18,3 +18,21 @@ export function validateUsername(username: string): string {
   }
   return "";
 }
+
+export function validateTrackTitle(title: string): string {
+  if (!title) {
+    return "Title is required";
+  } else if (title.length < 3 && title.length > 20) {
+    return "Title must be between 3 and 20 characters";
+  }
+  return "";
+}
+
+export function validateTrackArtist(artist: string): string {
+  if (!artist) {
+    return "Artist is required";
+  } else if (artist.length < 3 && artist.length > 20) {
+    return "Artist must be between 3 and 20 characters";
+  }
+  return "";
+}

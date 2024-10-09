@@ -9,12 +9,14 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "../ui/dropdown-menu";
-import { tracks } from "@/lib/consts";
 import { usePlaylists } from "@/hooks/use-playlists";
+import { useTracks } from "@/hooks/use-tracks";
 
 export default function TracksTable() {
+  const { data: tracks } = useTracks();
   const imageUrl =
     "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
   return (
     <table className="w-full text-xs">
       <thead className="sticky top-0 bg-[#0A0A0A] z-10 border-b border-[#282828]">
@@ -28,9 +30,10 @@ export default function TracksTable() {
         </tr>
       </thead>
       <tbody className="mt-[1px]">
-        {tracks.map((track, i) => (
-          <TrackRow track={track} imageUrl={imageUrl} key={i} index={i + 1} />
-        ))}
+        {tracks &&
+          tracks.map((track, i) => (
+            <TrackRow track={track} imageUrl={imageUrl} key={i} index={i + 1} />
+          ))}
       </tbody>
     </table>
   );
