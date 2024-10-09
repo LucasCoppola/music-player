@@ -1,9 +1,11 @@
+- [-] Track resource - disk storage  
+
 - [] Improve Error Handling 
   - [] Users
   - [] Playlists
   - [] Auth
 
-- [] Track resource - disk storage  
+- [] Current track provider (frontend)
 - [] Image resource - disk storage
 
 - [] Download Tracks

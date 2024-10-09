@@ -123,9 +123,10 @@ export class TrackService {
 
   async remove(id: string, user_id: string) {
     try {
-      const user = await this.usersService.findOneById(user_id);
-
-      const track = await this.findOne(id, user_id);
+      const [user, track] = await Promise.all([
+        this.usersService.findOneById(user_id),
+        this.findOne(id, user_id),
+      ]);
 
       this.removeFile(track.track_file_path);
 
@@ -147,14 +148,17 @@ export class TrackService {
     }
   }
 
-  removeFile(track_file_path: string) {
+  async removeFile(track_file_path: string) {
     try {
-      if (fs.existsSync(track_file_path)) {
-        fs.unlinkSync(track_file_path);
-      }
+      await fs.promises.unlink(track_file_path);
     } catch (error) {
-      console.error('Error removing file: ', error);
-      throw new InternalServerErrorException('Failed to remove file');
+      if (error.code === 'ENOENT') {
+        console.warn('File not found:', track_file_path);
+        throw new NotFoundException();
+      } else {
+        console.error('Error removing file:', error);
+        throw new InternalServerErrorException('Failed to remove file');
+      }
     }
   }
 }
