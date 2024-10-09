@@ -6,9 +6,9 @@ import {
 import { UpdateTrackDto } from './dto/update-track.dto';
 import * as fs from 'node:fs';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { Track } from 'src/entities/track.entity';
+import { Track } from '../entities/track.entity';
 import { Repository } from 'typeorm';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
