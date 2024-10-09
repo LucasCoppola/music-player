@@ -19,10 +19,6 @@ export class PlaylistService {
 
     const user = await this.usersService.findOneById(owner_id);
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
     const insertedPlaylist = await this.playlistRepository
       .createQueryBuilder()
       .insert()
@@ -39,12 +35,11 @@ export class PlaylistService {
   }
 
   async findAll(user_id: string): Promise<Playlist[]> {
-    const user = this.usersService.findOneById(user_id);
-    if (!user) throw new NotFoundException('User not found');
+    const user = await this.usersService.findOneById(user_id);
 
     const playlists = await this.playlistRepository
       .createQueryBuilder('playlist')
-      .where('playlist.user_id = :user_id', { user_id })
+      .where('playlist.user_id = :user_id', { user_id: user.id })
       .orderBy('playlist.created_at', 'DESC')
       .getMany();
 
@@ -52,13 +47,12 @@ export class PlaylistService {
   }
 
   async findOne(user_id: string, id: string): Promise<Playlist> {
-    const user = this.usersService.findOneById(user_id);
-    if (!user) throw new NotFoundException('User not found');
+    const user = await this.usersService.findOneById(user_id);
 
     const playlist = await this.playlistRepository
       .createQueryBuilder('playlist')
       .where('playlist.id = :id', { id })
-      .andWhere('playlist.user_id = :user_id', { user_id })
+      .andWhere('playlist.user_id = :user_id', { user_id: user.id })
       .getOne();
 
     return playlist;

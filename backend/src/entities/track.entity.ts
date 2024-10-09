@@ -26,7 +26,10 @@ export class Track {
   mimetype: string;
 
   @Column()
-  size: number;
+  size_in_kb: number;
+
+  @Column({ default: false })
+  favorite: boolean;
 
   @Column()
   track_file_path: string;

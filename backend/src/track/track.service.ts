@@ -21,6 +21,7 @@ export class TrackService {
 
   async uploadFile(file: Express.Multer.File) {
     const uploadPath = './uploads/tracks';
+    const fileSizeInKb = Math.floor(file.size / 1024);
 
     try {
       if (!fs.existsSync(uploadPath)) {
@@ -32,9 +33,9 @@ export class TrackService {
 
       return {
         message: 'File uploaded successfully',
-        path: filePath,
+        track_file_path: filePath,
         mimetype: file.mimetype,
-        size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+        size_in_kb: fileSizeInKb,
       };
     } catch (error) {
       console.error('Error uploading file: ', error);
@@ -46,20 +47,24 @@ export class TrackService {
     createTrackDto: CreateTrackDto,
     user_id: string,
   ): Promise<Track> {
-    const { title, artist, track_file_path, size, mimetype } = createTrackDto;
+    const { title, artist, track_file_path, size_in_kb, mimetype } =
+      createTrackDto;
 
     try {
       const user = await this.usersService.findOneById(user_id);
-
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
 
       const newTrack = await this.tracksRepository
         .createQueryBuilder()
         .insert()
         .into(Track)
-        .values({ title, artist, user_id, track_file_path, size, mimetype })
+        .values({
+          title,
+          artist,
+          user_id: user.id,
+          track_file_path,
+          size_in_kb,
+          mimetype,
+        })
         .returning('*')
         .execute();
 
@@ -74,13 +79,9 @@ export class TrackService {
     try {
       const user = await this.usersService.findOneById(user_id);
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
       const tracks = await this.tracksRepository
         .createQueryBuilder('track')
-        .where('track.user_id = :user_id', { user_id })
+        .where('track.user_id = :user_id', { user_id: user.id })
         .orderBy('track.created_at', 'DESC')
         .getMany();
 
@@ -95,20 +96,24 @@ export class TrackService {
     try {
       const user = await this.usersService.findOneById(user_id);
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-
       const track = await this.tracksRepository
         .createQueryBuilder('track')
-        .where('track.user_id = :user_id', { user_id })
         .where('track.id = :id', { id })
+        .andWhere('track.user_id = :user_id', { user_id: user.id })
         .getOne();
+
+      if (!track) {
+        throw new NotFoundException('Track not found');
+      }
 
       return track;
     } catch (error) {
       console.log('Error finding track: ', error);
-      throw new InternalServerErrorException('Failed to find track');
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to find track');
+      }
     }
   }
 
@@ -116,7 +121,40 @@ export class TrackService {
     return `This action updates a #${id} track`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  async remove(id: string, user_id: string) {
+    try {
+      const user = await this.usersService.findOneById(user_id);
+
+      const track = await this.findOne(id, user_id);
+
+      this.removeFile(track.track_file_path);
+
+      const trackDeleted = await this.tracksRepository
+        .createQueryBuilder()
+        .delete()
+        .from(Track)
+        .where('id = :id', { id })
+        .andWhere('user_id = :user_id', { user_id: user.id })
+        .execute();
+
+      return {
+        message: 'Track removed successfully',
+        affected: trackDeleted.affected,
+      };
+    } catch (error) {
+      console.log('Error removing track: ', error);
+      throw new InternalServerErrorException('Failed to remove track');
+    }
+  }
+
+  removeFile(track_file_path: string) {
+    try {
+      if (fs.existsSync(track_file_path)) {
+        fs.unlinkSync(track_file_path);
+      }
+    } catch (error) {
+      console.error('Error removing file: ', error);
+      throw new InternalServerErrorException('Failed to remove file');
+    }
   }
 }

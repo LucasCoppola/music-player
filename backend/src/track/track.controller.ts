@@ -70,7 +70,7 @@ export class TrackController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.trackService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req: Request) {
+    return await this.trackService.remove(id, req.user.sub);
   }
 }

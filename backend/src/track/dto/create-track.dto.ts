@@ -19,5 +19,5 @@ export class CreateTrackDto {
 
   @IsNotEmpty()
   @IsNumber()
-  size: number;
+  size_in_kb: number;
 }
