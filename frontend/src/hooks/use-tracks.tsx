@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./utils";
 
-type Track = {
+export type Track = {
   id: string;
   title: string;
   artist: string;
@@ -115,6 +115,36 @@ export function useCreateTrack() {
     onError: (e) => {
       console.error("Failed to create track", e);
       toast.error("Failed to create track");
+    },
+  });
+}
+
+export function useDeleteTrack() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(`${import.meta.env.VITE_BASE_URL}/api/tracks/${id}`, {
+        method: "DELETE",
+        headers: {
+          contentType: "application/json",
+          authToken,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      toast.success("Track deleted successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to delete track", e);
+      toast.error("Failed to delete track");
     },
   });
 }

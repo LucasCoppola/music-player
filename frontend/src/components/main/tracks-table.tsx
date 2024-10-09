@@ -1,5 +1,5 @@
-import { Ellipsis, Pause, Play, Plus } from "lucide-react";
-import { Button } from "../ui/button";
+import { Ellipsis, Pause, Play, Plus, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -8,14 +8,26 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from "../ui/dropdown-menu";
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { usePlaylists } from "@/hooks/use-playlists";
-import { useTracks } from "@/hooks/use-tracks";
+import { Track, useDeleteTrack, useTracks } from "@/hooks/use-tracks";
+import { imageUrl } from "@/lib/consts";
+import { useState } from "react";
 
 export default function TracksTable() {
   const { data: tracks } = useTracks();
-  const imageUrl =
-    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
   return (
     <table className="w-full text-xs">
@@ -24,7 +36,6 @@ export default function TracksTable() {
           <th className="py-2 pl-3 pr-2 font-medium w-10">#</th>
           <th className="py-2 px-2 font-medium">Title</th>
           <th className="py-2 px-2 font-medium hidden sm:table-cell">Artist</th>
-          <th className="py-2 px-2 font-medium hidden md:table-cell">Album</th>
           <th className="py-2 px-2 font-medium">Duration</th>
           <th className="py-2 px-2 font-medium w-8"></th>
         </tr>
@@ -44,11 +55,14 @@ function TrackRow({
   imageUrl,
   index,
 }: {
-  track: (typeof tracks)[number];
+  track: Track;
   imageUrl: string;
   index: number;
 }) {
   const { data: playlists } = usePlaylists();
+  const { mutate } = useDeleteTrack();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isCurrentTrack = true;
   const isPlaying = false;
 
@@ -70,13 +84,10 @@ function TrackRow({
       <td className="py-[2px] px-2 text-[#d1d5db] max-w-40 truncate">
         {track.artist}
       </td>
-      <td className="py-[2px] px-2 text-[#d1d5db]">{track.album}</td>
-      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">
-        {track.duration}
-      </td>
+      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">3:21</td>
       <td className="py-[2px] px-2 text-right">
         <div className="opacity-0 group-hover:opacity-100">
-          <DropdownMenu>
+          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -88,33 +99,68 @@ function TrackRow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 dark">
-              <DropdownMenuItem className="text-xs">
-                {isCurrentTrack && isPlaying ? (
-                  <>
-                    <Pause className="mr-2 size-3 stroke-[1.5]" />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <Play className="mr-2 size-3 stroke-[1.5]" />
-                    Play
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-xs">
-                  <Plus className="mr-2 size-3" />
-                  Add to Playlist
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-48">
-                  {playlists &&
-                    playlists.map((playlist, i) => (
-                      <DropdownMenuItem className="text-xs" key={i}>
-                        {playlist.title}
-                      </DropdownMenuItem>
-                    ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
+              <AlertDialog>
+                <DropdownMenuItem className="text-xs">
+                  {isCurrentTrack && isPlaying ? (
+                    <>
+                      <Pause className="mr-2 size-3 stroke-[1.5]" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="mr-2 size-3 stroke-[1.5]" />
+                      Play
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="text-xs">
+                    <Plus className="mr-2 size-3" />
+                    Add to Playlist
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-48">
+                    {playlists &&
+                      playlists.map((playlist, i) => (
+                        <DropdownMenuItem className="text-xs" key={i}>
+                          {playlist.title}
+                        </DropdownMenuItem>
+                      ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-xs"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash className="mr-2 size-3" />
+                    Delete
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="dark text-foreground">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Track?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      The track will be permanently deleted. This action cannot
+                      be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setIsMenuOpen(false)}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-600 hover:bg-red-500 text-foreground"
+                      onClick={() => {
+                        mutate({ id: track.id });
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
