@@ -10,6 +10,7 @@ import {
   validatePassword,
   validateUsername,
 } from "@/lib/validation";
+import { Loader } from "lucide-react";
 
 export type RegisterFormData = {
   username: string;
@@ -116,7 +117,11 @@ export default function SignUp({
         className="w-full"
         disabled={signUpMutation.isPending}
       >
-        {signUpMutation.isPending ? "Signing Up..." : "Sign Up"}
+        {signUpMutation.isPending ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          "Sign Up"
+        )}
       </Button>
       {signUpMutation.isError && (
         <p className="text-red-500 mt-2 text-xs">

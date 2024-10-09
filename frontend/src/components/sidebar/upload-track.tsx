@@ -1,4 +1,4 @@
-import { Music, Upload, X } from "lucide-react";
+import { Loader, Music, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -216,7 +216,11 @@ export default function UploadTrack({
               disabled={!trackFormData.file || uploadTrack.isPending}
               className="w-full mt-2"
             >
-              {uploadTrack.isPending ? "Uploading..." : "Upload"}
+              {uploadTrack.isPending ? (
+                <Loader className="size-4 animate-spin" />
+              ) : (
+                "Upload"
+              )}
             </Button>
           </form>
         </DialogContent>

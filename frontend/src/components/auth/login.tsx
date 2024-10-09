@@ -5,6 +5,7 @@ import { Label } from "../ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/context/auth-context";
+import { Loader } from "lucide-react";
 
 export type LoginFormData = {
   email: string;
@@ -76,7 +77,11 @@ export default function Login({
         className="w-full"
         disabled={loginMutation.isPending}
       >
-        {loginMutation.isPending ? "Logging In..." : "Login"}
+        {loginMutation.isPending ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          "Login"
+        )}
       </Button>
       {loginMutation.isError && (
         <p className="text-red-500 mt-2 text-xs">
