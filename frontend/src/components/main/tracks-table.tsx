@@ -120,8 +120,15 @@ function TrackRow({
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-48">
                     {playlists &&
-                      playlists.map((playlist, i) => (
-                        <DropdownMenuItem className="text-xs" key={i}>
+                      playlists.map((playlist) => (
+                        <DropdownMenuItem
+                          className="text-xs"
+                          key={playlist.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // addToPlaylistAction(playlist.id, track.id);
+                          }}
+                        >
                           {playlist.title}
                         </DropdownMenuItem>
                       ))}

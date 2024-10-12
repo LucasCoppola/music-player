@@ -33,7 +33,7 @@ export class Playlist {
   @JoinColumn({ name: 'user_id' })
   owner_id: string;
 
-  @ManyToMany(() => Track, (track) => track.playlists)
+  @ManyToMany(() => Track, (track) => track.playlists, { onDelete: 'CASCADE' })
   @JoinTable({
     name: 'playlist_tracks',
     joinColumn: {

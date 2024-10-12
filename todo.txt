@@ -1,10 +1,14 @@
 - [] Playlist
-   - [] Modify title, modify/add image
-   - [] Delete playlist
+   - [x] Modify title 
+   - [x] Delete playlist
    - [] Add/remove track 
    - [] Calculate playlist duration and total tracks
 - [] Image resource - disk storage
+   - [] Modify/add playlist image
+   - [] Modify/add track image
 - [] Search tracks
+
+- [] Issue with dropdowns and dialogs causing focus loss
 
 - [] Current track provider (frontend)
    - [] Modify title, artist, and modify/add image

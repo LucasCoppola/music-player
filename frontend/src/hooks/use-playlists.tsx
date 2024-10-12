@@ -2,8 +2,9 @@ import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./utils";
+import { useNavigate } from "@tanstack/react-router";
 
-type Playlist = {
+export type Playlist = {
   id: string;
   title: string;
   created_at: string;
@@ -122,6 +123,41 @@ export function useUpdatePlaylistTitle() {
     onError: (e) => {
       console.error("Failed to update playlist", e);
       toast.error(e.message || "Failed to update playlist");
+    },
+  });
+}
+
+export function useDeletePlaylist() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const navigate = useNavigate({ from: "/playlist/$playlistId" });
+
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      toast.success(data.message || "Playlist deleted successfully.");
+      navigate({ to: "/" });
+    },
+    onError: (e) => {
+      console.error("Failed to delete playlist", e);
+      toast.error(e.message || "Failed to delete playlist");
     },
   });
 }

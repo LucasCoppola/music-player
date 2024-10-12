@@ -9,6 +9,7 @@ import { useAuth } from "@/context/auth-context";
 import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useCreatePlaylist, usePlaylists } from "@/hooks/use-playlists";
+import PlaylistRow from "./playlist-row";
 
 export default function Sidebar() {
   const { authState, logout } = useAuth();
@@ -66,18 +67,8 @@ export default function Sidebar() {
         {authState?.isAuthenticated && (
           <ul className="space-y-0.5 text-xs mt-[1px]">
             {playlists &&
-              playlists.map((playlist, i) => (
-                <li key={i} className="group relative">
-                  <Link
-                    to={`/playlist/${playlist.id}`}
-                    className={`block py-1 px-4 cursor-pointer hover:bg-[#1A1A1A] text-[#d1d5db] 
-                      focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 
-                      ${pathname === `/playlist/${playlist.id}` ? "bg-[#1A1A1A]" : ""}`}
-                    tabIndex={0}
-                  >
-                    {playlist.title}
-                  </Link>
-                </li>
+              playlists.map((playlist) => (
+                <PlaylistRow playlist={playlist} key={playlist.id} />
               ))}
           </ul>
         )}
