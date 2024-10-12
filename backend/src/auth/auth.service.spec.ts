@@ -69,14 +69,11 @@ describe('AuthService', () => {
         loginDto.password,
         mockUser.password,
       );
-      expect(jwtService.signAsync).toHaveBeenCalledWith(
-        {
-          sub: mockUser.id,
-          username: mockUser.username,
-          email: mockUser.email,
-        },
-        { expiresIn: '1h' },
-      );
+      expect(jwtService.signAsync).toHaveBeenCalledWith({
+        sub: mockUser.id,
+        username: mockUser.username,
+        email: mockUser.email,
+      });
     });
 
     it('should throw UnauthorizedException when user is not found', async () => {
@@ -130,14 +127,11 @@ describe('AuthService', () => {
         password: 'hashedpassword',
         username: registerDto.username,
       });
-      expect(jwtService.signAsync).toHaveBeenCalledWith(
-        {
-          sub: mockNewUser.id,
-          username: mockNewUser.username,
-          email: mockNewUser.email,
-        },
-        { expiresIn: '1h' },
-      );
+      expect(jwtService.signAsync).toHaveBeenCalledWith({
+        sub: mockNewUser.id,
+        username: mockNewUser.username,
+        email: mockNewUser.email,
+      });
     });
 
     it('should throw ConflictException when email is already in use', async () => {
