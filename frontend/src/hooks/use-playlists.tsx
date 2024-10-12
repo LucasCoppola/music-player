@@ -80,13 +80,13 @@ export function useCreatePlaylist() {
         body: JSON.stringify(newPlaylist),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["playlists"] });
-      toast.success("Playlist created successfully.");
+      toast.success(data.message || "Playlist created successfully.");
     },
     onError: (e) => {
       console.error("Failed to create playlist", e);
-      toast.error("Failed to create playlist");
+      toast.error(e.message || "Failed to create playlist");
     },
   });
 }
@@ -112,14 +112,16 @@ export function useUpdatePlaylistTitle() {
         },
       );
     },
-    onSuccess: (data: Playlist) => {
+    onSuccess: (data: { message: string; playlistId: string }) => {
       queryClient.invalidateQueries({ queryKey: ["playlists"] });
-      queryClient.invalidateQueries({ queryKey: ["playlist", data.id] });
-      toast.success("Playlist updated successfully.");
+      queryClient.invalidateQueries({
+        queryKey: ["playlist", data.playlistId],
+      });
+      toast.success(data.message || "Playlist updated successfully.");
     },
     onError: (e) => {
       console.error("Failed to update playlist", e);
-      toast.error("Failed to update playlist");
+      toast.error(e.message || "Failed to update playlist");
     },
   });
 }

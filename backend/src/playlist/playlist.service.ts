@@ -18,13 +18,13 @@ export class PlaylistService {
     private usersService: UsersService,
   ) {}
 
-  async create(createPlaylistDto: CreatePlaylistDto): Promise<Playlist> {
+  async create(createPlaylistDto: CreatePlaylistDto) {
     const { id, title, owner_id } = createPlaylistDto;
 
     const user = await this.usersService.findOneById(owner_id);
 
     try {
-      const insertedPlaylist = await this.playlistRepository
+      await this.playlistRepository
         .createQueryBuilder()
         .insert()
         .into(Playlist)
@@ -36,7 +36,7 @@ export class PlaylistService {
         .returning('*')
         .execute();
 
-      return insertedPlaylist.raw[0];
+      return { message: 'Playlist created successfully.' };
     } catch (error) {
       console.log('Error creating playlist: ', error);
       throw new InternalServerErrorException('Failed to create playlist');
@@ -103,7 +103,10 @@ export class PlaylistService {
         .returning('*')
         .execute();
 
-      return result.raw[0];
+      return {
+        message: 'Playlist updated successfully.',
+        playlistId: result.raw[0].id,
+      };
     } catch (error) {
       console.log('Error updating playlist: ', error);
       throw new InternalServerErrorException('Failed to update playlist');

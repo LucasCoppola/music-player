@@ -108,13 +108,13 @@ export function useCreateTrack() {
         }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["tracks"] });
-      toast.success("Track created successfully.");
+      toast.success(data.message || "Track created successfully.");
     },
     onError: (e) => {
       console.error("Failed to create track", e);
-      toast.error("Failed to create track");
+      toast.error(e.message || "Failed to create track");
     },
   });
 }
@@ -138,13 +138,13 @@ export function useDeleteTrack() {
         },
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["tracks"] });
-      toast.success("Track deleted successfully.");
+      toast.success(data.message || "Track deleted successfully.");
     },
     onError: (e) => {
       console.error("Failed to delete track", e);
-      toast.error("Failed to delete track");
+      toast.error(e.message || "Failed to delete track");
     },
   });
 }

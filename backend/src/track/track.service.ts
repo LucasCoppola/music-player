@@ -43,17 +43,14 @@ export class TrackService {
     }
   }
 
-  async create(
-    createTrackDto: CreateTrackDto,
-    user_id: string,
-  ): Promise<Track> {
+  async create(createTrackDto: CreateTrackDto, user_id: string) {
     const { title, artist, track_file_path, size_in_kb, mimetype } =
       createTrackDto;
 
     try {
       const user = await this.usersService.findOneById(user_id);
 
-      const newTrack = await this.tracksRepository
+      await this.tracksRepository
         .createQueryBuilder()
         .insert()
         .into(Track)
@@ -65,10 +62,9 @@ export class TrackService {
           size_in_kb,
           mimetype,
         })
-        .returning('*')
         .execute();
 
-      return newTrack.raw[0];
+      return { message: 'Track created successfully' };
     } catch (error) {
       console.log('Error creating track: ', error);
       throw new InternalServerErrorException('Failed to create track');
@@ -130,7 +126,7 @@ export class TrackService {
 
       this.removeFile(track.track_file_path);
 
-      const trackDeleted = await this.tracksRepository
+      await this.tracksRepository
         .createQueryBuilder()
         .delete()
         .from(Track)
@@ -140,7 +136,6 @@ export class TrackService {
 
       return {
         message: 'Track removed successfully',
-        affected: trackDeleted.affected,
       };
     } catch (error) {
       console.log('Error removing track: ', error);
