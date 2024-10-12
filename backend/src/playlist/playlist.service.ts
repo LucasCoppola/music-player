@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -66,15 +70,44 @@ export class PlaylistService {
         .andWhere('playlist.user_id = :user_id', { user_id: user.id })
         .getOne();
 
+      if (!playlist) {
+        throw new NotFoundException('Playlist not found');
+      }
+
       return playlist;
     } catch (error) {
       console.log('Error finding playlist: ', error);
-      throw new InternalServerErrorException('Failed to find playlist');
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to find playlist');
+      }
     }
   }
 
-  update(id: string, updatePlaylistDto: UpdatePlaylistDto) {
-    return `This action updates a #${id} playlist`;
+  async update(
+    id: string,
+    user_id: string,
+    updatePlaylistDto: UpdatePlaylistDto,
+  ) {
+    const { title } = updatePlaylistDto;
+    const playlist = await this.findOne(user_id, id);
+
+    try {
+      const result = await this.playlistRepository
+        .createQueryBuilder()
+        .update(Playlist)
+        .set({ title })
+        .where('id = :id', { id: playlist.id })
+        .andWhere('user_id = :user_id', { user_id })
+        .returning('*')
+        .execute();
+
+      return result.raw[0];
+    } catch (error) {
+      console.log('Error updating playlist: ', error);
+      throw new InternalServerErrorException('Failed to update playlist');
+    }
   }
 
   remove(id: string) {

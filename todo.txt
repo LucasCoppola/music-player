@@ -1,14 +1,15 @@
-- [-] Track resource - disk storage  
-
-- [] Improve Error Handling 
-  - [] Users
-  - [] Playlists
-  - [] Auth
+- [] Playlist
+   - [] Modify title, modify/add image
+   - [] Delete playlist
+   - [] Add/remove track 
+   - [] Calculate playlist duration and total tracks
+- [] Image resource - disk storage
+- [] Search tracks
 
 - [] Current track provider (frontend)
-- [] Image resource - disk storage
-
-- [] Download Tracks
+   - [] Modify title, artist, and modify/add image
+   - [] Add to favorites
+   - [] Download track
 - [] Favorites Playlist
   -? Should be independent from the playlist resource or not?
   - You can add a track to favorites like a normal playlist or by clicking the heart

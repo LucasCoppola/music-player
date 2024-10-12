@@ -38,9 +38,10 @@ export class PlaylistController {
   @Patch(':id')
   update(
     @Param('id') id: string,
+    @Req() req: Request,
     @Body() updatePlaylistDto: UpdatePlaylistDto,
   ) {
-    return this.playlistService.update(id, updatePlaylistDto);
+    return this.playlistService.update(id, req.user.sub, updatePlaylistDto);
   }
 
   @Delete(':id')

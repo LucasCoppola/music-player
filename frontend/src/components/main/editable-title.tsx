@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { useUpdatePlaylistTitle } from "@/hooks/use-playlists";
 
 export function EditableTitle({
   playlistId,
@@ -11,6 +12,7 @@ export function EditableTitle({
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(initialName);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { mutate } = useUpdatePlaylistTitle();
 
   useEffect(() => {
     if (isEditing) {
@@ -18,17 +20,15 @@ export function EditableTitle({
     }
   }, [isEditing]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsEditing(false);
     if (name.trim() !== "" && name !== initialName) {
-      console.log(playlistId);
-      // updatePlaylist(playlistId, { name });
-      // await updatePlaylistNameAction(playlistId, name);
+      mutate({ id: playlistId, title: name });
     } else {
       setName(initialName); // Reset to initial name if empty or unchanged
     }
-  };
+  }
 
   if (isEditing) {
     return (

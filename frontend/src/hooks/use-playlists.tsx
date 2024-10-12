@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useClient } from "./utils";
 
 type Playlist = {
   id: string;
@@ -12,23 +13,20 @@ type Playlist = {
 
 export function usePlaylists() {
   const { authState } = useAuth();
+  const client = useClient();
 
   return useQuery({
     queryKey: ["playlists"],
-    queryFn: async (): Promise<Array<Playlist>> => {
+    queryFn: async (): Promise<Playlist[]> => {
       if (!authState?.token) return [];
 
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authState.token}`,
-          },
+      return await client(`${import.meta.env.VITE_BASE_URL}/api/playlists`, {
+        method: "GET",
+        headers: {
+          contentType: "application/json",
+          authToken: authState.token,
         },
-      );
-      return await response.json();
+      });
     },
     enabled: !!authState?.token,
   });
@@ -36,24 +34,23 @@ export function usePlaylists() {
 
 export function usePlaylistById(playlistId: string) {
   const { authState } = useAuth();
+  const client = useClient();
 
   return useQuery({
     queryKey: ["playlist", playlistId],
     queryFn: async (): Promise<Playlist> => {
       if (!authState?.token) throw new Error("Unauthorized");
 
-      const response = await fetch(
+      return await client(
         `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}`,
         {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authState.token}`,
+            contentType: "application/json",
+            authToken: authState.token,
           },
         },
       );
-
-      return await response.json();
     },
     enabled: !!authState?.token && !!playlistId,
   });
@@ -62,6 +59,7 @@ export function usePlaylistById(playlistId: string) {
 export function useCreatePlaylist() {
   const queryClient = useQueryClient();
   const { authState } = useAuth();
+  const client = useClient();
 
   return useMutation({
     mutationFn: async ({ id, title }: { id: string; title: string }) => {
@@ -73,23 +71,14 @@ export function useCreatePlaylist() {
         owner_id: authState?.userId,
       };
 
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authState.token}`,
-          },
-          body: JSON.stringify(newPlaylist),
+      return await client(`${import.meta.env.VITE_BASE_URL}/api/playlists`, {
+        method: "POST",
+        headers: {
+          contentType: "application/json",
+          authToken: authState.token,
         },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to create playlist");
-      }
-
-      return await response.json();
+        body: JSON.stringify(newPlaylist),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["playlists"] });
@@ -98,6 +87,39 @@ export function useCreatePlaylist() {
     onError: (e) => {
       console.error("Failed to create playlist", e);
       toast.error("Failed to create playlist");
+    },
+  });
+}
+
+export function useUpdatePlaylistTitle() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+      if (!authState?.token) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            contentType: "application/json",
+            authToken: authState.token,
+          },
+          body: JSON.stringify({ title }),
+        },
+      );
+    },
+    onSuccess: (data: Playlist) => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({ queryKey: ["playlist", data.id] });
+      toast.success("Playlist updated successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to update playlist", e);
+      toast.error("Failed to update playlist");
     },
   });
 }
