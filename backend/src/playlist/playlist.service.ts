@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Playlist } from '../entities/playlist.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class PlaylistService {
@@ -16,6 +17,7 @@ export class PlaylistService {
     @InjectRepository(Playlist)
     private playlistRepository: Repository<Playlist>,
     private usersService: UsersService,
+    private trackService: TrackService,
   ) {}
 
   async create(createPlaylistDto: CreatePlaylistDto) {
@@ -133,6 +135,26 @@ export class PlaylistService {
     } catch (error) {
       console.log('Error removing playlist: ', error);
       throw new InternalServerErrorException('Failed to remove playlist');
+    }
+  }
+
+  async addTrack(id: string, user_id: string, track_id: string) {
+    const [playlist, track] = await Promise.all([
+      this.findOne(user_id, id),
+      this.trackService.findOne(track_id, user_id),
+    ]);
+
+    try {
+      await this.playlistRepository
+        .createQueryBuilder()
+        .relation(Playlist, 'tracks')
+        .of(playlist.id)
+        .add(track.id);
+
+      return { message: 'Track added to playlist successfully' };
+    } catch (error) {
+      console.log('Error adding track to playlist: ', error);
+      throw new InternalServerErrorException('Failed to add track to playlist');
     }
   }
 }

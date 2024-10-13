@@ -167,3 +167,41 @@ export function useDeletePlaylist() {
     },
   });
 }
+
+export function useAddTrackToPlaylist() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({
+      playlistId,
+      trackId,
+    }: {
+      playlistId: string;
+      trackId: string;
+    }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/track/${trackId}`,
+        {
+          method: "POST",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      toast.success(data.message || "Track added to playlist successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to add track to playlist", e);
+      toast.error(e.message || "Failed to add track to playlist");
+    },
+  });
+}

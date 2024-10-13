@@ -10,5 +10,6 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [UsersModule, JwtModule, TypeOrmModule.forFeature([Track])],
   controllers: [TrackController],
   providers: [TrackService],
+  exports: [TrackService],
 })
 export class TrackModule {}

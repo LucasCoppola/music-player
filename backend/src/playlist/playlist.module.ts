@@ -5,9 +5,15 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Playlist } from '../entities/playlist.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { TrackModule } from 'src/track/track.module';
 
 @Module({
-  imports: [UsersModule, JwtModule, TypeOrmModule.forFeature([Playlist])],
+  imports: [
+    TrackModule,
+    UsersModule,
+    JwtModule,
+    TypeOrmModule.forFeature([Playlist]),
+  ],
   controllers: [PlaylistController],
   providers: [PlaylistService],
 })
