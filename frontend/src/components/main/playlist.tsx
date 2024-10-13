@@ -7,6 +7,7 @@ import { EditableTitle } from "./editable-title";
 import TracksTable from "./tracks-table";
 import { usePlaylistById } from "@/hooks/use-playlists";
 import { PlaylistLoadingSkeleton } from "../skeletons";
+import { formatDuration } from "@/lib/utils";
 
 export default function Playlist() {
   const { playlistId } = useParams({
@@ -55,7 +56,8 @@ export default function Playlist() {
                 initialName={playlist.title}
               />
               <p className="text-xs sm:text-sm text-gray-400">
-                11 tracks • 23:55
+                {playlist.track_count} tracks •{" "}
+                {formatDuration(playlist.duration)}
               </p>
             </div>
           </div>

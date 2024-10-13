@@ -62,7 +62,10 @@ export class PlaylistService {
     }
   }
 
-  async findOne(user_id: string, id: string): Promise<Playlist> {
+  async findOne(
+    user_id: string,
+    id: string,
+  ): Promise<Playlist & { track_count: number; duration: number }> {
     const user = await this.usersService.findOneById(user_id);
 
     try {
@@ -77,7 +80,17 @@ export class PlaylistService {
         throw new NotFoundException('Playlist not found');
       }
 
-      return playlist;
+      const track_count = playlist.tracks.length;
+      const duration = playlist.tracks.reduce(
+        (acc, track) => acc + track.duration,
+        0,
+      );
+
+      return {
+        ...playlist,
+        track_count,
+        duration,
+      };
     } catch (error) {
       console.log('Error finding playlist: ', error);
       if (error instanceof NotFoundException) {

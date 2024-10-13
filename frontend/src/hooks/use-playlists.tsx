@@ -11,6 +11,8 @@ export type Playlist = {
   created_at: string;
   updated_at: string;
   image_path: string;
+  track_count: number;
+  duration: number;
   tracks: Track[];
 };
 

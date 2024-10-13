@@ -24,6 +24,7 @@ import {
 import { useAddTrackToPlaylist, usePlaylists } from "@/hooks/use-playlists";
 import { useState } from "react";
 import { Track, useDeleteTrack } from "@/hooks/use-tracks";
+import { formatDuration } from "@/lib/utils";
 
 export default function TrackRow({
   track,
@@ -60,7 +61,9 @@ export default function TrackRow({
       <td className="py-[2px] px-2 text-[#d1d5db] max-w-40 truncate">
         {track.artist}
       </td>
-      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">3:21</td>
+      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">
+        {formatDuration(track.duration)}
+      </td>
       <td className="py-[2px] px-2 text-right">
         <div className="opacity-0 group-hover:opacity-100">
           <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>

@@ -16,6 +16,7 @@ import {
   useRemoveTrackFromPlaylist,
 } from "@/hooks/use-playlists";
 import { Track } from "@/hooks/use-tracks";
+import { formatDuration } from "@/lib/utils";
 
 export default function TrackPlaylistRow({
   track,
@@ -51,7 +52,9 @@ export default function TrackPlaylistRow({
       <td className="py-[2px] px-2 text-[#d1d5db] max-w-40 truncate">
         {track.artist}
       </td>
-      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">3:21</td>
+      <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">
+        {formatDuration(track.duration)}
+      </td>
       <td className="py-[2px] px-2 text-right">
         <div className="opacity-0 group-hover:opacity-100">
           <DropdownMenu>
