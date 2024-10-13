@@ -1,4 +1,4 @@
-- [] Playlist
+- [x] Playlist
    - [x] Modify title 
    - [x] Delete playlist
    - [x] Add/remove track 

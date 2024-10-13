@@ -17,6 +17,7 @@ import {
 } from "@/hooks/use-playlists";
 import { Track } from "@/hooks/use-tracks";
 import { formatDuration } from "@/lib/utils";
+import { useParams } from "@tanstack/react-router";
 
 export default function TrackPlaylistRow({
   track,
@@ -27,9 +28,13 @@ export default function TrackPlaylistRow({
   imageUrl: string;
   index: number;
 }) {
-  const { data: playlists } = usePlaylists();
+  const { playlistId } = useParams({
+    from: "/playlist/$playlistId",
+  });
+  const { data } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
+  const playlists = data?.filter((p) => p.id !== playlistId);
 
   const isCurrentTrack = true;
   const isPlaying = false;

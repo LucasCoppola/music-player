@@ -15,6 +15,10 @@ export function EditableTitle({
   const { mutate } = useUpdatePlaylistTitle();
 
   useEffect(() => {
+    setName(initialName);
+  }, [initialName, playlistId]);
+
+  useEffect(() => {
     if (isEditing) {
       inputRef.current?.focus();
     }
