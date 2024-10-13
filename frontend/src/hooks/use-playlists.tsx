@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./utils";
 import { useLocation, useNavigate } from "@tanstack/react-router";
+import { Track } from "./use-tracks";
 
 export type Playlist = {
   id: string;
@@ -10,6 +11,7 @@ export type Playlist = {
   created_at: string;
   updated_at: string;
   image_path: string;
+  tracks: Track[];
 };
 
 export function usePlaylists() {

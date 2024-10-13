@@ -70,6 +70,7 @@ export class PlaylistService {
         .createQueryBuilder('playlist')
         .where('playlist.id = :id', { id })
         .andWhere('playlist.user_id = :user_id', { user_id: user.id })
+        .leftJoinAndSelect('playlist.tracks', 'tracks')
         .getOne();
 
       if (!playlist) {
