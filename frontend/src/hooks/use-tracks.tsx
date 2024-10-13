@@ -9,6 +9,8 @@ export type Track = {
   artist: string;
   user_id: string;
   track_file_path: string;
+  duration: number;
+  bit_rate: number;
 };
 
 type UploadFile = {

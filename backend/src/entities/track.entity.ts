@@ -28,6 +28,12 @@ export class Track {
   @Column()
   size_in_kb: number;
 
+  @Column({ type: 'float' })
+  duration: number;
+
+  @Column()
+  bit_rate: number;
+
   @Column({ default: false })
   favorite: boolean;
 
@@ -43,6 +49,8 @@ export class Track {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @ManyToMany(() => Playlist, (playlist) => playlist.tracks)
+  @ManyToMany(() => Playlist, (playlist) => playlist.tracks, {
+    onDelete: 'CASCADE',
+  })
   playlists: Playlist[];
 }

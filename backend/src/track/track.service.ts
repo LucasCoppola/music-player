@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import * as fs from 'node:fs';
+import * as ffmpeg from 'fluent-ffmpeg';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { Track } from '../entities/track.entity';
 import { Repository } from 'typeorm';
@@ -48,7 +49,10 @@ export class TrackService {
       createTrackDto;
 
     try {
-      const user = await this.usersService.findOneById(user_id);
+      const [user, { duration, bit_rate }] = await Promise.all([
+        this.usersService.findOneById(user_id),
+        this.getAudioMetadata(track_file_path),
+      ]);
 
       await this.tracksRepository
         .createQueryBuilder()
@@ -61,6 +65,8 @@ export class TrackService {
           track_file_path,
           size_in_kb,
           mimetype,
+          duration,
+          bit_rate,
         })
         .execute();
 
@@ -155,5 +161,22 @@ export class TrackService {
         throw new InternalServerErrorException('Failed to remove file');
       }
     }
+  }
+
+  async getAudioMetadata(
+    file_path: string,
+  ): Promise<{ duration: number; bit_rate: number }> {
+    return new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(file_path, (err, metadata) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({
+            duration: metadata.format.duration,
+            bit_rate: metadata.format.bit_rate,
+          });
+        }
+      });
+    });
   }
 }
