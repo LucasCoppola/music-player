@@ -117,15 +117,19 @@ export class PlaylistService {
     const playlist = await this.findOne(user_id, id);
 
     try {
-      await this.playlistRepository
+      const result = await this.playlistRepository
         .createQueryBuilder()
         .delete()
         .from(Playlist)
         .where('id = :id', { id: playlist.id })
         .andWhere('user_id = :user_id', { user_id })
+        .returning('id')
         .execute();
 
-      return { message: 'Playlist removed successfully.' };
+      return {
+        playlistId: result.raw[0].id,
+        message: 'Playlist removed successfully.',
+      };
     } catch (error) {
       console.log('Error removing playlist: ', error);
       throw new InternalServerErrorException('Failed to remove playlist');

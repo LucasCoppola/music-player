@@ -2,7 +2,7 @@ import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./utils";
-import { useNavigate } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 export type Playlist = {
   id: string;
@@ -132,6 +132,9 @@ export function useDeletePlaylist() {
   const { authState } = useAuth();
   const authToken = authState?.token;
   const navigate = useNavigate({ from: "/playlist/$playlistId" });
+  const pathname = useLocation({
+    select: (location) => location.pathname,
+  });
 
   const client = useClient();
 
@@ -153,7 +156,10 @@ export function useDeletePlaylist() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["playlists"] });
       toast.success(data.message || "Playlist deleted successfully.");
-      navigate({ to: "/" });
+
+      if (`/playlist/${data.playlistId}` === pathname) {
+        navigate({ to: "/" });
+      }
     },
     onError: (e) => {
       console.error("Failed to delete playlist", e);
