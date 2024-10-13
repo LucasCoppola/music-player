@@ -1,7 +1,7 @@
 - [] Playlist
    - [x] Modify title 
    - [x] Delete playlist
-   - [] Add/remove track 
+   - [x] Add/remove track 
    - [] Calculate playlist duration and total tracks
 - [] Image resource - disk storage
    - [] Modify/add playlist image

@@ -62,7 +62,7 @@ export default function Playlist() {
 
           <ScrollArea className="flex-1 mt-3">
             <div className="min-w-max">
-              <TracksTable tracks={playlist.tracks} />
+              <TracksTable tracks={playlist.tracks} source="playlist" />
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

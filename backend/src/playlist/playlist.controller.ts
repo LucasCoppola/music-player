@@ -49,12 +49,21 @@ export class PlaylistController {
     return this.playlistService.remove(id, req.user.sub);
   }
 
-  @Post(':id/track/:trackId')
+  @Post(':id/tracks/:trackId')
   addTrack(
     @Param('id') id: string,
     @Param('trackId') track_id: string,
     @Req() req: Request,
   ) {
     return this.playlistService.addTrack(id, req.user.sub, track_id);
+  }
+
+  @Delete(':id/tracks/:trackId')
+  removeTrack(
+    @Param('id') id: string,
+    @Param('trackId') track_id: string,
+    @Req() req: Request,
+  ) {
+    return this.playlistService.removeTrack(id, req.user.sub, track_id);
   }
 }

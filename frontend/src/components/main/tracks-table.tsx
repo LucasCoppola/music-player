@@ -1,15 +1,20 @@
 import { Track } from "@/hooks/use-tracks";
 import { imageUrl } from "@/lib/consts";
-import TrackRow from "./tracks-row";
 import { TracksTableSkeleton } from "../skeletons";
+import TrackRow from "./track-row";
+import TrackPlaylistRow from "./track-playlist-row";
 
 export default function TracksTable({
   tracks,
+  source,
   isLoading = false,
 }: {
   tracks: Track[] | undefined;
+  source: "all" | "playlist";
   isLoading?: boolean;
 }) {
+  const TrackComponent = source === "all" ? TrackRow : TrackPlaylistRow;
+
   return (
     <>
       {isLoading ? (
@@ -30,7 +35,7 @@ export default function TracksTable({
           <tbody className="mt-[1px]">
             {tracks && tracks.length > 0 ? (
               tracks.map((track, i) => (
-                <TrackRow
+                <TrackComponent
                   track={track}
                   imageUrl={imageUrl}
                   key={i}

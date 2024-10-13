@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 function TracksComponent() {
   const { data: tracks, isLoading } = useTracks();
 
-  return <TracksTable tracks={tracks} isLoading={isLoading} />;
+  return <TracksTable tracks={tracks} isLoading={isLoading} source="all" />;
 }
 
 export const Route = createFileRoute("/")({

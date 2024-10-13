@@ -158,4 +158,26 @@ export class PlaylistService {
       throw new InternalServerErrorException('Failed to add track to playlist');
     }
   }
+
+  async removeTrack(id: string, user_id: string, track_id: string) {
+    const [playlist, track] = await Promise.all([
+      this.findOne(user_id, id),
+      this.trackService.findOne(track_id, user_id),
+    ]);
+
+    try {
+      await this.playlistRepository
+        .createQueryBuilder()
+        .relation(Playlist, 'tracks')
+        .of(playlist.id)
+        .remove(track.id);
+
+      return { message: 'Track removed from playlist successfully' };
+    } catch (error) {
+      console.log('Error removing track from playlist: ', error);
+      throw new InternalServerErrorException(
+        'Failed to remove track from playlist',
+      );
+    }
+  }
 }

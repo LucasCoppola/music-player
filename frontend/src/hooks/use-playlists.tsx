@@ -187,7 +187,7 @@ export function useAddTrackToPlaylist() {
       if (!authToken) throw new Error("Unauthorized");
 
       return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/track/${trackId}`,
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
         {
           method: "POST",
           headers: {
@@ -198,12 +198,52 @@ export function useAddTrackToPlaylist() {
       );
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({
+        queryKey: ["playlists"],
+      });
       toast.success(data.message || "Track added to playlist successfully.");
     },
     onError: (e) => {
       console.error("Failed to add track to playlist", e);
       toast.error(e.message || "Failed to add track to playlist");
+    },
+  });
+}
+
+export function useRemoveTrackFromPlaylist() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const client = useClient();
+
+  const playlistId = useLocation({
+    select: (location) => location.pathname.split("/")[2],
+  });
+
+  return useMutation({
+    mutationFn: async ({ trackId }: { trackId: string }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
+        {
+          method: "DELETE",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
+      toast.success(
+        data.message || "Track removed from playlist successfully.",
+      );
+    },
+    onError: (e) => {
+      console.error("Failed to remove track from playlist", e);
+      toast.error(e.message || "Failed to remove track from playlist");
     },
   });
 }
