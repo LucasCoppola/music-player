@@ -10,7 +10,7 @@ export type Playlist = {
   title: string;
   created_at: string;
   updated_at: string;
-  image_path: string;
+  image_name: string;
   track_count: number;
   duration: number;
   tracks: Track[];
@@ -246,6 +246,49 @@ export function useRemoveTrackFromPlaylist() {
     onError: (e) => {
       console.error("Failed to remove track from playlist", e);
       toast.error(e.message || "Failed to remove track from playlist");
+    },
+  });
+}
+
+export function useUploadPlaylistCover() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({
+      playlistId,
+      image,
+    }: {
+      playlistId: string;
+      image: File;
+    }): Promise<{ message: string; playlistId: string; coverUrl: string }> => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      const formData = new FormData();
+      formData.append("cover", image);
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/cover`,
+        {
+          method: "POST",
+          headers: {
+            authToken,
+          },
+          body: formData,
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["playlist", data.playlistId],
+      });
+      toast.success(data.message || "Playlist cover uploaded successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to upload playlist cover", e);
+      toast.error(e.message || "Failed to upload playlist cover");
     },
   });
 }

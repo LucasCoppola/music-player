@@ -8,12 +8,19 @@ import {
   Delete,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { memoryStorage } from 'multer';
 
 @Controller('playlists')
 @UseGuards(AuthGuard)
@@ -47,6 +54,30 @@ export class PlaylistController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
     return this.playlistService.remove(id, req.user.sub);
+  }
+
+  @Post(':id/cover')
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      storage: memoryStorage(),
+    }),
+  )
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5 MB
+          new FileTypeValidator({
+            fileType: 'image/jpeg|image/png|image/gif',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    return await this.playlistService.uploadImage(file, id, req.user.sub);
   }
 
   @Post(':id/tracks/:trackId')

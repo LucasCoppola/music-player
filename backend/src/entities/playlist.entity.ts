@@ -21,7 +21,13 @@ export class Playlist {
   title: string;
 
   @Column({ nullable: true })
-  image_path: string;
+  image_name: string;
+
+  @Column({ nullable: true })
+  mimetype: string;
+
+  @Column({ nullable: true })
+  size_in_kb: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

@@ -15,9 +15,15 @@ import { Playlist } from './entities/playlist.entity';
 import { Favorites } from './entities/favorites.entity';
 import { ListeningHistory } from './entities/listening_history.entity';
 import { TrackPlayCount } from './entities/track_play_count.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'uploads', 'images'),
+      serveRoot: '/images',
+    }),
     ConfigModule.forRoot({
       envFilePath: `.env.${configuration().environment}`,
       isGlobal: true,

@@ -1,27 +1,43 @@
+import { useUploadPlaylistCover } from "@/hooks/use-playlists";
 import { Upload, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function CoverImage({
-  url,
+  coverImage,
   playlistId,
 }: {
-  url: string | null;
+  coverImage: string | null;
   playlistId: string;
 }) {
-  const currentUrl = url;
-  const pending = false;
+  const { mutate: uploadPlaylistCover, isPending } = useUploadPlaylistCover();
+  const imageUrl = `${import.meta.env.VITE_BASE_URL}/images/${coverImage}`;
 
-  if (currentUrl) {
+  if (coverImage) {
     return (
       <img
-        src={currentUrl}
+        src={imageUrl}
         alt="Playlist cover"
         className="w-16 h-16 sm:w-20 sm:h-20 object-cover"
       />
     );
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const file = formData.get("file") as File | null;
+
+    if (!file) {
+      toast.error("Please select a file.");
+      return;
+    }
+
+    uploadPlaylistCover({ playlistId, image: file });
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <input type="hidden" name="playlistId" value={playlistId} />
       <label
         htmlFor="coverUpload"
@@ -39,13 +55,13 @@ export function CoverImage({
               if (file.size <= 5 * 1024 * 1024) {
                 e.target.form?.requestSubmit();
               } else {
-                alert("File size exceeds 5MB limit");
+                toast.error("File size exceeds 5MB limit");
                 e.target.value = "";
               }
             }
           }}
         />
-        {pending ? (
+        {isPending ? (
           <Loader2 className="w-5 h-5 animate-spin text-neutral-600" />
         ) : (
           <>

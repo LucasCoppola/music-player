@@ -49,7 +49,10 @@ export default function Playlist() {
           </div>
 
           <div className="flex items-center py-3 px-4 space-x-3 bg-[#0A0A0A]">
-            <CoverImage url={null} playlistId={playlist.id} />
+            <CoverImage
+              coverImage={playlist.image_name ?? null}
+              playlistId={playlist.id}
+            />
             <div>
               <EditableTitle
                 playlistId={playlist.id}

@@ -10,6 +10,7 @@ import { Playlist } from '../entities/playlist.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { TrackService } from '../track/track.service';
+import * as fs from 'fs';
 
 @Injectable()
 export class PlaylistService {
@@ -19,6 +20,39 @@ export class PlaylistService {
     private usersService: UsersService,
     private trackService: TrackService,
   ) {}
+
+  async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
+    const uploadPath = './uploads/images';
+    const fileSizeInKb = Math.floor(file.size / 1024);
+
+    try {
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      const image_name = `${Date.now()}-${file.originalname}`;
+      const filePath = `${uploadPath}/${image_name}`;
+
+      await fs.promises.writeFile(filePath, file.buffer);
+
+      await this.update(id, user_id, {
+        image_name,
+        mimetype: file.mimetype,
+        size_in_kb: fileSizeInKb,
+        title: null,
+      });
+
+      return {
+        message: 'Cover image uploaded successfully',
+        playlistId: id,
+        image_file_path: filePath,
+        mimetype: file.mimetype,
+        size_in_kb: fileSizeInKb,
+      };
+    } catch (error) {
+      console.error('Error uploading cover image: ', error);
+      throw new InternalServerErrorException('Cover image upload failed');
+    }
+  }
 
   async create(createPlaylistDto: CreatePlaylistDto) {
     const { id, title, owner_id } = createPlaylistDto;
@@ -35,7 +69,6 @@ export class PlaylistService {
           title,
           owner_id: user.id,
         })
-        .returning('*')
         .execute();
 
       return { message: 'Playlist created successfully.' };
@@ -106,17 +139,25 @@ export class PlaylistService {
     user_id: string,
     updatePlaylistDto: UpdatePlaylistDto,
   ) {
-    const { title } = updatePlaylistDto;
+    const { title, image_name, mimetype, size_in_kb } = updatePlaylistDto;
     const playlist = await this.findOne(user_id, id);
 
     try {
+      const updateFields: Partial<Playlist> = {};
+      if (title) updateFields.title = title;
+      if (image_name) {
+        updateFields.image_name = image_name;
+        updateFields.mimetype = mimetype;
+        updateFields.size_in_kb = size_in_kb;
+      }
+
       const result = await this.playlistRepository
         .createQueryBuilder()
         .update(Playlist)
-        .set({ title })
+        .set(updateFields)
         .where('id = :id', { id: playlist.id })
         .andWhere('user_id = :user_id', { user_id })
-        .returning('*')
+        .returning('id')
         .execute();
 
       return {
