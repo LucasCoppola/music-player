@@ -1,13 +1,19 @@
 import TracksTable from "@/components/main/tracks-table";
 import { useTracks } from "@/hooks/use-tracks";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 
 function TracksComponent() {
-  const { data: tracks, isLoading } = useTracks();
+  const { q } = useSearch({ from: "/" });
+  const { data: tracks, isLoading } = useTracks(q);
 
   return <TracksTable tracks={tracks} isLoading={isLoading} source="all" />;
 }
 
 export const Route = createFileRoute("/")({
   component: TracksComponent,
+  validateSearch: (search: { q?: string }) => {
+    return {
+      q: search.q ?? "",
+    };
+  },
 });

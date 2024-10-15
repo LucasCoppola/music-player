@@ -44,6 +44,22 @@ export class TrackService {
     }
   }
 
+  async search(query: string, user_id: string) {
+    try {
+      const tracks = await this.tracksRepository
+        .createQueryBuilder('track')
+        .where('track.title ILIKE :query', { query: `%${query}%` })
+        .orWhere('track.artist ILIKE :query', { query: `%${query}%` })
+        .andWhere('track.user_id = :user_id', { user_id })
+        .getMany();
+
+      return tracks;
+    } catch (error) {
+      console.log('Error searching tracks: ', error);
+      throw new InternalServerErrorException('Failed to search tracks');
+    }
+  }
+
   async create(createTrackDto: CreateTrackDto, user_id: string) {
     const { title, artist, track_file_path, size_in_kb, mimetype } =
       createTrackDto;

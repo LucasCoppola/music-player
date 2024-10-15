@@ -5,8 +5,10 @@
    - [x] Calculate playlist duration and total tracks
 
 - [x] Modify/add playlist image
-- [] Search tracks
+- [-] Search tracks
 
+- [] Integration tests for Playlists
+- [] Integration tests for Tracks
 - [] Issue with dropdowns and dialogs causing focus loss
 
 - [] Current track provider (frontend)

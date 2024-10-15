@@ -19,24 +19,27 @@ type UploadFile = {
   size_in_kb: number;
 };
 
-export function useTracks() {
+export function useTracks(query: string) {
   const { authState } = useAuth();
   const authToken = authState?.token;
 
   const client = useClient();
 
   return useQuery({
-    queryKey: ["tracks"],
+    queryKey: ["tracks", query],
     queryFn: async (): Promise<Track[]> => {
       if (!authToken) throw new Error("Unauthorized");
 
-      return await client(`${import.meta.env.VITE_BASE_URL}/api/tracks`, {
-        method: "GET",
-        headers: {
-          contentType: "application/json",
-          authToken,
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/tracks?q=${query}`,
+        {
+          method: "GET",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
         },
-      });
+      );
     },
     enabled: !!authToken,
   });

@@ -13,6 +13,7 @@ import {
   FileTypeValidator,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -55,8 +56,12 @@ export class TrackController {
   }
 
   @Get()
-  async findAll(@Req() req: Request) {
-    return await this.trackService.findAll(req.user.sub);
+  async findAll(@Req() req: Request, @Query('q') query: string) {
+    if (query) {
+      return await this.trackService.search(query, req.user.sub);
+    } else {
+      return await this.trackService.findAll(req.user.sub);
+    }
   }
 
   @Get(':id')
