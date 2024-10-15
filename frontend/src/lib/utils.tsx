@@ -17,3 +17,18 @@ export function formatDuration(durationInSeconds: number) {
 
   return `${minutes}:${formattedSeconds}`;
 }
+
+export function highlightText(text: string, query: string | undefined) {
+  if (!query) return text;
+  const parts = text.split(new RegExp(`(${query})`, "gi"));
+
+  return parts.map((part, i) =>
+    part.toLowerCase() === query.toLowerCase() ? (
+      <mark key={i} className="bg-sky-300 text-black">
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
+  );
+}

@@ -25,7 +25,7 @@ export default function Playlist() {
         <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0A0A] pb-[69px]">
           <div className="flex items-center justify-between p-3 bg-[#0A0A0A]">
             <div className="flex items-center space-x-1">
-              <Link to="/">
+              <Link to="/" search={{ q: "" }}>
                 <Button variant="ghost" size="icon" className="h-7 w-7">
                   <ChevronLeft className="w-4 h-4" />
                 </Button>

@@ -8,10 +8,12 @@ export default function TracksTable({
   tracks,
   source,
   isLoading = false,
+  query,
 }: {
   tracks: Track[] | undefined;
   source: "all" | "playlist";
   isLoading?: boolean;
+  query?: string;
 }) {
   const TrackComponent = source === "all" ? TrackRow : TrackPlaylistRow;
 
@@ -40,6 +42,7 @@ export default function TracksTable({
                   imageUrl={imageUrl}
                   key={i}
                   index={i + 1}
+                  query={query}
                 />
               ))
             ) : (

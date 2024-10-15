@@ -6,7 +6,9 @@ function TracksComponent() {
   const { q } = useSearch({ from: "/" });
   const { data: tracks, isLoading } = useTracks(q);
 
-  return <TracksTable tracks={tracks} isLoading={isLoading} source="all" />;
+  return (
+    <TracksTable tracks={tracks} isLoading={isLoading} source="all" query={q} />
+  );
 }
 
 export const Route = createFileRoute("/")({

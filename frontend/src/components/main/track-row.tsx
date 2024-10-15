@@ -24,16 +24,18 @@ import {
 import { useAddTrackToPlaylist, usePlaylists } from "@/hooks/use-playlists";
 import { useState } from "react";
 import { Track, useDeleteTrack } from "@/hooks/use-tracks";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, highlightText } from "@/lib/utils";
 
 export default function TrackRow({
   track,
   imageUrl,
   index,
+  query,
 }: {
   track: Track;
   imageUrl: string;
   index: number;
+  query?: string;
 }) {
   const { data: playlists } = usePlaylists();
   const { mutate: deleteTrack } = useDeleteTrack();
@@ -54,12 +56,12 @@ export default function TrackRow({
             <img src={imageUrl} alt="Album cover" className="object-cover" />
           </div>
           <div className="font-medium truncate max-w-[180px] sm:max-w-[200px] text-[#d1d5db]">
-            {track.title}
+            {highlightText(track.title, query)}
           </div>
         </div>
       </td>
       <td className="py-[2px] px-2 text-[#d1d5db] max-w-40 truncate">
-        {track.artist}
+        {highlightText(track.artist, query)}
       </td>
       <td className="py-[2px] px-2 tabular-nums text-[#d1d5db]">
         {formatDuration(track.duration)}
