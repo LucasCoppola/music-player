@@ -144,8 +144,12 @@ export class PlaylistService {
 
     try {
       const updateFields: Partial<Playlist> = {};
+      let oldImageName: string | undefined;
+
       if (title) updateFields.title = title;
       if (image_name) {
+        oldImageName = playlist.image_name;
+
         updateFields.image_name = image_name;
         updateFields.mimetype = mimetype;
         updateFields.size_in_kb = size_in_kb;
@@ -157,8 +161,12 @@ export class PlaylistService {
         .set(updateFields)
         .where('id = :id', { id: playlist.id })
         .andWhere('user_id = :user_id', { user_id })
-        .returning('id')
+        .returning('id, image_name')
         .execute();
+
+      if (oldImageName && oldImageName !== result.raw[0].image_name) {
+        await this.removeImageFile(oldImageName);
+      }
 
       return {
         message: 'Playlist updated successfully.',
@@ -232,6 +240,21 @@ export class PlaylistService {
       throw new InternalServerErrorException(
         'Failed to remove track from playlist',
       );
+    }
+  }
+
+  async removeImageFile(image_name: string) {
+    const image_file_path = `./uploads/images/${image_name}`;
+    try {
+      await fs.promises.unlink(image_file_path);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        console.warn('File not found:', image_file_path);
+        throw new NotFoundException();
+      } else {
+        console.error('Error removing file:', error);
+        throw new InternalServerErrorException('Failed to remove file');
+      }
     }
   }
 }

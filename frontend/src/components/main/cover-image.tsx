@@ -1,5 +1,7 @@
 import { useUploadPlaylistCover } from "@/hooks/use-playlists";
-import { Upload, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Upload, Loader, Pencil } from "lucide-react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 export function CoverImage({
@@ -11,32 +13,69 @@ export function CoverImage({
 }) {
   const { mutate: uploadPlaylistCover, isPending } = useUploadPlaylistCover();
   const imageUrl = `${import.meta.env.VITE_BASE_URL}/images/${coverImage}`;
+  const [isHovered, setIsHovered] = useState(false);
 
-  if (coverImage) {
-    return (
-      <img
-        src={imageUrl}
-        alt="Playlist cover"
-        className="w-16 h-16 sm:w-20 sm:h-20 object-cover"
-      />
-    );
-  }
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File | null;
 
-    if (!file) {
+    if (file) {
+      if (file.size <= 5 * 1024 * 1024) {
+        uploadPlaylistCover({ playlistId, image: file });
+      } else {
+        toast.error("File size exceeds 5MB limit");
+      }
+    } else {
       toast.error("Please select a file.");
-      return;
     }
-
-    uploadPlaylistCover({ playlistId, image: file });
   }
 
-  return (
+  return coverImage ? (
+    <div
+      className="relative w-16 h-16 sm:w-20 sm:h-20 cursor-pointer group"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <img
+        src={imageUrl}
+        alt="Playlist cover"
+        className="w-full h-full object-cover"
+      />
+      <form className="absolute inset-0" onSubmit={handleSubmit}>
+        <label
+          htmlFor="imageUpload"
+          className="absolute inset-0 cursor-pointer flex items-center justify-center"
+        >
+          <input
+            id="imageUpload"
+            type="file"
+            className="hidden"
+            accept="image/*"
+            name="file"
+            onChange={(e) => e.target.form?.requestSubmit()}
+          />
+          <div
+            className={cn(
+              "group-hover:bg-black group-hover:bg-opacity-50 rounded-full p-2",
+              isPending && "bg-opacity-50",
+            )}
+          >
+            {isPending ? (
+              <Loader className="w-4 h-4 text-foreground animate-spin" />
+            ) : (
+              isHovered && (
+                <Pencil className="w-4 h-4 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              )
+            )}
+          </div>
+        </label>
+      </form>
+    </div>
+  ) : (
     <form onSubmit={handleSubmit}>
       <input type="hidden" name="playlistId" value={playlistId} />
       <label
@@ -49,20 +88,10 @@ export function CoverImage({
           name="file"
           accept="image/*"
           className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              if (file.size <= 5 * 1024 * 1024) {
-                e.target.form?.requestSubmit();
-              } else {
-                toast.error("File size exceeds 5MB limit");
-                e.target.value = "";
-              }
-            }
-          }}
+          onChange={(e) => e.target.form?.requestSubmit()}
         />
         {isPending ? (
-          <Loader2 className="w-5 h-5 animate-spin text-neutral-600" />
+          <Loader className="w-5 h-5 animate-spin text-neutral-600" />
         ) : (
           <>
             <Upload className="w-3 h-3 mb-1" />

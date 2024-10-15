@@ -3,9 +3,8 @@
    - [x] Delete playlist
    - [x] Add/remove track 
    - [x] Calculate playlist duration and total tracks
-- [] Image resource - disk storage
-   - [] Modify/add playlist image
-   - [] Modify/add track image
+
+- [x] Modify/add playlist image
 - [] Search tracks
 
 - [] Issue with dropdowns and dialogs causing focus loss
