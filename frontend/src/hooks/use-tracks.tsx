@@ -8,13 +8,13 @@ export type Track = {
   title: string;
   artist: string;
   user_id: string;
-  track_file_path: string;
+  track_name: string;
   duration: number;
   bit_rate: number;
 };
 
 type UploadFile = {
-  track_file_path: string;
+  track_name: string;
   mimetype: string;
   size_in_kb: number;
 };
@@ -86,13 +86,13 @@ export function useCreateTrack() {
     mutationFn: async ({
       title,
       artist,
-      track_file_path,
+      track_name,
       mimetype,
       size_in_kb,
     }: {
       title: string;
       artist: string;
-      track_file_path: string;
+      track_name: string;
       mimetype: string;
       size_in_kb: number;
     }) => {
@@ -107,7 +107,7 @@ export function useCreateTrack() {
         body: JSON.stringify({
           title,
           artist,
-          track_file_path,
+          track_name,
           mimetype,
           size_in_kb,
         }),

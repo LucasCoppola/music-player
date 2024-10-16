@@ -20,10 +20,16 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'uploads', 'images'),
-      serveRoot: '/images',
-    }),
+    ServeStaticModule.forRoot(
+      {
+        rootPath: join(__dirname, '..', '..', 'uploads', 'images'),
+        serveRoot: '/images',
+      },
+      {
+        rootPath: join(__dirname, '..', '..', 'uploads', 'tracks'),
+        serveRoot: '/tracks',
+      },
+    ),
     ConfigModule.forRoot({
       envFilePath: `.env.${configuration().environment}`,
       isGlobal: true,

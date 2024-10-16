@@ -28,13 +28,14 @@ export class TrackService {
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
       }
-      const filePath = `${uploadPath}/${Date.now()}-${file.originalname}`;
+      const track_name = `${Date.now()}-${file.originalname}`;
+      const filePath = `${uploadPath}/${track_name}`;
 
       await fs.promises.writeFile(filePath, file.buffer);
 
       return {
         message: 'File uploaded successfully',
-        track_file_path: filePath,
+        track_name,
         mimetype: file.mimetype,
         size_in_kb: fileSizeInKb,
       };
@@ -61,13 +62,12 @@ export class TrackService {
   }
 
   async create(createTrackDto: CreateTrackDto, user_id: string) {
-    const { title, artist, track_file_path, size_in_kb, mimetype } =
-      createTrackDto;
+    const { title, artist, track_name, size_in_kb, mimetype } = createTrackDto;
 
     try {
       const [user, { duration, bit_rate }] = await Promise.all([
         this.usersService.findOneById(user_id),
-        this.getAudioMetadata(track_file_path),
+        this.getAudioMetadata(track_name),
       ]);
 
       await this.tracksRepository
@@ -78,7 +78,7 @@ export class TrackService {
           title,
           artist,
           user_id: user.id,
-          track_file_path,
+          track_name,
           size_in_kb,
           mimetype,
           duration,
@@ -146,7 +146,7 @@ export class TrackService {
         this.findOne(id, user_id),
       ]);
 
-      this.removeFile(track.track_file_path);
+      this.removeFile(track.track_name);
 
       await this.tracksRepository
         .createQueryBuilder()
@@ -165,7 +165,8 @@ export class TrackService {
     }
   }
 
-  async removeFile(track_file_path: string) {
+  async removeFile(track_name: string) {
+    const track_file_path = `./uploads/tracks/${track_name}`;
     try {
       await fs.promises.unlink(track_file_path);
     } catch (error) {
@@ -180,10 +181,11 @@ export class TrackService {
   }
 
   async getAudioMetadata(
-    file_path: string,
+    track_name: string,
   ): Promise<{ duration: number; bit_rate: number }> {
+    const track_file_path = `./uploads/tracks/${track_name}`;
     return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(file_path, (err, metadata) => {
+      ffmpeg.ffprobe(track_file_path, (err, metadata) => {
         if (err) {
           reject(err);
         } else {

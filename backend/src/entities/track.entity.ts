@@ -38,10 +38,10 @@ export class Track {
   favorite: boolean;
 
   @Column()
-  track_file_path: string;
+  track_name: string;
 
   @Column({ nullable: true })
-  image_file_path: string;
+  image_name: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

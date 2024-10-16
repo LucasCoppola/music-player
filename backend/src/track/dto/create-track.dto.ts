@@ -11,7 +11,7 @@ export class CreateTrackDto {
 
   @IsString()
   @IsNotEmpty()
-  track_file_path: string;
+  track_name: string;
 
   @IsString()
   @IsNotEmpty()

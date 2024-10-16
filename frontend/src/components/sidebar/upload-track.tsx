@@ -74,15 +74,14 @@ export default function UploadTrack({
       return;
     }
 
-    const { track_file_path, mimetype, size_in_kb } =
-      await uploadTrack.mutateAsync({
-        file: trackFormData.file,
-      });
+    const { track_name, mimetype, size_in_kb } = await uploadTrack.mutateAsync({
+      file: trackFormData.file,
+    });
 
     createTrack.mutate({
       title: trackFormData.title,
       artist: trackFormData.artist,
-      track_file_path,
+      track_name,
       mimetype,
       size_in_kb,
     });
