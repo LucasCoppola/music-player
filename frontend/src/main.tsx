@@ -7,6 +7,7 @@ import { AuthProvider } from "./providers/auth-provider.tsx";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { NotFound } from "./components/not-found.tsx";
+import { PlaybackProvider } from "./providers/playback-provider.tsx";
 
 const router = createRouter({ routeTree, defaultNotFoundComponent: NotFound });
 const queryClient = new QueryClient();
@@ -21,8 +22,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster richColors theme="dark" />
+        <PlaybackProvider>
+          <RouterProvider router={router} />
+          <Toaster richColors theme="dark" />
+        </PlaybackProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
