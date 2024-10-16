@@ -1,6 +1,6 @@
 import { usePlayback } from "@/context/playback-context";
 import { defaultCoverTrackImage } from "@/lib/consts";
-import { cn } from "@/lib/utils";
+import { cn, getCoverTrackImage } from "@/lib/utils";
 import { Loader, Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -42,7 +42,7 @@ export default function NowPlaying() {
         onMouseLeave={handleMouseLeave}
       >
         <img
-          src={`${import.meta.env.VITE_BASE_URL}/images/${currentTrack.image_name ?? defaultCoverTrackImage}`}
+          src={getCoverTrackImage(currentTrack.image_name)}
           alt="Album cover"
           className="w-full h-full object-cover"
         />

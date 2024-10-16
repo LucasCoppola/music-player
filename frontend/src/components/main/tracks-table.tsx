@@ -5,6 +5,7 @@ import TrackRow from "./track-row";
 import TrackPlaylistRow from "./track-playlist-row";
 import { usePlayback } from "@/context/playback-context";
 import { useEffect, useState } from "react";
+import { getCoverTrackImage } from "@/lib/utils";
 
 export default function TracksTable({
   tracks,
@@ -49,7 +50,7 @@ export default function TracksTable({
               tracks.map((track, i) => (
                 <TrackComponent
                   track={track}
-                  imageUrl={`${import.meta.env.VITE_BASE_URL}/images/${track.image_name ?? defaultCoverTrackImage}`}
+                  imageUrl={getCoverTrackImage(track.image_name)}
                   key={i}
                   index={i + 1}
                   query={query}

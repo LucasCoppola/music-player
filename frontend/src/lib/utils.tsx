@@ -32,3 +32,11 @@ export function highlightText(text: string, query: string | undefined) {
     ),
   );
 }
+
+export function getCoverTrackImage(image_name: string | null): string {
+  if (image_name) {
+    return `${import.meta.env.VITE_BASE_URL}/images/${image_name}`;
+  } else {
+    return `${import.meta.env.VITE_BASE_URL}/images/default_cover_track_image.png`;
+  }
+}
