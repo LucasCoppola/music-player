@@ -3,6 +3,8 @@ import { imageUrl } from "@/lib/consts";
 import { TracksTableSkeleton } from "../skeletons";
 import TrackRow from "./track-row";
 import TrackPlaylistRow from "./track-playlist-row";
+import { usePlayback } from "@/context/playback-context";
+import { useEffect, useState } from "react";
 
 export default function TracksTable({
   tracks,
@@ -16,6 +18,14 @@ export default function TracksTable({
   query?: string;
 }) {
   const TrackComponent = source === "all" ? TrackRow : TrackPlaylistRow;
+  const { setPlaylist } = usePlayback();
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (tracks) {
+      setPlaylist(tracks);
+    }
+  }, [tracks, setPlaylist]);
 
   return (
     <>
@@ -43,6 +53,8 @@ export default function TracksTable({
                   key={i}
                   index={i + 1}
                   query={query}
+                  isSelected={selectedTrackId === track.id}
+                  onSelect={() => setSelectedTrackId(track.id)}
                 />
               ))
             ) : (

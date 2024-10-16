@@ -25,35 +25,79 @@ import { useAddTrackToPlaylist, usePlaylists } from "@/hooks/use-playlists";
 import { useState } from "react";
 import { Track, useDeleteTrack } from "@/hooks/use-tracks";
 import { formatDuration, highlightText } from "@/lib/utils";
+import { usePlayback } from "@/context/playback-context";
 
 export default function TrackRow({
   track,
   imageUrl,
   index,
   query,
+  isSelected,
+  onSelect,
 }: {
   track: Track;
   imageUrl: string;
   index: number;
   query?: string;
+  isSelected: boolean;
+  onSelect: () => void;
 }) {
   const { data: playlists } = usePlaylists();
   const { mutate: deleteTrack } = useDeleteTrack();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
 
+  const [isFocused, setIsFocused] = useState(false);
+  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isCurrentTrack = true;
-  const isPlaying = false;
+  const isCurrentTrack = currentTrack?.title === track.title;
+
+  function onClickTrackRow(e: React.MouseEvent) {
+    e.preventDefault();
+    onSelect();
+    if (isCurrentTrack) {
+      togglePlayPause();
+    } else {
+      playTrack(track);
+    }
+  }
+
+  function onKeyDownTrackRow(e: React.KeyboardEvent<HTMLTableRowElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelect();
+      if (isCurrentTrack) {
+        togglePlayPause();
+      } else {
+        playTrack(track);
+      }
+    }
+  }
 
   return (
-    <tr className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative">
+    <tr
+      className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
+      tabIndex={0}
+      onClick={onClickTrackRow}
+      onKeyDown={onKeyDownTrackRow}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    >
       <td className="py-[2px] pl-3 pr-2 tabular-nums w-10 text-center text-gray-400">
-        {index}
+        {isCurrentTrack && isPlaying ? (
+          <div className="flex items-end justify-center space-x-[2px] size-[0.65rem] mx-auto">
+            <div className="w-1 bg-neutral-600 animate-now-playing-1"></div>
+            <div className="w-1 bg-neutral-600 animate-now-playing-2 [animation-delay:0.2s]"></div>
+            <div className="w-1 bg-neutral-600 animate-now-playing-3 [animation-delay:0.4s]"></div>
+          </div>
+        ) : (
+          <span className="text-gray-400">{index}</span>
+        )}
       </td>
       <td className="py-[2px] px-2">
         <div className="flex items-center">
           <div className="relative size-5 mr-2">
-            <img src={imageUrl} alt="Album cover" className="object-cover" />
+            <img src={imageUrl} alt="Track cover" className="object-cover" />
           </div>
           <div className="font-medium truncate max-w-[180px] sm:max-w-[200px] text-[#d1d5db]">
             {highlightText(track.title, query)}
@@ -81,7 +125,17 @@ export default function TrackRow({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 dark">
               <AlertDialog>
-                <DropdownMenuItem className="text-xs">
+                <DropdownMenuItem
+                  className="text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isCurrentTrack) {
+                      togglePlayPause();
+                    } else {
+                      playTrack(track);
+                    }
+                  }}
+                >
                   {isCurrentTrack && isPlaying ? (
                     <>
                       <Pause className="mr-2 size-3 stroke-[1.5]" />
@@ -156,6 +210,9 @@ export default function TrackRow({
           </DropdownMenu>
         </div>
       </td>
+      {(isSelected || isFocused) && (
+        <div className="absolute inset-0 border border-[#1e3a8a] pointer-events-none" />
+      )}
     </tr>
   );
 }
