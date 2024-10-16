@@ -19,20 +19,16 @@ import { Track } from "@/hooks/use-tracks";
 import { formatDuration } from "@/lib/utils";
 import { useParams } from "@tanstack/react-router";
 import { usePlayback } from "@/context/playback-context";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function TrackPlaylistRow({
   track,
   imageUrl,
   index,
-  isSelected,
-  onSelect,
 }: {
   track: Track;
   imageUrl: string;
   index: number;
-  isSelected: boolean;
-  onSelect: () => void;
 }) {
   const { playlistId } = useParams({
     from: "/playlist/$playlistId",
@@ -41,14 +37,16 @@ export default function TrackPlaylistRow({
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
   const playlists = data?.filter((p) => p.id !== playlistId);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const [isFocused, setIsFocused] = useState(false);
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
 
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
   function onClickTrackRow(e: React.MouseEvent) {
     e.preventDefault();
-    onSelect();
     if (isCurrentTrack) {
       togglePlayPause();
     } else {
@@ -59,7 +57,6 @@ export default function TrackPlaylistRow({
   function onKeyDownTrackRow(e: React.KeyboardEvent<HTMLTableRowElement>) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onSelect();
       if (isCurrentTrack) {
         togglePlayPause();
       } else {
@@ -74,11 +71,17 @@ export default function TrackPlaylistRow({
       tabIndex={0}
       onClick={onClickTrackRow}
       onKeyDown={onKeyDownTrackRow}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <td className="py-[2px] pl-3 pr-2 tabular-nums w-10 text-center text-gray-400">
-        {isCurrentTrack && isPlaying ? (
+        {isHovered ? (
+          isPlaying && isCurrentTrack ? (
+            <Pause className="ml-1 size-3" />
+          ) : (
+            <Play className="ml-1 size-3" />
+          )
+        ) : isCurrentTrack && isPlaying ? (
           <div className="flex items-end justify-center space-x-[2px] size-[0.65rem] mx-auto">
             <div className="w-1 bg-neutral-600 animate-now-playing-1"></div>
             <div className="w-1 bg-neutral-600 animate-now-playing-2 [animation-delay:0.2s]"></div>
@@ -118,29 +121,6 @@ export default function TrackPlaylistRow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 dark">
-              <DropdownMenuItem
-                className="text-xs"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (isCurrentTrack) {
-                    togglePlayPause();
-                  } else {
-                    playTrack(track);
-                  }
-                }}
-              >
-                {isCurrentTrack && isPlaying ? (
-                  <>
-                    <Pause className="mr-2 size-3 stroke-[1.5]" />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <Play className="mr-2 size-3 stroke-[1.5]" />
-                    Play
-                  </>
-                )}
-              </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="text-xs">
                   <Plus className="mr-2 size-3" />
@@ -178,9 +158,6 @@ export default function TrackPlaylistRow({
           </DropdownMenu>
         </div>
       </td>
-      {(isSelected || isFocused) && (
-        <div className="absolute inset-0 border border-[#1e3a8a] pointer-events-none" />
-      )}
     </tr>
   );
 }

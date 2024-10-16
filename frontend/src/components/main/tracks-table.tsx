@@ -1,10 +1,9 @@
 import { Track } from "@/hooks/use-tracks";
-import { defaultCoverTrackImage } from "@/lib/consts";
 import { TracksTableSkeleton } from "../skeletons";
 import TrackRow from "./track-row";
 import TrackPlaylistRow from "./track-playlist-row";
 import { usePlayback } from "@/context/playback-context";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getCoverTrackImage } from "@/lib/utils";
 
 export default function TracksTable({
@@ -20,7 +19,6 @@ export default function TracksTable({
 }) {
   const TrackComponent = source === "all" ? TrackRow : TrackPlaylistRow;
   const { setPlaylist } = usePlayback();
-  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   useEffect(() => {
     if (tracks) {
@@ -54,8 +52,6 @@ export default function TracksTable({
                   key={i}
                   index={i + 1}
                   query={query}
-                  isSelected={selectedTrackId === track.id}
-                  onSelect={() => setSelectedTrackId(track.id)}
                 />
               ))
             ) : (
