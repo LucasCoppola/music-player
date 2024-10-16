@@ -1,20 +1,17 @@
 import { usePlayback } from "@/context/playback-context";
 import { formatDuration } from "@/lib/utils";
-import { useRef } from "react";
+import { Slider } from "../ui/slider";
 
 export default function ProgressBar() {
-  const { currentTime, duration, audioRef, setCurrentTime } = usePlayback();
-  const progressBarRef = useRef<HTMLDivElement>(null);
+  const { currentTime, duration, audioRef, setCurrentTime, currentTrack } =
+    usePlayback();
 
-  function handleProgressChange(e: React.MouseEvent<HTMLDivElement>) {
-    if (progressBarRef.current && audioRef.current) {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-      const newTime = (percentage / 100) * duration;
+  function handleSliderChange(value: number[]) {
+    const newTime = (value[0] / 100) * duration;
+    if (audioRef.current) {
       audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
     }
+    setCurrentTime(newTime);
   }
 
   return (
@@ -22,18 +19,14 @@ export default function ProgressBar() {
       <span className="text-xs tabular-nums text-gray-400">
         {formatDuration(currentTime)}
       </span>
-      <div
-        ref={progressBarRef}
-        className="flex-grow mx-2 h-1 bg-[#3E3E3E] rounded-full cursor-pointer relative"
-        onClick={handleProgressChange}
-      >
-        <div
-          className="absolute top-0 left-0 h-full bg-white rounded-full"
-          style={{
-            width: `${(currentTime / duration) * 100}%`,
-          }}
-        ></div>
-      </div>
+      <Slider
+        value={[(currentTime / duration) * 100]}
+        onValueChange={handleSliderChange}
+        className="mx-2 cursor-pointer py-1.5"
+        max={100}
+        step={0.1}
+        disabled={!currentTrack}
+      />
       <div className="text-xs tabular-nums text-gray-400">
         {formatDuration(duration)}
       </div>

@@ -12,7 +12,7 @@
 - [] Issue with dropdowns and dialogs causing focus loss
 
 - [-] Current track provider (frontend)
-   - [] Modify title, artist, and modify/add image
+   - [] Modify/add image
    - [] Add to favorites
    - [] Download track
 - [] Favorites Playlist
