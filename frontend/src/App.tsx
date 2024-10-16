@@ -1,6 +1,6 @@
 import Sidebar from "./components/sidebar/sidebar";
 import NowPlaying from "./components/now-playing";
-import PlaybackControls from "./components/playback-controls";
+import PlaybackControls from "./components/playback-controls/playback-controls";
 import { ScrollArea } from "./components/ui/scroll-area";
 import { Outlet } from "@tanstack/react-router";
 
