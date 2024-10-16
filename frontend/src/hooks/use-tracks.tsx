@@ -9,6 +9,7 @@ export type Track = {
   artist: string;
   user_id: string;
   track_name: string;
+  image_name: string | null;
   duration: number;
   bit_rate: number;
 };

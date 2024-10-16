@@ -1,38 +1,97 @@
-import { imageUrl } from "@/lib/consts";
+import { usePlayback } from "@/context/playback-context";
+import { defaultCoverTrackImage } from "@/lib/consts";
+import { cn } from "@/lib/utils";
+import { Loader, Pencil } from "lucide-react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 export default function NowPlaying() {
+  const { currentTrack } = usePlayback();
+  const [isHovered, setIsHovered] = useState(false);
+  const isPending = false;
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+  if (!currentTrack) {
+    return null;
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const file = formData.get("file") as File | null;
+
+    if (file) {
+      if (file.size <= 5 * 1024 * 1024) {
+        // uploadTrackCover({ trackId, image: file });
+      } else {
+        toast.error("File size exceeds 5MB limit");
+      }
+    } else {
+      toast.error("Please select a file.");
+    }
+  }
+
   return (
-    <div className="w-56 h-[100dvh] p-4 bg-[#121212]">
+    <div className="hidden md:block w-56 h-[100dvh] p-4 bg-[#121212]">
       <h2 className="mb-3 text-sm font-semibold text-gray-200">Now Playing</h2>
-      <img
-        src={imageUrl}
-        alt="Album cover"
-        className="w-full aspect-square object-cover mb-3"
-      />
-      <div className="space-y-1 text-xs">
-        <div>
-          <p className="text-gray-400">Title</p>
-          <p className="text-gray-200 truncate">Wanna Feel It</p>
+      <div
+        className="relative w-full aspect-square mb-3 group"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <img
+          src={`${import.meta.env.VITE_BASE_URL}/images/${currentTrack.image_name ?? defaultCoverTrackImage}`}
+          alt="Album cover"
+          className="w-full h-full object-cover"
+        />
+        <form className="absolute inset-0" onSubmit={handleSubmit}>
+          <label
+            htmlFor="imageUpload"
+            className="absolute inset-0 cursor-pointer flex items-center justify-center"
+          >
+            <input
+              id="imageUpload"
+              type="file"
+              className="hidden"
+              accept="image/*"
+              name="file"
+              onChange={(e) => e.target.form?.requestSubmit()}
+            />
+            <div
+              className={cn(
+                "group-hover:bg-black group-hover:bg-opacity-50 rounded-full p-2",
+                isPending && "bg-opacity-50",
+              )}
+            >
+              {isPending ? (
+                <Loader className="w-6 h-6 text-foreground animate-spin" />
+              ) : (
+                isHovered && (
+                  <Pencil className="w-6 h-6 text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                )
+              )}
+            </div>
+          </label>
+        </form>
+      </div>
+      <div className="text-xs space-y-2">
+        <div className="space-y-0.5 group">
+          <p className="text-xs text-muted-foreground">Title</p>
+          <p className="text-xs truncate ">{currentTrack.title}</p>
         </div>
-        <div>
-          <p className="text-gray-400">Artist</p>
-          <p className="text-gray-200 truncate">Infraction</p>
+        <div className="space-y-0.5 group">
+          <p className="text-xs text-muted-foreground">Artist</p>
+          <p className="text-xs truncate ">{currentTrack.artist}</p>
         </div>
-        <div>
-          <p className="text-gray-400">Album</p>
-          <p className="text-gray-200 truncate">Royalty Free</p>
-        </div>
-        <div>
-          <p className="text-gray-400">Genre</p>
-          <p className="text-gray-200 truncate">Electronic</p>
-        </div>
-        <div>
-          <p className="text-gray-400">BPM</p>
-          <p className="text-gray-200 truncate"></p>
-        </div>
-        <div>
-          <p className="text-gray-400">Key</p>
-          <p className="text-gray-200 truncate"></p>
+        <div className="space-y-0.5 group">
+          <p className="text-xs text-muted-foreground">Bit Rate</p>
+          <p className="text-xs truncate ">
+            {currentTrack.bit_rate
+              ? `${Math.round(currentTrack.bit_rate / 1000)} kbps`
+              : "-"}
+          </p>
         </div>
       </div>
     </div>

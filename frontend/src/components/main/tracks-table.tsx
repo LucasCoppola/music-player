@@ -1,5 +1,5 @@
 import { Track } from "@/hooks/use-tracks";
-import { imageUrl } from "@/lib/consts";
+import { defaultCoverTrackImage } from "@/lib/consts";
 import { TracksTableSkeleton } from "../skeletons";
 import TrackRow from "./track-row";
 import TrackPlaylistRow from "./track-playlist-row";
@@ -49,7 +49,7 @@ export default function TracksTable({
               tracks.map((track, i) => (
                 <TrackComponent
                   track={track}
-                  imageUrl={imageUrl}
+                  imageUrl={`${import.meta.env.VITE_BASE_URL}/images/${track.image_name ?? defaultCoverTrackImage}`}
                   key={i}
                   index={i + 1}
                   query={query}
