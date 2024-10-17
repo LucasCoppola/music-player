@@ -20,7 +20,7 @@ export class TrackService {
     private usersService: UsersService,
   ) {}
 
-  async uploadFile(file: Express.Multer.File) {
+  async uploadTrack(file: Express.Multer.File) {
     const uploadPath = './uploads/tracks';
     const fileSizeInKb = Math.floor(file.size / 1024);
 
@@ -42,6 +42,36 @@ export class TrackService {
     } catch (error) {
       console.error('Error uploading file: ', error);
       throw new InternalServerErrorException('File upload failed');
+    }
+  }
+
+  async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
+    const uploadPath = './uploads/images';
+    const fileSizeInKb = Math.floor(file.size / 1024);
+
+    try {
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      const image_name = `${Date.now()}-${file.originalname}`;
+      const filePath = `${uploadPath}/${image_name}`;
+
+      await fs.promises.writeFile(filePath, file.buffer);
+
+      await this.update(id, user_id, {
+        image_name,
+        mimetype: file.mimetype,
+        size_in_kb: fileSizeInKb,
+      });
+
+      return {
+        message: 'Track cover image uploaded successfully',
+        track_id: id,
+        image_name,
+      };
+    } catch (error) {
+      console.error('Error uploading track cover image: ', error);
+      throw new InternalServerErrorException('Failed to upload cover image');
     }
   }
 
@@ -135,8 +165,36 @@ export class TrackService {
     }
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
-    return `This action updates a #${id} track`;
+  async update(id: string, user_id: string, updateTrackDto: UpdateTrackDto) {
+    const { image_name, mimetype, size_in_kb } = updateTrackDto;
+    const track = await this.findOne(id, user_id);
+    const oldImageName = track.image_name;
+
+    try {
+      const result = await this.tracksRepository
+        .createQueryBuilder()
+        .update(Track)
+        .set({
+          image_name,
+          mimetype,
+          size_in_kb,
+        })
+        .where('id = :id', { id: track.id })
+        .andWhere('user_id = :user_id', { user_id })
+        .returning('image_name')
+        .execute();
+
+      if (oldImageName && oldImageName !== result.raw[0].image_name) {
+        await this.removeFile(oldImageName, 'images');
+      }
+
+      return {
+        message: 'Track updated successfully.',
+      };
+    } catch (error) {
+      console.log('Error updating track: ', error);
+      throw new InternalServerErrorException('Failed to update track');
+    }
   }
 
   async remove(id: string, user_id: string) {
@@ -146,7 +204,7 @@ export class TrackService {
         this.findOne(id, user_id),
       ]);
 
-      this.removeFile(track.track_name);
+      this.removeFile(track.track_name, 'tracks');
 
       await this.tracksRepository
         .createQueryBuilder()
@@ -165,13 +223,14 @@ export class TrackService {
     }
   }
 
-  async removeFile(track_name: string) {
-    const track_file_path = `./uploads/tracks/${track_name}`;
+  async removeFile(file_name: string, type: 'images' | 'tracks') {
+    const file_path = `./uploads/${type}/${file_name}`;
+
     try {
-      await fs.promises.unlink(track_file_path);
+      await fs.promises.unlink(file_path);
     } catch (error) {
       if (error.code === 'ENOENT') {
-        console.warn('File not found:', track_file_path);
+        console.warn('File not found:', file_path);
         throw new NotFoundException();
       } else {
         console.error('Error removing file:', error);

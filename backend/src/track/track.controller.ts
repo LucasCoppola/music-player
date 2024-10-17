@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UploadedFile,
@@ -16,7 +15,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { UpdateTrackDto } from './dto/update-track.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -68,8 +66,10 @@ export class TrackController {
       }),
     )
     file: Express.Multer.File,
+    @Param('id') id: string,
+    @Req() req: Request,
   ) {
-    return await this.trackService.uploadImage(file);
+    return await this.trackService.uploadImage(file, id, req.user.sub);
   }
 
   @Post()
@@ -89,11 +89,6 @@ export class TrackController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req: Request) {
     return await this.trackService.findOne(id, req.user.sub);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    return this.trackService.update(+id, updateTrackDto);
   }
 
   @Delete(':id')
