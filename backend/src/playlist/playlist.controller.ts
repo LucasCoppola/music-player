@@ -56,9 +56,9 @@ export class PlaylistController {
     return this.playlistService.remove(id, req.user.sub);
   }
 
-  @Post(':id/cover')
+  @Post(':id/upload/image')
   @UseInterceptors(
-    FileInterceptor('cover', {
+    FileInterceptor('image', {
       storage: memoryStorage(),
     }),
   )

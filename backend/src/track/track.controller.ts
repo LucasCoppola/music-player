@@ -28,13 +28,13 @@ import { AuthGuard } from '../auth/auth.guard';
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
-  @Post('upload')
+  @Post('upload/audio')
   @UseInterceptors(
     FileInterceptor('track', {
       storage: memoryStorage(),
     }),
   )
-  async uploadFile(
+  async uploadTrack(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -47,7 +47,29 @@ export class TrackController {
     )
     file: Express.Multer.File,
   ) {
-    return await this.trackService.uploadFile(file);
+    return await this.trackService.uploadTrack(file);
+  }
+
+  @Post(':id/upload/image')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+    }),
+  )
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5 MB
+          new FileTypeValidator({
+            fileType: 'image/jpeg|image/png|image/gif',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return await this.trackService.uploadImage(file);
   }
 
   @Post()
