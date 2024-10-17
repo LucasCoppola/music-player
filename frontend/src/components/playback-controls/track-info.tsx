@@ -1,9 +1,15 @@
-import { HeartIcon } from "lucide-react";
+import { HeartIcon, HeartOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlayback } from "@/context/playback-context";
+import { useCallback, useState } from "react";
 
 export default function TrackInfo() {
   const { currentTrack, currentImageUrl } = usePlayback();
+  const [isHovered, setIsHovered] = useState(false);
+  const isFavorite = true;
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
   return (
     <div className="flex items-center w-1/3 space-x-2">
@@ -23,13 +29,29 @@ export default function TrackInfo() {
                 {currentTrack.artist}
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="ml-2 hover:bg-zinc-900"
-            >
-              <HeartIcon className="h-4 w-4" />
-            </Button>
+            {isFavorite ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                {isHovered ? (
+                  <HeartOff className="size-4 fill-primary" />
+                ) : (
+                  <HeartIcon className="size-4 fill-primary" />
+                )}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+              >
+                <HeartIcon className="size-4" />
+              </Button>
+            )}
           </div>
         </>
       )}

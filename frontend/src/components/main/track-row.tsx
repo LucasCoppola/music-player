@@ -1,4 +1,13 @@
-import { Ellipsis, Pause, Play, Plus, Trash } from "lucide-react";
+import {
+  Download,
+  Ellipsis,
+  Heart,
+  HeartOff,
+  Pause,
+  Play,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -41,6 +50,7 @@ export default function TrackRow({
   const { data: playlists } = usePlaylists();
   const { mutate: deleteTrack } = useDeleteTrack();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
+  const isFavorite = true;
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
 
@@ -118,13 +128,13 @@ export default function TrackRow({
         {formatDuration(track.duration)}
       </td>
       <td className="py-[2px] px-2 text-right">
-        <div className="opacity-0 group-hover:opacity-100">
+        <div className="opacity-0 group-hover:opacity-100 flex items-center space-x-1">
           <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 text-gray-400 hover:text-white focus:text-white"
+                className="h-5 w-5 text-primary/90 hover:text-primary focus:text-primary"
               >
                 <Ellipsis className="size-4" />
                 <span className="sr-only">Track options</span>
@@ -156,6 +166,21 @@ export default function TrackRow({
                       ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
+                {isFavorite ? (
+                  <DropdownMenuItem className="text-xs">
+                    <HeartOff className="mr-2 size-3 fill-primary" />
+                    Remove from Favorites
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem className="text-xs">
+                    <Heart className="mr-2 size-3" />
+                    Add to Favorites
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem className="text-xs">
+                  <Download className="mr-2 size-3" />
+                  Download Track
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem

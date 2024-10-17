@@ -13,17 +13,14 @@ import PlaylistRow from "./playlist-row";
 
 export default function Sidebar() {
   const { authState, logout } = useAuth();
-  const pathname = useLocation({
-    select: (location) => location.pathname,
-  });
+  const search = useLocation({ select: (location) => location.search });
   const { data: playlists } = usePlaylists();
+  const { mutate: createPlaylist } = useCreatePlaylist();
 
   const newPlaylist = {
     id: crypto.randomUUID(),
     title: "New Playlist",
   };
-
-  const { mutate: createPlaylist } = useCreatePlaylist();
 
   return (
     <div className="w-56 bg-[#121212] flex flex-col h-full">
@@ -37,13 +34,22 @@ export default function Sidebar() {
           <SearchInput />
         </div>
       </div>
-      <div className="mb-6">
+      <div className="mb-4 space-y-1">
         <Link
           to="/"
+          search={{ q: "" }}
           className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
-            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/" ? "bg-[#1A1A1A]" : ""}`}
+            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${search.q === "" ? "bg-[#1A1A1A]" : ""}`}
         >
           All Tracks
+        </Link>
+        <Link
+          to="/"
+          search={{ q: "favorites" }}
+          className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
+            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${search.q === "favorites" ? "bg-[#1A1A1A]" : ""}`}
+        >
+          Favorites
         </Link>
       </div>
 

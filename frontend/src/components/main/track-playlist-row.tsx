@@ -1,4 +1,13 @@
-import { Ellipsis, Pause, Play, Plus, Trash } from "lucide-react";
+import {
+  Download,
+  Ellipsis,
+  Heart,
+  HeartOff,
+  Pause,
+  Play,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -38,6 +47,7 @@ export default function TrackPlaylistRow({
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
   const playlists = data?.filter((p) => p.id !== playlistId);
   const [isHovered, setIsHovered] = useState(false);
+  const isFavorite = true;
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
@@ -94,7 +104,11 @@ export default function TrackPlaylistRow({
       <td className="py-[2px] px-2">
         <div className="flex items-center">
           <div className="relative size-5 mr-2">
-            <img src={imageUrl} alt="Album cover" className="object-cover" />
+            <img
+              src={imageUrl}
+              alt="Album cover"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="font-medium truncate max-w-[180px] sm:max-w-[200px] text-[#d1d5db]">
             {track.title}
@@ -145,6 +159,21 @@ export default function TrackPlaylistRow({
                     ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              {isFavorite ? (
+                <DropdownMenuItem className="text-xs">
+                  <HeartOff className="mr-2 size-3 fill-primary" />
+                  Remove from Favorites
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem className="text-xs">
+                  <Heart className="mr-2 size-3" />
+                  Add to Favorites
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem className="text-xs">
+                <Download className="mr-2 size-3" />
+                Download Track
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-xs"

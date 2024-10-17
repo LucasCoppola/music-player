@@ -11,13 +11,15 @@
 - [] Integration tests for Tracks
 - [] Issue with dropdowns and dialogs causing focus loss
 
-- [-] Current track provider (frontend)
-   - [] Modify/add image
-   - [] Add to favorites
-   - [] Download track
+- [x] Current track provider (frontend)
+- [x] Modify/add image
+
+- [] Download track
 - [] Favorites Playlist
+- [] Add to favorites
   -? Should be independent from the playlist resource or not?
   - You can add a track to favorites like a normal playlist or by clicking the heart
+
 - [] Listening History
 - [] Track play count
 
