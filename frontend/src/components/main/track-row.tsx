@@ -100,7 +100,11 @@ export default function TrackRow({
       <td className="py-[2px] px-2">
         <div className="flex items-center">
           <div className="relative size-5 mr-2">
-            <img src={imageUrl} alt="Track cover" className="object-cover" />
+            <img
+              src={imageUrl}
+              alt="Track cover"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="font-medium truncate max-w-[180px] sm:max-w-[200px] text-[#d1d5db]">
             {highlightText(track.title, query)}

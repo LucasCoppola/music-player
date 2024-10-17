@@ -1,17 +1,28 @@
 import { usePlayback } from "@/context/playback-context";
-import { defaultCoverTrackImage } from "@/lib/consts";
+import { useUploadTrackCoverImage } from "@/hooks/use-tracks";
 import { cn, getCoverTrackImage } from "@/lib/utils";
 import { Loader, Pencil } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function NowPlaying() {
-  const { currentTrack } = usePlayback();
+  const {
+    mutate: uploadTrackCoverImage,
+    isPending,
+    data,
+  } = useUploadTrackCoverImage();
+  const { currentTrack, currentImageUrl, setCurrentImageUrl } = usePlayback();
   const [isHovered, setIsHovered] = useState(false);
-  const isPending = false;
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+  useEffect(() => {
+    if (data?.image_name) {
+      const newImageUrl = getCoverTrackImage(data.image_name);
+      setCurrentImageUrl(newImageUrl);
+    }
+  }, [data?.image_name, setCurrentImageUrl]);
 
   if (!currentTrack) {
     return null;
@@ -22,9 +33,9 @@ export default function NowPlaying() {
     const formData = new FormData(e.currentTarget);
     const file = formData.get("file") as File | null;
 
-    if (file) {
+    if (file && currentTrack) {
       if (file.size <= 5 * 1024 * 1024) {
-        // uploadTrackCover({ trackId, image: file });
+        uploadTrackCoverImage({ trackId: currentTrack.id, file });
       } else {
         toast.error("File size exceeds 5MB limit");
       }
@@ -42,7 +53,7 @@ export default function NowPlaying() {
         onMouseLeave={handleMouseLeave}
       >
         <img
-          src={getCoverTrackImage(currentTrack.image_name)}
+          src={currentImageUrl}
           alt="Album cover"
           className="w-full h-full object-cover"
         />

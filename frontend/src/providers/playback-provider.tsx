@@ -7,6 +7,7 @@ import {
 } from "react";
 import { Track } from "@/hooks/use-tracks";
 import { PlaybackContext } from "@/context/playback-context";
+import { getCoverTrackImage } from "@/lib/utils";
 
 export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -15,6 +16,14 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
+
+  useEffect(() => {
+    if (currentTrack) {
+      setCurrentImageUrl(getCoverTrackImage(currentTrack.image_name));
+    }
+  }, [currentTrack]);
 
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
@@ -95,6 +104,8 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         setDuration,
         setPlaylist,
         audioRef,
+        currentImageUrl,
+        setCurrentImageUrl,
       }}
     >
       {children}

@@ -267,10 +267,10 @@ export function useUploadPlaylistCover() {
       if (!authToken) throw new Error("Unauthorized");
 
       const formData = new FormData();
-      formData.append("cover", image);
+      formData.append("image", image);
 
       return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/cover`,
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/upload/image`,
         {
           method: "POST",
           headers: {

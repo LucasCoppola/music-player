@@ -14,6 +14,8 @@ type PlaybackContextType = {
   setDuration: (duration: number) => void;
   setPlaylist: (tracks: Track[]) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
+  currentImageUrl: string;
+  setCurrentImageUrl: (image_name: string) => void;
 };
 
 export const PlaybackContext = createContext<PlaybackContextType | undefined>(

@@ -1,17 +1,16 @@
 import { HeartIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlayback } from "@/context/playback-context";
-import { getCoverTrackImage } from "@/lib/utils";
 
 export default function TrackInfo() {
-  const { currentTrack } = usePlayback();
+  const { currentTrack, currentImageUrl } = usePlayback();
 
   return (
     <div className="flex items-center w-1/3 space-x-2">
       {currentTrack && (
         <>
           <img
-            src={getCoverTrackImage(currentTrack.image_name)}
+            src={currentImageUrl}
             alt="Track thumbnail"
             className="w-10 h-10 object-cover mr-2"
           />
