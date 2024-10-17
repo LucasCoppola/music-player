@@ -30,12 +30,12 @@ export default function Volume() {
 
   function displayVolumeIcon(): JSX.Element {
     if (volume > 0 && volume <= 0.5) {
-      return <Volume1 className="h-4 w-4" />;
+      return <Volume1 className="size-4" />;
     } else if (volume > 0.5) {
-      return <Volume2 className="h-4 w-4" />;
+      return <Volume2 className="size-4" />;
     }
 
-    return <VolumeX className="h-4 w-4" />;
+    return <VolumeX className="size-4" />;
   }
 
   function toggleMute() {
@@ -54,13 +54,13 @@ export default function Volume() {
   }
 
   return (
-    <div className="flex items-center w-1/3 justify-end pr-8">
+    <div className="w-1/3 pr-8">
       {currentTrack && (
-        <>
+        <div className="group flex justify-end items-center">
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-zinc-900"
+            className="size-7 hover:bg-[#181818]"
             onClick={toggleMute}
           >
             {displayVolumeIcon()}
@@ -74,7 +74,7 @@ export default function Volume() {
             step={0.01}
             disabled={!currentTrack}
           />
-        </>
+        </div>
       )}
     </div>
   );
