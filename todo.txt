@@ -14,14 +14,10 @@
 - [x] Current track provider (frontend)
 - [x] Modify/add image
 
-Boolean Toggle:
-
-If users only want to see their favorite items, use a favs parameter as a boolean toggle:
-Example: /?q=keyword&favs=true
-When favs=true, it filters the results to show only favorites.
 
 - [] Download track
 - [] Favorites Playlist
+   - When the an user account is created, a favorite playlist should be created.
 - [] Add to favorites
   -? Should be independent from the playlist resource or not?
   - You can add a track to favorites like a normal playlist or by clicking the heart

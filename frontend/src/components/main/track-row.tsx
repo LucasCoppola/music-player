@@ -50,7 +50,6 @@ export default function TrackRow({
   const { data: playlists } = usePlaylists();
   const { mutate: deleteTrack } = useDeleteTrack();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
-  const isFavorite = true;
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
 
@@ -166,7 +165,7 @@ export default function TrackRow({
                       ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                {isFavorite ? (
+                {track.favorite ? (
                   <DropdownMenuItem className="text-xs">
                     <HeartOff className="mr-2 size-3 fill-primary" />
                     Remove from Favorites

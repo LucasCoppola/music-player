@@ -14,13 +14,23 @@ import PlaylistRow from "./playlist-row";
 export default function Sidebar() {
   const { authState, logout } = useAuth();
   const pathname = useLocation({ select: (location) => location.pathname });
-  const { data: playlists } = usePlaylists();
+  const { data } = usePlaylists();
   const { mutate: createPlaylist } = useCreatePlaylist();
 
   const newPlaylist = {
     id: crypto.randomUUID(),
     title: "New Playlist",
   };
+
+  const otherPlaylists =
+    data?.filter((playlist) => playlist.title !== "Favorites") || [];
+  const favoritesPlaylist = data?.find(
+    (playlist) => playlist.title === "Favorites",
+  );
+  const playlists = [
+    ...(favoritesPlaylist ? [favoritesPlaylist] : []),
+    ...otherPlaylists,
+  ];
 
   return (
     <div className="w-56 bg-[#121212] flex flex-col h-full">
@@ -42,13 +52,6 @@ export default function Sidebar() {
             focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/" ? "bg-[#1A1A1A]" : ""}`}
         >
           All Tracks
-        </Link>
-        <Link
-          to="/p/favorites"
-          className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
-            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/p/favorites" ? "bg-[#1A1A1A]" : ""}`}
-        >
-          Favorites
         </Link>
       </div>
 

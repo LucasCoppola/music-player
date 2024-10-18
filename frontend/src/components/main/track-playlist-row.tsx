@@ -47,7 +47,6 @@ export default function TrackPlaylistRow({
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
   const playlists = data?.filter((p) => p.id !== playlistId);
   const [isHovered, setIsHovered] = useState(false);
-  const isFavorite = true;
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
@@ -159,7 +158,7 @@ export default function TrackPlaylistRow({
                     ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              {isFavorite ? (
+              {track.favorite ? (
                 <DropdownMenuItem className="text-xs">
                   <HeartOff className="mr-2 size-3 fill-primary" />
                   Remove from Favorites

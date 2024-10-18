@@ -40,62 +40,68 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
         {playlist.title}
       </Link>
 
-      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100">
-        <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-5 w-5 rounded-sm">
-              <MoreVertical className="size-4" />
-              <span className="sr-only">Playlist options</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48 dark">
-            <DropdownMenuItem
-              className="text-xs"
-              onSelect={(e) => {
-                e.preventDefault();
-                setIsAlertDialogOpen(true);
-              }}
-            >
-              <Trash className="mr-2 size-3" />
-              Delete
-            </DropdownMenuItem>
-            <AlertDialog
-              open={isAlertDialogOpen}
-              onOpenChange={setIsAlertDialogOpen}
-            >
-              <AlertDialogContent className="dark text-foreground">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Playlist?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    The playlist will be permanently deleted along with all its
-                    tracks. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsAlertDialogOpen(false);
-                    }}
-                  >
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-red-600 hover:bg-red-500 text-foreground"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsAlertDialogOpen(false);
-                      mutate({ id: playlist.id });
-                    }}
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      {playlist.title !== "Favorites" && (
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100">
+          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 rounded-sm"
+              >
+                <MoreVertical className="size-4" />
+                <span className="sr-only">Playlist options</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48 dark">
+              <DropdownMenuItem
+                className="text-xs"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsAlertDialogOpen(true);
+                }}
+              >
+                <Trash className="mr-2 size-3" />
+                Delete
+              </DropdownMenuItem>
+              <AlertDialog
+                open={isAlertDialogOpen}
+                onOpenChange={setIsAlertDialogOpen}
+              >
+                <AlertDialogContent className="dark text-foreground">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Playlist?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      The playlist will be permanently deleted along with all
+                      its tracks. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsAlertDialogOpen(false);
+                      }}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-600 hover:bg-red-500 text-foreground"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsAlertDialogOpen(false);
+                        mutate({ id: playlist.id });
+                      }}
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
     </li>
   );
 }

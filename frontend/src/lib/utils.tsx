@@ -37,6 +37,14 @@ export function getCoverTrackImage(image_name: string | null): string {
   if (image_name) {
     return `${import.meta.env.VITE_BASE_URL}/images/${image_name}`;
   } else {
-    return `${import.meta.env.VITE_BASE_URL}/images/default_cover_track_image.png`;
+    return `${import.meta.env.VITE_BASE_URL}/images/defaults/default_cover_track_image.png`;
+  }
+}
+
+export function getCoverPlaylistImage(image_name: string): string {
+  if (image_name) {
+    return `${import.meta.env.VITE_BASE_URL}/images/${image_name}`;
+  } else {
+    return `${import.meta.env.VITE_BASE_URL}/images/defaults/default_cover_track_image.png`;
   }
 }

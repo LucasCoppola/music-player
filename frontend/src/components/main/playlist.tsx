@@ -10,9 +10,7 @@ import { PlaylistLoadingSkeleton } from "../skeletons";
 import { formatDuration } from "@/lib/utils";
 
 export default function Playlist() {
-  const { playlistId } = useParams({
-    from: "/p/$playlistId",
-  });
+  const { playlistId } = useParams({ from: "/p/$playlistId" });
   const { data: playlist, isLoading } = usePlaylistById(playlistId);
 
   if (isLoading) {
@@ -49,15 +47,31 @@ export default function Playlist() {
           </div>
 
           <div className="flex items-center py-3 px-4 space-x-3 bg-[#0A0A0A]">
-            <CoverImage
-              coverImage={playlist.image_name ?? null}
-              playlistId={playlist.id}
-            />
-            <div>
-              <EditableTitle
+            {playlist?.title === "Favorites" ? (
+              <div className="w-16 h-16 sm:w-20 sm:h-20">
+                <img
+                  src={`${import.meta.env.VITE_BASE_URL}/images/defaults/${playlist.image_name}`}
+                  alt="Favorite playlist cover"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <CoverImage
+                coverImage={playlist.image_name ?? null}
                 playlistId={playlist.id}
-                initialName={playlist.title}
               />
+            )}
+            <div>
+              {playlist?.title === "Favorites" ? (
+                <h1 className="text-xl sm:text-2xl font-bold">
+                  {playlist.title}
+                </h1>
+              ) : (
+                <EditableTitle
+                  playlistId={playlist.id}
+                  initialName={playlist.title}
+                />
+              )}
               <p className="text-xs sm:text-sm text-gray-400">
                 {playlist.track_count} tracks •{" "}
                 {formatDuration(playlist.duration)}
