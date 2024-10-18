@@ -18,7 +18,7 @@ export type Track = {
 type UploadFile = {
   trackId?: string;
   message: string;
-  file_name: string;
+  track_name: string;
   mimetype: string;
   size_in_kb: number;
 };
