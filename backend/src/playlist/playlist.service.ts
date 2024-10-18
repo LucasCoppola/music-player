@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -55,11 +56,15 @@ export class PlaylistService {
   }
 
   async create(createPlaylistDto: CreatePlaylistDto) {
-    const { id, title, owner_id } = createPlaylistDto;
+    const { id, title, owner_id, image_name } = createPlaylistDto;
 
     const user = await this.usersService.findOneById(owner_id);
 
     try {
+      if (title === 'Favorites') {
+        throw new BadRequestException('Favorites is a reserved playlist title');
+      }
+
       await this.playlistRepository
         .createQueryBuilder()
         .insert()
@@ -68,13 +73,18 @@ export class PlaylistService {
           id,
           title,
           owner_id: user.id,
+          image_name,
         })
         .execute();
 
       return { message: 'Playlist created successfully.' };
     } catch (error) {
       console.log('Error creating playlist: ', error);
-      throw new InternalServerErrorException('Failed to create playlist');
+      if (error instanceof BadRequestException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to create playlist');
+      }
     }
   }
 
@@ -146,7 +156,11 @@ export class PlaylistService {
       const updateFields: Partial<Playlist> = {};
       let oldImageName: string | undefined;
 
-      if (title) updateFields.title = title;
+      if (title === 'Favorites') {
+        throw new BadRequestException('Favorites is a reserved playlist title');
+      }
+
+      if (title && title !== playlist.title) updateFields.title = title;
       if (image_name) {
         oldImageName = playlist.image_name;
 
@@ -174,7 +188,11 @@ export class PlaylistService {
       };
     } catch (error) {
       console.log('Error updating playlist: ', error);
-      throw new InternalServerErrorException('Failed to update playlist');
+      if (error instanceof BadRequestException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to update playlist');
+      }
     }
   }
 
@@ -188,8 +206,10 @@ export class PlaylistService {
         .from(Playlist)
         .where('id = :id', { id: playlist.id })
         .andWhere('user_id = :user_id', { user_id })
-        .returning('id')
+        .returning('id, image_name')
         .execute();
+
+      await this.removeImageFile(result.raw[0].image_name);
 
       return {
         playlistId: result.raw[0].id,

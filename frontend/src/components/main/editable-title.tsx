@@ -27,7 +27,9 @@ export function EditableTitle({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsEditing(false);
-    if (name.trim() !== "" && name !== initialName) {
+    if (name === "Favorites") {
+      setName(initialName);
+    } else if (name.trim() !== "" && name !== initialName) {
       mutate({ id: playlistId, title: name });
     } else {
       setName(initialName); // Reset to initial name if empty or unchanged
