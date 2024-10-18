@@ -20,8 +20,10 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  useAddTrackToFavorites,
   useAddTrackToPlaylist,
   usePlaylists,
+  useRemoveTrackFromFavorites,
   useRemoveTrackFromPlaylist,
 } from "@/hooks/use-playlists";
 import { Track } from "@/hooks/use-tracks";
@@ -45,7 +47,12 @@ export default function TrackPlaylistRow({
   const { data } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
-  const playlists = data?.filter((p) => p.id !== playlistId);
+  const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
+  const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
+
+  const playlists = data?.filter(
+    (p) => p.id !== playlistId && p.type === "regular",
+  );
   const [isHovered, setIsHovered] = useState(false);
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
@@ -159,12 +166,18 @@ export default function TrackPlaylistRow({
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               {track.favorite ? (
-                <DropdownMenuItem className="text-xs">
+                <DropdownMenuItem
+                  className="text-xs"
+                  onClick={() => removeFromFavorites({ trackId: track.id })}
+                >
                   <HeartOff className="mr-2 size-3 fill-primary" />
                   Remove from Favorites
                 </DropdownMenuItem>
               ) : (
-                <DropdownMenuItem className="text-xs">
+                <DropdownMenuItem
+                  className="text-xs"
+                  onClick={() => addTrackToFavorites({ trackId: track.id })}
+                >
                   <Heart className="mr-2 size-3" />
                   Add to Favorites
                 </DropdownMenuItem>

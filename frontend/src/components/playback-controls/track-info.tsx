@@ -6,7 +6,6 @@ import { useCallback, useState } from "react";
 export default function TrackInfo() {
   const { currentTrack, currentImageUrl } = usePlayback();
   const [isHovered, setIsHovered] = useState(false);
-  const isFavorite = true;
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -29,7 +28,7 @@ export default function TrackInfo() {
                 {currentTrack.artist}
               </div>
             </div>
-            {isFavorite ? (
+            {currentTrack.favorite ? (
               <Button
                 variant="ghost"
                 size="icon"

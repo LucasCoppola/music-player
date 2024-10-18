@@ -16,12 +16,8 @@
 
 
 - [] Download track
-- [] Favorites Playlist
-  - Instead of using the title as a conditional check, create a type property.
-  - "Pinned" functionality: findAll playlists order by.
-- [] Add to favorites
-  -? Should be independent from the playlist resource or not?
-  - You can add a track to favorites like a normal playlist or by clicking the heart
+- [x] Favorites Playlist
+- [x] Add/remove from favorites
 
 - [] Listening History
 - [] Track play count

@@ -75,6 +75,40 @@ export class TrackService {
     }
   }
 
+  async markAsFavorite(id: string, user_id: string) {
+    try {
+      await this.tracksRepository
+        .createQueryBuilder()
+        .update()
+        .set({ favorite: true })
+        .where('id = :id', { id })
+        .andWhere('user_id = :user_id', { user_id })
+        .execute();
+    } catch (error) {
+      console.log('Error marking track as favorite: ', error);
+      throw new InternalServerErrorException(
+        'Failed to mark track as favorite',
+      );
+    }
+  }
+
+  async unmarkAsFavorite(id: string, user_id: string) {
+    try {
+      await this.tracksRepository
+        .createQueryBuilder()
+        .update()
+        .set({ favorite: false })
+        .where('id = :id', { id })
+        .andWhere('user_id = :user_id', { user_id })
+        .execute();
+    } catch (error) {
+      console.log('Error unmarking track as favorite: ', error);
+      throw new InternalServerErrorException(
+        'Failed to unmark track as favorite',
+      );
+    }
+  }
+
   async search(query: string, user_id: string) {
     try {
       const tracks = await this.tracksRepository

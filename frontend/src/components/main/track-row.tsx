@@ -30,7 +30,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useAddTrackToPlaylist, usePlaylists } from "@/hooks/use-playlists";
+import {
+  useAddTrackToFavorites,
+  useAddTrackToPlaylist,
+  usePlaylists,
+  useRemoveTrackFromFavorites,
+} from "@/hooks/use-playlists";
 import { useCallback, useState } from "react";
 import { Track, useDeleteTrack } from "@/hooks/use-tracks";
 import { formatDuration, highlightText } from "@/lib/utils";
@@ -48,10 +53,12 @@ export default function TrackRow({
   query?: string;
 }) {
   const { data: playlists } = usePlaylists();
-  const { mutate: deleteTrack } = useDeleteTrack();
-  const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
-
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
+  const { mutate: deleteTrack } = useDeleteTrack();
+
+  const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
+  const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
+  const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -148,30 +155,38 @@ export default function TrackRow({
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-48">
                     {playlists &&
-                      playlists.map((playlist) => (
-                        <DropdownMenuItem
-                          className="text-xs"
-                          key={playlist.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addTrackToPlaylist({
-                              trackId: track.id,
-                              playlistId: playlist.id,
-                            });
-                          }}
-                        >
-                          {playlist.title}
-                        </DropdownMenuItem>
-                      ))}
+                      playlists
+                        .filter((p) => p.type === "regular")
+                        .map((playlist) => (
+                          <DropdownMenuItem
+                            className="text-xs"
+                            key={playlist.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addTrackToPlaylist({
+                                trackId: track.id,
+                                playlistId: playlist.id,
+                              });
+                            }}
+                          >
+                            {playlist.title}
+                          </DropdownMenuItem>
+                        ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 {track.favorite ? (
-                  <DropdownMenuItem className="text-xs">
+                  <DropdownMenuItem
+                    className="text-xs"
+                    onClick={() => removeFromFavorites({ trackId: track.id })}
+                  >
                     <HeartOff className="mr-2 size-3 fill-primary" />
                     Remove from Favorites
                   </DropdownMenuItem>
                 ) : (
-                  <DropdownMenuItem className="text-xs">
+                  <DropdownMenuItem
+                    className="text-xs"
+                    onClick={() => addTrackToFavorites({ trackId: track.id })}
+                  >
                     <Heart className="mr-2 size-3" />
                     Add to Favorites
                   </DropdownMenuItem>

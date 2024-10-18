@@ -37,6 +37,22 @@ export class PlaylistController {
     return this.playlistService.findAll(req.user.sub);
   }
 
+  @Post('favorites/tracks/:trackId')
+  addTrackToFavorites(@Param('trackId') track_id: string, @Req() req: Request) {
+    return this.playlistService.addTrackToFavorites(req.user.sub, track_id);
+  }
+
+  @Delete('favorites/tracks/:trackId')
+  removeTrackFromFavorites(
+    @Param('trackId') track_id: string,
+    @Req() req: Request,
+  ) {
+    return this.playlistService.removeTrackFromFavorites(
+      req.user.sub,
+      track_id,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: Request) {
     return this.playlistService.findOne(req.user.sub, id);

@@ -294,3 +294,69 @@ export function useUploadPlaylistCover() {
     },
   });
 }
+
+export function useAddTrackToFavorites() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({ trackId }: { trackId: string }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
+        {
+          method: "POST",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      toast.success(data.message || "Track added to favorites successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to add track to favorites", e);
+      toast.error(e.message || "Failed to add track to favorites");
+    },
+  });
+}
+
+export function useRemoveTrackFromFavorites() {
+  const queryClient = useQueryClient();
+  const { authState } = useAuth();
+  const authToken = authState?.token;
+  const client = useClient();
+
+  return useMutation({
+    mutationFn: async ({ trackId }: { trackId: string }) => {
+      if (!authToken) throw new Error("Unauthorized");
+
+      return await client(
+        `${import.meta.env.VITE_BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
+        {
+          method: "DELETE",
+          headers: {
+            contentType: "application/json",
+            authToken,
+          },
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      toast.success(
+        data.message || "Track removed from favorites successfully.",
+      );
+    },
+    onError: (e) => {
+      console.error("Failed to remove track from favorites", e);
+      toast.error(e.message || "Failed to remove track from favorites");
+    },
+  });
+}

@@ -229,6 +229,34 @@ export class PlaylistService {
     }
   }
 
+  async addTrackToFavorites(user_id: string, track_id: string) {
+    const [playlist, track] = await Promise.all([
+      this.playlistRepository
+        .createQueryBuilder('playlist')
+        .where('playlist.type = :type', { type: 'favorite' })
+        .andWhere('playlist.user_id = :user_id', { user_id })
+        .getOne(),
+      this.trackService.findOne(track_id, user_id),
+    ]);
+
+    try {
+      await this.playlistRepository
+        .createQueryBuilder()
+        .relation(Playlist, 'tracks')
+        .of(playlist.id)
+        .add(track.id);
+
+      await this.trackService.markAsFavorite(track_id, user_id);
+
+      return { message: 'Track added to Favorites' };
+    } catch (error) {
+      console.log('Error adding track to favorites: ', error);
+      throw new InternalServerErrorException(
+        'Failed to add track to favorites',
+      );
+    }
+  }
+
   async removeTrack(id: string, user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
       this.findOne(user_id, id),
@@ -247,6 +275,34 @@ export class PlaylistService {
       console.log('Error removing track from playlist: ', error);
       throw new InternalServerErrorException(
         'Failed to remove track from playlist',
+      );
+    }
+  }
+
+  async removeTrackFromFavorites(user_id: string, track_id: string) {
+    const [playlist, track] = await Promise.all([
+      this.playlistRepository
+        .createQueryBuilder('playlist')
+        .where('playlist.type = :type', { type: 'favorite' })
+        .andWhere('playlist.user_id = :user_id', { user_id })
+        .getOne(),
+      this.trackService.findOne(track_id, user_id),
+    ]);
+
+    try {
+      await this.playlistRepository
+        .createQueryBuilder()
+        .relation(Playlist, 'tracks')
+        .of(playlist.id)
+        .remove(track.id);
+
+      await this.trackService.unmarkAsFavorite(track_id, user_id);
+
+      return { message: 'Track removed from Favorites' };
+    } catch (error) {
+      console.log('Error removed track from favorites: ', error);
+      throw new InternalServerErrorException(
+        'Failed to removed track from favorites',
       );
     }
   }
