@@ -6,14 +6,17 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
+import { PlaylistService } from '../playlist/playlist.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private playlistService: PlaylistService,
   ) {}
 
   async login(loginAuthDto: LoginDto) {
@@ -54,6 +57,14 @@ export class AuthService {
       email,
       password: hashedPassword,
       username,
+    });
+
+    const favoritePlaylistId = crypto.randomUUID();
+    await this.playlistService.create({
+      id: favoritePlaylistId,
+      title: 'Favorites',
+      owner_id: newUser.id,
+      image_name: 'heart.png',
     });
 
     const payload = {

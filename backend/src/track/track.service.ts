@@ -124,9 +124,9 @@ export class TrackService {
   }
 
   async findAll(user_id: string): Promise<Track[]> {
-    try {
-      const user = await this.usersService.findOneById(user_id);
+    const user = await this.usersService.findOneById(user_id);
 
+    try {
       const tracks = await this.tracksRepository
         .createQueryBuilder('track')
         .where('track.user_id = :user_id', { user_id: user.id })
@@ -141,9 +141,9 @@ export class TrackService {
   }
 
   async findOne(id: string, user_id: string): Promise<Track> {
-    try {
-      const user = await this.usersService.findOneById(user_id);
+    const user = await this.usersService.findOneById(user_id);
 
+    try {
       const track = await this.tracksRepository
         .createQueryBuilder('track')
         .where('track.id = :id', { id })
