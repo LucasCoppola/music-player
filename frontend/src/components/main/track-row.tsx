@@ -53,7 +53,14 @@ export default function TrackRow({
   query?: string;
 }) {
   const { data: playlists } = usePlaylists();
-  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
+  const {
+    currentTrack,
+    playTrack,
+    togglePlayPause,
+    isPlaying,
+    setIsCurrentFavorite,
+    isCurrentFavorite,
+  } = usePlayback();
   const { mutate: deleteTrack } = useDeleteTrack();
 
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
@@ -174,10 +181,13 @@ export default function TrackRow({
                         ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                {track.favorite ? (
+                {isCurrentFavorite ? (
                   <DropdownMenuItem
                     className="text-xs"
-                    onClick={() => removeFromFavorites({ trackId: track.id })}
+                    onClick={() => {
+                      setIsCurrentFavorite(false);
+                      removeFromFavorites({ trackId: track.id });
+                    }}
                   >
                     <HeartOff className="mr-2 size-3 fill-primary" />
                     Remove from Favorites
@@ -185,7 +195,10 @@ export default function TrackRow({
                 ) : (
                   <DropdownMenuItem
                     className="text-xs"
-                    onClick={() => addTrackToFavorites({ trackId: track.id })}
+                    onClick={() => {
+                      setIsCurrentFavorite(true);
+                      addTrackToFavorites({ trackId: track.id });
+                    }}
                   >
                     <Heart className="mr-2 size-3" />
                     Add to Favorites

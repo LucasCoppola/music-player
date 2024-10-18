@@ -18,10 +18,12 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [currentImageUrl, setCurrentImageUrl] = useState("");
+  const [isCurrentFavorite, setIsCurrentFavorite] = useState(false);
 
   useEffect(() => {
     if (currentTrack) {
       setCurrentImageUrl(getCoverTrackImage(currentTrack.image_name));
+      setIsCurrentFavorite(currentTrack.favorite);
     }
   }, [currentTrack]);
 
@@ -106,6 +108,8 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         audioRef,
         currentImageUrl,
         setCurrentImageUrl,
+        isCurrentFavorite,
+        setIsCurrentFavorite,
       }}
     >
       {children}

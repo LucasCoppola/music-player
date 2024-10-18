@@ -16,6 +16,8 @@ type PlaybackContextType = {
   audioRef: React.RefObject<HTMLAudioElement>;
   currentImageUrl: string;
   setCurrentImageUrl: (image_name: string) => void;
+  isCurrentFavorite: boolean;
+  setIsCurrentFavorite: (isFavorite: boolean) => void;
 };
 
 export const PlaybackContext = createContext<PlaybackContextType | undefined>(

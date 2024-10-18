@@ -1,7 +1,6 @@
 import {
   Download,
   Ellipsis,
-  Heart,
   HeartOff,
   Pause,
   Play,
@@ -20,7 +19,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  useAddTrackToFavorites,
   useAddTrackToPlaylist,
   usePlaylists,
   useRemoveTrackFromFavorites,
@@ -47,15 +45,21 @@ export default function TrackPlaylistRow({
   const { data } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
-  const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
-  const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
+  const { mutate: removeFromFavorites } =
+    useRemoveTrackFromFavorites(playlistId);
 
   const playlists = data?.filter(
     (p) => p.id !== playlistId && p.type === "regular",
   );
   const [isHovered, setIsHovered] = useState(false);
 
-  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
+  const {
+    currentTrack,
+    playTrack,
+    togglePlayPause,
+    isPlaying,
+    setIsCurrentFavorite,
+  } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
@@ -165,23 +169,16 @@ export default function TrackPlaylistRow({
                     ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              {track.favorite ? (
-                <DropdownMenuItem
-                  className="text-xs"
-                  onClick={() => removeFromFavorites({ trackId: track.id })}
-                >
-                  <HeartOff className="mr-2 size-3 fill-primary" />
-                  Remove from Favorites
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem
-                  className="text-xs"
-                  onClick={() => addTrackToFavorites({ trackId: track.id })}
-                >
-                  <Heart className="mr-2 size-3" />
-                  Add to Favorites
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                className="text-xs"
+                onClick={() => {
+                  setIsCurrentFavorite(false);
+                  removeFromFavorites({ trackId: track.id });
+                }}
+              >
+                <HeartOff className="mr-2 size-3 fill-primary" />
+                Remove from Favorites
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-xs">
                 <Download className="mr-2 size-3" />
                 Download Track

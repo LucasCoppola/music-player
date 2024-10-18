@@ -295,7 +295,7 @@ export function useUploadPlaylistCover() {
   });
 }
 
-export function useAddTrackToFavorites() {
+export function useAddTrackToFavorites(playlistId?: string) {
   const queryClient = useQueryClient();
   const { authState } = useAuth();
   const authToken = authState?.token;
@@ -318,6 +318,7 @@ export function useAddTrackToFavorites() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
       toast.success(data.message || "Track added to favorites successfully.");
     },
     onError: (e) => {
@@ -327,7 +328,7 @@ export function useAddTrackToFavorites() {
   });
 }
 
-export function useRemoveTrackFromFavorites() {
+export function useRemoveTrackFromFavorites(playlistId?: string) {
   const queryClient = useQueryClient();
   const { authState } = useAuth();
   const authToken = authState?.token;
@@ -350,6 +351,7 @@ export function useRemoveTrackFromFavorites() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
       toast.success(
         data.message || "Track removed from favorites successfully.",
       );
