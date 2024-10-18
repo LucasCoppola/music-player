@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { PlaylistService } from '../playlist/playlist.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -12,6 +13,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let usersService: UsersService;
   let jwtService: JwtService;
+  let playlistService: PlaylistService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,12 +32,19 @@ describe('AuthService', () => {
             signAsync: jest.fn(),
           },
         },
+        {
+          provide: PlaylistService,
+          useValue: {
+            create: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
+    playlistService = module.get<PlaylistService>(PlaylistService);
   });
 
   it('should be defined', () => {
@@ -113,6 +122,9 @@ describe('AuthService', () => {
       jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue(null);
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedpassword' as never);
       jest.spyOn(usersService, 'create').mockResolvedValue(mockNewUser);
+      jest
+        .spyOn(playlistService, 'create')
+        .mockResolvedValue({ message: 'Playlist created successfully.' });
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('mocked_token');
 
       const result = await authService.register(registerDto);
@@ -126,6 +138,13 @@ describe('AuthService', () => {
         email: registerDto.email,
         password: 'hashedpassword',
         username: registerDto.username,
+      });
+      expect(playlistService.create).toHaveBeenCalledWith({
+        id: expect.any(String),
+        title: 'Favorites',
+        owner_id: mockNewUser.id,
+        image_name: 'heart.png',
+        type: 'favorite',
       });
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: mockNewUser.id,
