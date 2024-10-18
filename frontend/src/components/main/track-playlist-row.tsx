@@ -40,7 +40,7 @@ export default function TrackPlaylistRow({
   index: number;
 }) {
   const { playlistId } = useParams({
-    from: "/playlist/$playlistId",
+    from: "/p/$playlistId",
   });
   const { data } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();

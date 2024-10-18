@@ -135,7 +135,7 @@ export function useDeletePlaylist() {
   const queryClient = useQueryClient();
   const { authState } = useAuth();
   const authToken = authState?.token;
-  const navigate = useNavigate({ from: "/playlist/$playlistId" });
+  const navigate = useNavigate({ from: "/p/$playlistId" });
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
@@ -161,8 +161,8 @@ export function useDeletePlaylist() {
       queryClient.invalidateQueries({ queryKey: ["playlists"] });
       toast.success(data.message || "Playlist deleted successfully.");
 
-      if (`/playlist/${data.playlistId}` === pathname) {
-        navigate({ to: "/" });
+      if (`/p/${data.playlistId}` === pathname) {
+        navigate({ to: "/", search: { q: "" } });
       }
     },
     onError: (e) => {

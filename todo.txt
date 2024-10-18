@@ -14,6 +14,12 @@
 - [x] Current track provider (frontend)
 - [x] Modify/add image
 
+Boolean Toggle:
+
+If users only want to see their favorite items, use a favs parameter as a boolean toggle:
+Example: /?q=keyword&favs=true
+When favs=true, it filters the results to show only favorites.
+
 - [] Download track
 - [] Favorites Playlist
 - [] Add to favorites

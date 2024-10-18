@@ -13,7 +13,7 @@ import PlaylistRow from "./playlist-row";
 
 export default function Sidebar() {
   const { authState, logout } = useAuth();
-  const search = useLocation({ select: (location) => location.search });
+  const pathname = useLocation({ select: (location) => location.pathname });
   const { data: playlists } = usePlaylists();
   const { mutate: createPlaylist } = useCreatePlaylist();
 
@@ -39,15 +39,14 @@ export default function Sidebar() {
           to="/"
           search={{ q: "" }}
           className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
-            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${search.q === "" ? "bg-[#1A1A1A]" : ""}`}
+            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/" ? "bg-[#1A1A1A]" : ""}`}
         >
           All Tracks
         </Link>
         <Link
-          to="/"
-          search={{ q: "favorites" }}
+          to="/p/favorites"
           className={`block py-1 px-4 text-xs text-[#d1d5db] hover:bg-[#1A1A1A] transition-colors 
-            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${search.q === "favorites" ? "bg-[#1A1A1A]" : ""}`}
+            focus:outline-none focus:ring-[0.5px] focus:ring-gray-400 ${pathname === "/p/favorites" ? "bg-[#1A1A1A]" : ""}`}
         >
           Favorites
         </Link>
@@ -56,7 +55,7 @@ export default function Sidebar() {
       <div className="flex items-center justify-between dark mb-4 px-4">
         <span className="text-xs font-semibold text-gray-400">Playlists</span>
         <Link
-          to="/playlist/$playlistId"
+          to="/p/$playlistId"
           params={{ playlistId: newPlaylist.id }}
           className={cn(
             buttonVariants({ variant: "ghost", size: "icon" }),

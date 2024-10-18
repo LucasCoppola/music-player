@@ -11,7 +11,7 @@ import { formatDuration } from "@/lib/utils";
 
 export default function Playlist() {
   const { playlistId } = useParams({
-    from: "/playlist/$playlistId",
+    from: "/p/$playlistId",
   });
   const { data: playlist, isLoading } = usePlaylistById(playlistId);
 
