@@ -47,7 +47,7 @@ export default function Playlist() {
           </div>
 
           <div className="flex items-center py-3 px-4 space-x-3 bg-[#0A0A0A]">
-            {playlist?.title === "Favorites" ? (
+            {playlist?.type === "favorite" ? (
               <div className="w-16 h-16 sm:w-20 sm:h-20">
                 <img
                   src={`${import.meta.env.VITE_BASE_URL}/images/defaults/${playlist.image_name}`}
@@ -62,7 +62,7 @@ export default function Playlist() {
               />
             )}
             <div>
-              {playlist?.title === "Favorites" ? (
+              {playlist?.type === "favorite" ? (
                 <h1 className="text-xl sm:text-2xl font-bold">
                   {playlist.title}
                 </h1>

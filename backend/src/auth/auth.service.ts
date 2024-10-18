@@ -65,6 +65,7 @@ export class AuthService {
       title: 'Favorites',
       owner_id: newUser.id,
       image_name: 'heart.png',
+      type: 'favorite',
     });
 
     const payload = {

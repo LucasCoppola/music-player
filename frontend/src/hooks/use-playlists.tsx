@@ -10,6 +10,7 @@ export type Playlist = {
   title: string;
   created_at: string;
   updated_at: string;
+  type: "regular" | "favorite";
   image_name: string;
   track_count: number;
   duration: number;
@@ -74,6 +75,7 @@ export function useCreatePlaylist() {
         id,
         title,
         owner_id: authState?.userId,
+        type: "regular",
       };
 
       return await client(`${import.meta.env.VITE_BASE_URL}/api/playlists`, {

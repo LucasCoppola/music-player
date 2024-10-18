@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -56,15 +55,11 @@ export class PlaylistService {
   }
 
   async create(createPlaylistDto: CreatePlaylistDto) {
-    const { id, title, owner_id, image_name } = createPlaylistDto;
+    const { id, title, owner_id, image_name, type } = createPlaylistDto;
 
     const user = await this.usersService.findOneById(owner_id);
 
     try {
-      if (title === 'Favorites') {
-        throw new BadRequestException('Favorites is a reserved playlist title');
-      }
-
       await this.playlistRepository
         .createQueryBuilder()
         .insert()
@@ -74,17 +69,14 @@ export class PlaylistService {
           title,
           owner_id: user.id,
           image_name,
+          type,
         })
         .execute();
 
       return { message: 'Playlist created successfully.' };
     } catch (error) {
       console.log('Error creating playlist: ', error);
-      if (error instanceof BadRequestException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Failed to create playlist');
-      }
+      throw new InternalServerErrorException('Failed to create playlist');
     }
   }
 
@@ -95,7 +87,11 @@ export class PlaylistService {
       const playlists = await this.playlistRepository
         .createQueryBuilder('playlist')
         .where('playlist.user_id = :user_id', { user_id: user.id })
-        .orderBy('playlist.created_at', 'DESC')
+        .orderBy(
+          `CASE WHEN playlist.type = 'favorite' THEN 0 ELSE 1 END`,
+          'ASC',
+        )
+        .addOrderBy('playlist.created_at', 'DESC')
         .getMany();
 
       return playlists;
@@ -156,10 +152,6 @@ export class PlaylistService {
       const updateFields: Partial<Playlist> = {};
       let oldImageName: string | undefined;
 
-      if (title === 'Favorites') {
-        throw new BadRequestException('Favorites is a reserved playlist title');
-      }
-
       if (title && title !== playlist.title) updateFields.title = title;
       if (image_name) {
         oldImageName = playlist.image_name;
@@ -188,11 +180,7 @@ export class PlaylistService {
       };
     } catch (error) {
       console.log('Error updating playlist: ', error);
-      if (error instanceof BadRequestException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Failed to update playlist');
-      }
+      throw new InternalServerErrorException('Failed to update playlist');
     }
   }
 

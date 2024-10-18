@@ -17,7 +17,8 @@
 
 - [] Download track
 - [] Favorites Playlist
-   - When the an user account is created, a favorite playlist should be created.
+  - Instead of using the title as a conditional check, create a type property.
+  - "Pinned" functionality: findAll playlists order by.
 - [] Add to favorites
   -? Should be independent from the playlist resource or not?
   - You can add a track to favorites like a normal playlist or by clicking the heart

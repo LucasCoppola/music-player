@@ -14,23 +14,13 @@ import PlaylistRow from "./playlist-row";
 export default function Sidebar() {
   const { authState, logout } = useAuth();
   const pathname = useLocation({ select: (location) => location.pathname });
-  const { data } = usePlaylists();
+  const { data: playlists } = usePlaylists();
   const { mutate: createPlaylist } = useCreatePlaylist();
 
   const newPlaylist = {
     id: crypto.randomUUID(),
     title: "New Playlist",
   };
-
-  const otherPlaylists =
-    data?.filter((playlist) => playlist.title !== "Favorites") || [];
-  const favoritesPlaylist = data?.find(
-    (playlist) => playlist.title === "Favorites",
-  );
-  const playlists = [
-    ...(favoritesPlaylist ? [favoritesPlaylist] : []),
-    ...otherPlaylists,
-  ];
 
   return (
     <div className="w-56 bg-[#121212] flex flex-col h-full">

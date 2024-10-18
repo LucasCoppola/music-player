@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 
 export class CreatePlaylistDto {
   @IsString()
@@ -8,6 +8,10 @@ export class CreatePlaylistDto {
   @IsString()
   @IsNotEmpty()
   title: string;
+
+  @IsEnum(['regular', 'favorite'])
+  @IsNotEmpty()
+  type: string;
 
   @IsString()
   @IsNotEmpty()

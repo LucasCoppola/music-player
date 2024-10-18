@@ -20,6 +20,9 @@ export class Playlist {
   @Column()
   title: string;
 
+  @Column({ enum: ['regular', 'favorite'] })
+  type: string;
+
   @Column({ nullable: true })
   image_name: string;
 
