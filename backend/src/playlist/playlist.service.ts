@@ -268,7 +268,7 @@ export class PlaylistService {
         .of(playlist.id)
         .add(track.id);
 
-      await this.trackService.markAsFavorite(track_id, user_id);
+      await this.trackService.toggleFavorite(track_id, user_id, true);
 
       return { message: 'Track added to Favorites' };
     } catch (error) {
@@ -314,7 +314,7 @@ export class PlaylistService {
         .of(playlist.id)
         .remove(track.id);
 
-      await this.trackService.unmarkAsFavorite(track_id, user_id);
+      await this.trackService.toggleFavorite(track_id, user_id, false);
 
       return { message: 'Track removed from Favorites' };
     } catch (error) {

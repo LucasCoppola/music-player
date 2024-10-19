@@ -14,6 +14,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TrackService {
+  private readonly uploadTracksPath = './uploads/tracks';
+  private readonly uploadImagesPath = './uploads/images';
+
   constructor(
     @InjectRepository(Track)
     private tracksRepository: Repository<Track>,
@@ -21,15 +24,14 @@ export class TrackService {
   ) {}
 
   async uploadTrack(file: Express.Multer.File) {
-    const uploadPath = './uploads/tracks';
     const fileSizeInKb = Math.floor(file.size / 1024);
 
     try {
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
+      if (!fs.existsSync(this.uploadTracksPath)) {
+        fs.mkdirSync(this.uploadTracksPath, { recursive: true });
       }
       const track_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${uploadPath}/${track_name}`;
+      const filePath = `${this.uploadTracksPath}/${track_name}`;
 
       await fs.promises.writeFile(filePath, file.buffer);
 
@@ -46,15 +48,14 @@ export class TrackService {
   }
 
   async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
-    const uploadPath = './uploads/images';
     const fileSizeInKb = Math.floor(file.size / 1024);
 
     try {
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
+      if (!fs.existsSync(this.uploadImagesPath)) {
+        fs.mkdirSync(this.uploadImagesPath, { recursive: true });
       }
       const image_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${uploadPath}/${image_name}`;
+      const filePath = `${this.uploadImagesPath}/${image_name}`;
 
       await fs.promises.writeFile(filePath, file.buffer);
 
@@ -75,36 +76,19 @@ export class TrackService {
     }
   }
 
-  async markAsFavorite(id: string, user_id: string) {
+  async toggleFavorite(id: string, user_id: string, isFavorite: boolean) {
     try {
       await this.tracksRepository
         .createQueryBuilder()
         .update()
-        .set({ favorite: true })
+        .set({ favorite: isFavorite })
         .where('id = :id', { id })
         .andWhere('user_id = :user_id', { user_id })
         .execute();
     } catch (error) {
-      console.log('Error marking track as favorite: ', error);
+      console.error(`Error toggling favorite status: `, error);
       throw new InternalServerErrorException(
-        'Failed to mark track as favorite',
-      );
-    }
-  }
-
-  async unmarkAsFavorite(id: string, user_id: string) {
-    try {
-      await this.tracksRepository
-        .createQueryBuilder()
-        .update()
-        .set({ favorite: false })
-        .where('id = :id', { id })
-        .andWhere('user_id = :user_id', { user_id })
-        .execute();
-    } catch (error) {
-      console.log('Error unmarking track as favorite: ', error);
-      throw new InternalServerErrorException(
-        'Failed to unmark track as favorite',
+        `Failed to ${isFavorite ? 'mark' : 'unmark'} track as favorite`,
       );
     }
   }
@@ -276,7 +260,8 @@ export class TrackService {
   async getAudioMetadata(
     track_name: string,
   ): Promise<{ duration: number; bit_rate: number }> {
-    const track_file_path = `./uploads/tracks/${track_name}`;
+    const track_file_path = `${this.uploadTracksPath}/${track_name}`;
+
     return new Promise((resolve, reject) => {
       ffmpeg.ffprobe(track_file_path, (err, metadata) => {
         if (err) {
