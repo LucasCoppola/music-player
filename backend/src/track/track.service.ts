@@ -10,7 +10,7 @@ import { Track } from '../entities/track.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FileService } from 'src/file/file.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class TrackService {

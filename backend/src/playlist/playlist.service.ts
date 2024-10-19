@@ -10,7 +10,7 @@ import { Playlist } from '../entities/playlist.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { TrackService } from '../track/track.service';
-import { FileService } from 'src/file/file.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class PlaylistService {
