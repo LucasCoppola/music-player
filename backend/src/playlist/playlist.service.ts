@@ -10,7 +10,7 @@ import { Playlist } from '../entities/playlist.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { TrackService } from '../track/track.service';
-import * as fs from 'fs';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class PlaylistService {
@@ -21,20 +21,20 @@ export class PlaylistService {
     private playlistRepository: Repository<Playlist>,
     private usersService: UsersService,
     private trackService: TrackService,
+    private fileService: FileService,
   ) {}
 
   async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
     const fileSizeInKb = Math.floor(file.size / 1024);
+    const image_name = `${Date.now()}-${file.originalname}`;
+
+    const filePath = await this.fileService.writeFile({
+      directory: this.uploadImagesPath,
+      filename: image_name,
+      buffer: file.buffer,
+    });
 
     try {
-      if (!fs.existsSync(this.uploadImagesPath)) {
-        fs.mkdirSync(this.uploadImagesPath, { recursive: true });
-      }
-      const image_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${this.uploadImagesPath}/${image_name}`;
-
-      await fs.promises.writeFile(filePath, file.buffer);
-
       await this.update(id, user_id, {
         image_name,
         mimetype: file.mimetype,
@@ -197,7 +197,9 @@ export class PlaylistService {
         .execute();
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
-        await this.removeImageFile(oldImageName);
+        await this.fileService.removeFile({
+          filePath: `${this.uploadImagesPath}/${oldImageName}`,
+        });
       }
 
       return {
@@ -223,7 +225,9 @@ export class PlaylistService {
         .returning('id, image_name')
         .execute();
 
-      await this.removeImageFile(result.raw[0].image_name);
+      await this.fileService.removeFile({
+        filePath: `${this.uploadImagesPath}/${result.raw[0].image_name}`,
+      });
 
       return {
         playlistId: result.raw[0].id,
@@ -322,22 +326,6 @@ export class PlaylistService {
       throw new InternalServerErrorException(
         'Failed to removed track from favorites',
       );
-    }
-  }
-
-  async removeImageFile(image_name: string) {
-    const image_file_path = `${this.uploadImagesPath}/${image_name}`;
-
-    try {
-      await fs.promises.unlink(image_file_path);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        console.warn('File not found:', image_file_path);
-        return;
-      } else {
-        console.error('Error removing file:', error);
-        throw new InternalServerErrorException('Failed to remove file');
-      }
     }
   }
 }

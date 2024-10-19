@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Track } from '../entities/track.entity';
 import { User } from '../entities/user.entity';
+import { FileService } from '../file/file.service';
 
 describe('TrackService', () => {
   let service: TrackService;
@@ -13,6 +14,7 @@ describe('TrackService', () => {
       providers: [
         TrackService,
         UsersService,
+        FileService,
         {
           provide: getRepositoryToken(Track),
           useValue: {},

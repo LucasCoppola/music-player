@@ -4,13 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import * as fs from 'node:fs';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { Track } from '../entities/track.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class TrackService {
@@ -21,44 +21,38 @@ export class TrackService {
     @InjectRepository(Track)
     private tracksRepository: Repository<Track>,
     private usersService: UsersService,
+    private fileService: FileService,
   ) {}
 
   async uploadTrack(file: Express.Multer.File) {
     const fileSizeInKb = Math.floor(file.size / 1024);
+    const track_name = `${Date.now()}-${file.originalname}`;
 
-    try {
-      if (!fs.existsSync(this.uploadTracksPath)) {
-        fs.mkdirSync(this.uploadTracksPath, { recursive: true });
-      }
-      const track_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${this.uploadTracksPath}/${track_name}`;
+    await this.fileService.writeFile({
+      directory: this.uploadTracksPath,
+      filename: track_name,
+      buffer: file.buffer,
+    });
 
-      await fs.promises.writeFile(filePath, file.buffer);
-
-      return {
-        message: 'File uploaded successfully',
-        track_name,
-        mimetype: file.mimetype,
-        size_in_kb: fileSizeInKb,
-      };
-    } catch (error) {
-      console.error('Error uploading file: ', error);
-      throw new InternalServerErrorException('File upload failed');
-    }
+    return {
+      message: 'File uploaded successfully',
+      track_name,
+      mimetype: file.mimetype,
+      size_in_kb: fileSizeInKb,
+    };
   }
 
   async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
     const fileSizeInKb = Math.floor(file.size / 1024);
+    const image_name = `${Date.now()}-${file.originalname}`;
+
+    await this.fileService.writeFile({
+      directory: this.uploadImagesPath,
+      filename: image_name,
+      buffer: file.buffer,
+    });
 
     try {
-      if (!fs.existsSync(this.uploadImagesPath)) {
-        fs.mkdirSync(this.uploadImagesPath, { recursive: true });
-      }
-      const image_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${this.uploadImagesPath}/${image_name}`;
-
-      await fs.promises.writeFile(filePath, file.buffer);
-
       await this.update(id, user_id, {
         image_name,
         mimetype: file.mimetype,
@@ -203,7 +197,9 @@ export class TrackService {
         .execute();
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
-        await this.removeFile(oldImageName, 'images');
+        await this.fileService.removeFile({
+          filePath: `${this.uploadImagesPath}/${oldImageName}`,
+        });
       }
 
       return {
@@ -216,14 +212,22 @@ export class TrackService {
   }
 
   async remove(id: string, user_id: string) {
+    const [user, track] = await Promise.all([
+      this.usersService.findOneById(user_id),
+      this.findOne(id, user_id),
+    ]);
+
+    await this.fileService.removeFile({
+      filePath: `${this.uploadTracksPath}/${track.track_name}`,
+    });
+
+    if (track.image_name) {
+      await this.fileService.removeFile({
+        filePath: `${this.uploadImagesPath}/${track.image_name}`,
+      });
+    }
+
     try {
-      const [user, track] = await Promise.all([
-        this.usersService.findOneById(user_id),
-        this.findOne(id, user_id),
-      ]);
-
-      this.removeFile(track.track_name, 'tracks');
-
       await this.tracksRepository
         .createQueryBuilder()
         .delete()
@@ -238,22 +242,6 @@ export class TrackService {
     } catch (error) {
       console.log('Error removing track: ', error);
       throw new InternalServerErrorException('Failed to remove track');
-    }
-  }
-
-  async removeFile(file_name: string, type: 'images' | 'tracks') {
-    const file_path = `./uploads/${type}/${file_name}`;
-
-    try {
-      await fs.promises.unlink(file_path);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        console.warn('File not found:', file_path);
-        throw new NotFoundException();
-      } else {
-        console.error('Error removing file:', error);
-        throw new InternalServerErrorException('Failed to remove file');
-      }
     }
   }
 

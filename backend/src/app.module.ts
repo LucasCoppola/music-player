@@ -17,6 +17,7 @@ import { ListeningHistory } from './entities/listening_history.entity';
 import { TrackPlayCount } from './entities/track_play_count.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { join } from 'path';
     AudioModule,
     PlaylistModule,
     TrackModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
