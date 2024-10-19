@@ -5,9 +5,15 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Track } from '../entities/track.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { FileModule } from '../file/file.module';
 
 @Module({
-  imports: [UsersModule, JwtModule, TypeOrmModule.forFeature([Track])],
+  imports: [
+    UsersModule,
+    JwtModule,
+    FileModule,
+    TypeOrmModule.forFeature([Track]),
+  ],
   controllers: [TrackController],
   providers: [TrackService],
   exports: [TrackService],
