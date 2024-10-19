@@ -14,6 +14,8 @@ import * as fs from 'fs';
 
 @Injectable()
 export class PlaylistService {
+  private readonly uploadImagesPath = './uploads/images';
+
   constructor(
     @InjectRepository(Playlist)
     private playlistRepository: Repository<Playlist>,
@@ -22,15 +24,14 @@ export class PlaylistService {
   ) {}
 
   async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
-    const uploadPath = './uploads/images';
     const fileSizeInKb = Math.floor(file.size / 1024);
 
     try {
-      if (!fs.existsSync(uploadPath)) {
-        fs.mkdirSync(uploadPath, { recursive: true });
+      if (!fs.existsSync(this.uploadImagesPath)) {
+        fs.mkdirSync(this.uploadImagesPath, { recursive: true });
       }
       const image_name = `${Date.now()}-${file.originalname}`;
-      const filePath = `${uploadPath}/${image_name}`;
+      const filePath = `${this.uploadImagesPath}/${image_name}`;
 
       await fs.promises.writeFile(filePath, file.buffer);
 
@@ -140,6 +141,31 @@ export class PlaylistService {
     }
   }
 
+  async findFavoritePlaylist(user_id: string) {
+    try {
+      const playlist = await this.playlistRepository
+        .createQueryBuilder('playlist')
+        .where('playlist.type = :type', { type: 'favorite' })
+        .andWhere('playlist.user_id = :user_id', { user_id })
+        .getOne();
+
+      if (!playlist) {
+        throw new NotFoundException('Favorite playlist not found');
+      }
+
+      return playlist;
+    } catch (error) {
+      console.log('Error finding favorite playlist: ', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(
+          'Failed to find favorite playlist',
+        );
+      }
+    }
+  }
+
   async update(
     id: string,
     user_id: string,
@@ -231,11 +257,7 @@ export class PlaylistService {
 
   async addTrackToFavorites(user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
-      this.playlistRepository
-        .createQueryBuilder('playlist')
-        .where('playlist.type = :type', { type: 'favorite' })
-        .andWhere('playlist.user_id = :user_id', { user_id })
-        .getOne(),
+      this.findFavoritePlaylist(user_id),
       this.trackService.findOne(track_id, user_id),
     ]);
 
@@ -281,11 +303,7 @@ export class PlaylistService {
 
   async removeTrackFromFavorites(user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
-      this.playlistRepository
-        .createQueryBuilder('playlist')
-        .where('playlist.type = :type', { type: 'favorite' })
-        .andWhere('playlist.user_id = :user_id', { user_id })
-        .getOne(),
+      this.findFavoritePlaylist(user_id),
       this.trackService.findOne(track_id, user_id),
     ]);
 
@@ -308,13 +326,14 @@ export class PlaylistService {
   }
 
   async removeImageFile(image_name: string) {
-    const image_file_path = `./uploads/images/${image_name}`;
+    const image_file_path = `${this.uploadImagesPath}/${image_name}`;
+
     try {
       await fs.promises.unlink(image_file_path);
     } catch (error) {
       if (error.code === 'ENOENT') {
         console.warn('File not found:', image_file_path);
-        throw new NotFoundException();
+        return;
       } else {
         console.error('Error removing file:', error);
         throw new InternalServerErrorException('Failed to remove file');
