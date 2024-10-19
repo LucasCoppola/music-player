@@ -214,7 +214,9 @@ export default function TrackRow({
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
                     className="text-xs"
-                    onSelect={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                   >
                     <Trash className="mr-2 size-3" />
                     Delete

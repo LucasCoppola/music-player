@@ -185,7 +185,7 @@ export function useUploadPlaylistCover() {
     }: {
       playlistId: string;
       image: File;
-    }): Promise<{ message: string; playlistId: string }> => {
+    }) => {
       const formData = new FormData();
       formData.append("image", image);
 

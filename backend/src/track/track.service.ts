@@ -37,8 +37,8 @@ export class TrackService {
     return {
       message: 'File uploaded successfully',
       track_name,
-      mimetype: file.mimetype,
       size_in_kb: fileSizeInKb,
+      mimetype: file.mimetype,
     };
   }
 
@@ -61,7 +61,6 @@ export class TrackService {
 
       return {
         message: 'Track cover image uploaded successfully',
-        track_id: id,
         image_name,
       };
     } catch (error) {

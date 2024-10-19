@@ -1,7 +1,7 @@
-import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./use-client";
+import { BASE_URL, queryKeys } from "@/lib/consts";
 
 export type Track = {
   id: string;
@@ -13,10 +13,10 @@ export type Track = {
   image_name: string | null;
   duration: number;
   bit_rate: number;
+  created_at: Date;
 };
 
-type UploadFile = {
-  trackId?: string;
+type UploadTrack = {
   message: string;
   track_name: string;
   mimetype: string;
@@ -24,54 +24,27 @@ type UploadFile = {
 };
 
 export function useTracks(query: string) {
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  const client = useClient();
+  const client = useClient<Track[]>();
 
   return useQuery({
-    queryKey: ["tracks", query],
-    queryFn: async (): Promise<Track[]> => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/tracks?q=${query}`,
-        {
-          method: "GET",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
-        },
-      );
-    },
-    enabled: !!authToken,
+    queryKey: queryKeys.tracks(),
+    queryFn: () =>
+      client(`${BASE_URL}/api/tracks?q=${query}`, { method: "GET" }),
   });
 }
 
 export function useUploadTrackFile() {
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  const client = useClient();
+  const client = useClient<UploadTrack>();
 
   return useMutation({
-    mutationFn: async ({ file }: { file: File }): Promise<UploadFile> => {
-      if (!authToken) throw new Error("Unauthorized");
-
+    mutationFn: async ({ file }: { file: File }) => {
       const formData = new FormData();
       formData.append("track", file);
 
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/tracks/upload/audio`,
-        {
-          method: "POST",
-          headers: {
-            authToken,
-          },
-          body: formData,
-        },
-      );
+      return await client(`${BASE_URL}/api/tracks/upload/audio`, {
+        method: "POST",
+        body: formData,
+      });
     },
     onError: (e) => {
       console.error("Failed to upload track", e);
@@ -81,37 +54,20 @@ export function useUploadTrackFile() {
 
 export function useUploadTrackCoverImage() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  const client = useClient();
+  const client = useClient<{ message: string; image_name: string }>();
 
   return useMutation({
-    mutationFn: async ({
-      file,
-      trackId,
-    }: {
-      file: File;
-      trackId: string;
-    }): Promise<{ message: string; image_name: string }> => {
-      if (!authToken) throw new Error("Unauthorized");
-
+    mutationFn: async ({ file, trackId }: { file: File; trackId: string }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/tracks/${trackId}/upload/image`,
-        {
-          method: "POST",
-          headers: {
-            authToken,
-          },
-          body: formData,
-        },
-      );
+      return await client(`${BASE_URL}/api/tracks/${trackId}/upload/image`, {
+        method: "POST",
+        body: formData,
+      });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
       toast.success(data.message || "Track cover image uploaded successfully.");
     },
     onError: (e) => {
@@ -123,10 +79,7 @@ export function useUploadTrackCoverImage() {
 
 export function useCreateTrack() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  const client = useClient();
+  const client = useClient<{ message: string }>();
 
   return useMutation({
     mutationFn: async ({
@@ -142,25 +95,14 @@ export function useCreateTrack() {
       mimetype: string;
       size_in_kb: number;
     }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(`${import.meta.env.VITE_BASE_URL}/api/tracks`, {
+      return await client(`${BASE_URL}/api/tracks`, {
         method: "POST",
-        headers: {
-          contentType: "application/json",
-          authToken,
-        },
-        body: JSON.stringify({
-          title,
-          artist,
-          track_name,
-          mimetype,
-          size_in_kb,
-        }),
+        headers: { contentType: "application/json" },
+        body: { title, artist, track_name, mimetype, size_in_kb },
       });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
       toast.success(data.message || "Track created successfully.");
     },
     onError: (e) => {
@@ -172,25 +114,16 @@ export function useCreateTrack() {
 
 export function useDeleteTrack() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  const client = useClient();
+  const client = useClient<{ message: string }>();
 
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(`${import.meta.env.VITE_BASE_URL}/api/tracks/${id}`, {
+      return await client(`${BASE_URL}/api/tracks/${id}`, {
         method: "DELETE",
-        headers: {
-          contentType: "application/json",
-          authToken,
-        },
       });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
       toast.success(data.message || "Track deleted successfully.");
     },
     onError: (e) => {
