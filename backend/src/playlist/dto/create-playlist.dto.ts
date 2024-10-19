@@ -15,10 +15,6 @@ export class CreatePlaylistDto {
 
   @IsString()
   @IsNotEmpty()
-  owner_id: string;
-
-  @IsString()
-  @IsNotEmpty()
   @IsOptional()
   image_name: string;
 }

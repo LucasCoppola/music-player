@@ -184,7 +184,8 @@ export default function TrackRow({
                 {isCurrentFavorite ? (
                   <DropdownMenuItem
                     className="text-xs"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setIsCurrentFavorite(false);
                       removeFromFavorites({ trackId: track.id });
                     }}
@@ -195,7 +196,8 @@ export default function TrackRow({
                 ) : (
                   <DropdownMenuItem
                     className="text-xs"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setIsCurrentFavorite(true);
                       addTrackToFavorites({ trackId: track.id });
                     }}

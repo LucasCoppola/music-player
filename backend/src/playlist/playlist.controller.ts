@@ -28,8 +28,8 @@ export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
 
   @Post()
-  create(@Body() createPlaylistDto: CreatePlaylistDto) {
-    return this.playlistService.create(createPlaylistDto);
+  create(@Req() req: Request, @Body() createPlaylistDto: CreatePlaylistDto) {
+    return this.playlistService.create(req.user.sub, createPlaylistDto);
   }
 
   @Get()

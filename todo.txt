@@ -1,23 +1,8 @@
-- [x] Playlist
-   - [x] Modify title 
-   - [x] Delete playlist
-   - [x] Add/remove track 
-   - [x] Calculate playlist duration and total tracks
-
-- [x] Modify/add playlist image
-- [x] Search tracks
-
 - [] Integration tests for Playlists
 - [] Integration tests for Tracks
 - [] Issue with dropdowns and dialogs causing focus loss
 
-- [x] Current track provider (frontend)
-- [x] Modify/add image
-
-
 - [] Download track
-- [x] Favorites Playlist
-- [x] Add/remove from favorites
 
 - [] Listening History
 - [] Track play count

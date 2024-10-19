@@ -139,10 +139,9 @@ describe('AuthService', () => {
         password: 'hashedpassword',
         username: registerDto.username,
       });
-      expect(playlistService.create).toHaveBeenCalledWith({
+      expect(playlistService.create).toHaveBeenCalledWith(mockNewUser.id, {
         id: expect.any(String),
         title: 'Favorites',
-        owner_id: mockNewUser.id,
         image_name: 'heart.png',
         type: 'favorite',
       });

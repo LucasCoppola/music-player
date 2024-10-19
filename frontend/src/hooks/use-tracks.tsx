@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useClient } from "./utils";
+import { useClient } from "./use-client";
 
 export type Track = {
   id: string;

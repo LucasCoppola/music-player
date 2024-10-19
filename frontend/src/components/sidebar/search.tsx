@@ -12,7 +12,9 @@ export default function SearchInput() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    navigate({ to: `/?q=${encodeURIComponent(debouncedQuery)}` });
+    if (debouncedQuery) {
+      navigate({ to: `/?q=${encodeURIComponent(debouncedQuery)}` });
+    }
   }, [navigate, debouncedQuery]);
 
   return (

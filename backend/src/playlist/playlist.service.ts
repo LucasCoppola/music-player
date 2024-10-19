@@ -28,37 +28,29 @@ export class PlaylistService {
     const fileSizeInKb = Math.floor(file.size / 1024);
     const image_name = `${Date.now()}-${file.originalname}`;
 
-    const filePath = await this.fileService.writeFile({
+    await this.fileService.writeFile({
       directory: this.uploadImagesPath,
       filename: image_name,
       buffer: file.buffer,
     });
 
-    try {
-      await this.update(id, user_id, {
-        image_name,
-        mimetype: file.mimetype,
-        size_in_kb: fileSizeInKb,
-        title: null,
-      });
+    await this.update(id, user_id, {
+      image_name,
+      mimetype: file.mimetype,
+      size_in_kb: fileSizeInKb,
+      title: null,
+    });
 
-      return {
-        message: 'Cover image uploaded successfully',
-        playlistId: id,
-        image_file_path: filePath,
-        mimetype: file.mimetype,
-        size_in_kb: fileSizeInKb,
-      };
-    } catch (error) {
-      console.error('Error uploading cover image: ', error);
-      throw new InternalServerErrorException('Cover image upload failed');
-    }
+    return {
+      message: 'Cover image uploaded successfully',
+      playlistId: id,
+    };
   }
 
-  async create(createPlaylistDto: CreatePlaylistDto) {
-    const { id, title, owner_id, image_name, type } = createPlaylistDto;
+  async create(user_id: string, createPlaylistDto: CreatePlaylistDto) {
+    const { id, title, image_name, type } = createPlaylistDto;
 
-    const user = await this.usersService.findOneById(owner_id);
+    const user = await this.usersService.findOneById(user_id);
 
     try {
       await this.playlistRepository
@@ -225,9 +217,11 @@ export class PlaylistService {
         .returning('id, image_name')
         .execute();
 
-      await this.fileService.removeFile({
-        filePath: `${this.uploadImagesPath}/${result.raw[0].image_name}`,
-      });
+      if (result.raw[0].image_name) {
+        await this.fileService.removeFile({
+          filePath: `${this.uploadImagesPath}/${result.raw[0].image_name}`,
+        });
+      }
 
       return {
         playlistId: result.raw[0].id,
@@ -252,7 +246,10 @@ export class PlaylistService {
         .of(playlist.id)
         .add(track.id);
 
-      return { message: 'Track added to playlist successfully' };
+      return {
+        message: 'Track added to playlist successfully',
+        playlistId: playlist.id,
+      };
     } catch (error) {
       console.log('Error adding track to playlist: ', error);
       throw new InternalServerErrorException('Failed to add track to playlist');
@@ -274,7 +271,7 @@ export class PlaylistService {
 
       await this.trackService.toggleFavorite(track_id, user_id, true);
 
-      return { message: 'Track added to Favorites' };
+      return { message: 'Track added to Favorites', playlistId: playlist.id };
     } catch (error) {
       console.log('Error adding track to favorites: ', error);
       throw new InternalServerErrorException(
@@ -296,7 +293,10 @@ export class PlaylistService {
         .of(playlist.id)
         .remove(track.id);
 
-      return { message: 'Track removed from playlist successfully' };
+      return {
+        message: 'Track removed from playlist successfully',
+        playlistId: playlist.id,
+      };
     } catch (error) {
       console.log('Error removing track from playlist: ', error);
       throw new InternalServerErrorException(
@@ -320,7 +320,10 @@ export class PlaylistService {
 
       await this.trackService.toggleFavorite(track_id, user_id, false);
 
-      return { message: 'Track removed from Favorites' };
+      return {
+        message: 'Track removed from Favorites',
+        playlistId: playlist.id,
+      };
     } catch (error) {
       console.log('Error removed track from favorites: ', error);
       throw new InternalServerErrorException(

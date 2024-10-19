@@ -60,10 +60,9 @@ export class AuthService {
     });
 
     const favoritePlaylistId = crypto.randomUUID();
-    await this.playlistService.create({
+    await this.playlistService.create(newUser.id, {
       id: favoritePlaylistId,
       title: 'Favorites',
-      owner_id: newUser.id,
       image_name: 'heart.png',
       type: 'favorite',
     });

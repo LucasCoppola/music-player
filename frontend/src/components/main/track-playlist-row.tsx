@@ -45,8 +45,7 @@ export default function TrackPlaylistRow({
   const { data } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
-  const { mutate: removeFromFavorites } =
-    useRemoveTrackFromFavorites(playlistId);
+  const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
 
   const playlists = data?.filter(
     (p) => p.id !== playlistId && p.type === "regular",
@@ -171,7 +170,8 @@ export default function TrackPlaylistRow({
               </DropdownMenuSub>
               <DropdownMenuItem
                 className="text-xs"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setIsCurrentFavorite(false);
                   removeFromFavorites({ trackId: track.id });
                 }}
@@ -186,8 +186,10 @@ export default function TrackPlaylistRow({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-xs"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => removeTrackFromPlaylist({ trackId: track.id })}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeTrackFromPlaylist({ trackId: track.id, playlistId });
+                }}
               >
                 <Trash className="mr-2 size-3" />
                 Delete from Playlist

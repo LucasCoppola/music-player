@@ -1,9 +1,9 @@
-import { useAuth } from "@/context/auth-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useClient } from "./utils";
+import { useClient } from "./use-client";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Track } from "./use-tracks";
+import { BASE_URL, queryKeys } from "@/lib/consts";
 
 export type Playlist = {
   id: string;
@@ -18,77 +18,38 @@ export type Playlist = {
 };
 
 export function usePlaylists() {
-  const { authState } = useAuth();
-  const client = useClient();
-
+  const client = useClient<Playlist[]>();
   return useQuery({
-    queryKey: ["playlists"],
-    queryFn: async (): Promise<Playlist[]> => {
-      if (!authState?.token) return [];
-
-      return await client(`${import.meta.env.VITE_BASE_URL}/api/playlists`, {
-        method: "GET",
-        headers: {
-          contentType: "application/json",
-          authToken: authState.token,
-        },
-      });
-    },
-    enabled: !!authState?.token,
+    queryKey: queryKeys.playlists(),
+    queryFn: () => client(`${BASE_URL}/api/playlists`, { method: "GET" }),
   });
 }
 
 export function usePlaylistById(playlistId: string) {
-  const { authState } = useAuth();
-  const client = useClient();
-
+  const client = useClient<Playlist>();
   return useQuery({
-    queryKey: ["playlist", playlistId],
-    queryFn: async (): Promise<Playlist> => {
-      if (!authState?.token) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}`,
-        {
-          method: "GET",
-          headers: {
-            contentType: "application/json",
-            authToken: authState.token,
-          },
-        },
-      );
-    },
-    enabled: !!authState?.token && !!playlistId,
+    queryKey: queryKeys.playlist(playlistId),
+    queryFn: () =>
+      client(`${BASE_URL}/api/playlists/${playlistId}`, {
+        method: "GET",
+      }),
+    enabled: !!playlistId,
   });
 }
 
 export function useCreatePlaylist() {
+  const client = useClient<{ message: string }>();
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const client = useClient();
 
   return useMutation({
-    mutationFn: async ({ id, title }: { id: string; title: string }) => {
-      if (!authState?.token) throw new Error("Unauthorized");
-
-      const newPlaylist = {
-        id,
-        title,
-        owner_id: authState?.userId,
-        type: "regular",
-      };
-
-      return await client(`${import.meta.env.VITE_BASE_URL}/api/playlists`, {
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      client(`${BASE_URL}/api/playlists`, {
         method: "POST",
-        headers: {
-          contentType: "application/json",
-          authToken: authState.token,
-        },
-        body: JSON.stringify(newPlaylist),
-      });
-    },
+        headers: { contentType: "application/json" },
+        body: { id, title, type: "regular" },
+      }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.playlists() });
       toast.success(data.message || "Playlist created successfully.");
     },
     onError: (e) => {
@@ -99,30 +60,20 @@ export function useCreatePlaylist() {
 }
 
 export function useUpdatePlaylistTitle() {
+  const client = useClient<{ message: string; playlistId: string }>();
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const client = useClient();
 
   return useMutation({
-    mutationFn: async ({ id, title }: { id: string; title: string }) => {
-      if (!authState?.token) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            contentType: "application/json",
-            authToken: authState.token,
-          },
-          body: JSON.stringify({ title }),
-        },
-      );
-    },
-    onSuccess: (data: { message: string; playlistId: string }) => {
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      client(`${BASE_URL}/api/playlists/${id}`, {
+        method: "PATCH",
+        headers: { contentType: "application/json" },
+        body: { title },
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.playlists() });
       queryClient.invalidateQueries({
-        queryKey: ["playlist", data.playlistId],
+        queryKey: queryKeys.playlist(data.playlistId),
       });
       toast.success(data.message || "Playlist updated successfully.");
     },
@@ -134,33 +85,18 @@ export function useUpdatePlaylistTitle() {
 }
 
 export function useDeletePlaylist() {
+  const client = useClient<{ message: string; playlistId: string }>();
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
   const navigate = useNavigate({ from: "/p/$playlistId" });
-  const pathname = useLocation({
-    select: (location) => location.pathname,
-  });
-
-  const client = useClient();
+  const pathname = useLocation({ select: (location) => location.pathname });
 
   return useMutation({
-    mutationFn: async ({ id }: { id: string }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
-        },
-      );
-    },
+    mutationFn: ({ id }: { id: string }) =>
+      client(`${BASE_URL}/api/playlists/${id}`, {
+        method: "DELETE",
+      }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.playlists() });
       toast.success(data.message || "Playlist deleted successfully.");
 
       if (`/p/${data.playlistId}` === pathname) {
@@ -176,34 +112,25 @@ export function useDeletePlaylist() {
 
 export function useAddTrackToPlaylist() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-  const client = useClient();
+  const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       playlistId,
       trackId,
     }: {
       playlistId: string;
       trackId: string;
-    }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
-        {
-          method: "POST",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
+    }) =>
+      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, {
+        method: "POST",
+        headers: {
+          contentType: "application/json",
         },
-      );
-    },
+      }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["playlists"],
+        queryKey: queryKeys.playlist(data.playlistId),
       });
       toast.success(data.message || "Track added to playlist successfully.");
     },
@@ -216,31 +143,26 @@ export function useAddTrackToPlaylist() {
 
 export function useRemoveTrackFromPlaylist() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-  const client = useClient();
-
-  const playlistId = useLocation({
-    select: (location) => location.pathname.split("/")[2],
-  });
+  const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
-    mutationFn: async ({ trackId }: { trackId: string }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
-        {
-          method: "DELETE",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
+    mutationFn: ({
+      trackId,
+      playlistId,
+    }: {
+      trackId: string;
+      playlistId: string;
+    }) =>
+      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, {
+        method: "DELETE",
+        headers: {
+          contentType: "application/json",
         },
-      );
-    },
+      }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.playlist(data.playlistId),
+      });
       toast.success(
         data.message || "Track removed from playlist successfully.",
       );
@@ -254,9 +176,7 @@ export function useRemoveTrackFromPlaylist() {
 
 export function useUploadPlaylistCover() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-  const client = useClient();
+  const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
     mutationFn: async ({
@@ -265,18 +185,16 @@ export function useUploadPlaylistCover() {
     }: {
       playlistId: string;
       image: File;
-    }): Promise<{ message: string; playlistId: string; coverUrl: string }> => {
-      if (!authToken) throw new Error("Unauthorized");
-
+    }): Promise<{ message: string; playlistId: string }> => {
       const formData = new FormData();
       formData.append("image", image);
 
       return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/${playlistId}/upload/image`,
+        `${BASE_URL}/api/playlists/${playlistId}/upload/image`,
         {
           method: "POST",
           headers: {
-            authToken,
+            contentType: undefined,
           },
           body: formData,
         },
@@ -284,7 +202,7 @@ export function useUploadPlaylistCover() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["playlist", data.playlistId],
+        queryKey: queryKeys.playlist(data.playlistId),
       });
       toast.success(data.message || "Playlist cover uploaded successfully.");
     },
@@ -295,30 +213,23 @@ export function useUploadPlaylistCover() {
   });
 }
 
-export function useAddTrackToFavorites(playlistId?: string) {
+export function useAddTrackToFavorites() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-  const client = useClient();
+  const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
-    mutationFn: async ({ trackId }: { trackId: string }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
-        {
-          method: "POST",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
+    mutationFn: ({ trackId }: { trackId: string }) =>
+      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, {
+        method: "POST",
+        headers: {
+          contentType: "application/json",
         },
-      );
-    },
+      }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tracks"] });
-      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.playlist(data.playlistId),
+      });
       toast.success(data.message || "Track added to favorites successfully.");
     },
     onError: (e) => {
@@ -328,30 +239,23 @@ export function useAddTrackToFavorites(playlistId?: string) {
   });
 }
 
-export function useRemoveTrackFromFavorites(playlistId?: string) {
+export function useRemoveTrackFromFavorites() {
   const queryClient = useQueryClient();
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-  const client = useClient();
+  const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
-    mutationFn: async ({ trackId }: { trackId: string }) => {
-      if (!authToken) throw new Error("Unauthorized");
-
-      return await client(
-        `${import.meta.env.VITE_BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
-        {
-          method: "DELETE",
-          headers: {
-            contentType: "application/json",
-            authToken,
-          },
+    mutationFn: ({ trackId }: { trackId: string }) =>
+      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, {
+        method: "DELETE",
+        headers: {
+          contentType: "application/json",
         },
-      );
-    },
+      }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["tracks"] });
-      queryClient.invalidateQueries({ queryKey: ["playlist", playlistId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.playlist(data.playlistId),
+      });
       toast.success(
         data.message || "Track removed from favorites successfully.",
       );
