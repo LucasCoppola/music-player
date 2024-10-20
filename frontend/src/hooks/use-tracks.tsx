@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useClient } from "./use-client";
 import { BASE_URL, queryKeys } from "@/lib/consts";
+import { useAuth } from "@/context/auth-context";
 
 export type Track = {
   id: string;
@@ -24,16 +25,19 @@ type UploadTrack = {
 };
 
 export function useTracks(query: string) {
+  const authToken = useAuth().authState?.token;
   const client = useClient<Track[]>();
 
   return useQuery({
     queryKey: queryKeys.tracks(),
     queryFn: () =>
-      client(`${BASE_URL}/api/tracks?q=${query}`, { method: "GET" }),
+      client(`${BASE_URL}/api/tracks?q=${query}`, authToken, { method: "GET" }),
+    enabled: !!authToken,
   });
 }
 
 export function useUploadTrackFile() {
+  const authToken = useAuth().authState?.token;
   const client = useClient<UploadTrack>();
 
   return useMutation({
@@ -41,7 +45,7 @@ export function useUploadTrackFile() {
       const formData = new FormData();
       formData.append("track", file);
 
-      return await client(`${BASE_URL}/api/tracks/upload/audio`, {
+      return await client(`${BASE_URL}/api/tracks/upload/audio`, authToken, {
         method: "POST",
         body: formData,
       });
@@ -53,6 +57,7 @@ export function useUploadTrackFile() {
 }
 
 export function useUploadTrackCoverImage() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; image_name: string }>();
 
@@ -61,10 +66,14 @@ export function useUploadTrackCoverImage() {
       const formData = new FormData();
       formData.append("image", file);
 
-      return await client(`${BASE_URL}/api/tracks/${trackId}/upload/image`, {
-        method: "POST",
-        body: formData,
-      });
+      return await client(
+        `${BASE_URL}/api/tracks/${trackId}/upload/image`,
+        authToken,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
@@ -78,6 +87,7 @@ export function useUploadTrackCoverImage() {
 }
 
 export function useCreateTrack() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string }>();
 
@@ -95,7 +105,7 @@ export function useCreateTrack() {
       mimetype: string;
       size_in_kb: number;
     }) => {
-      return await client(`${BASE_URL}/api/tracks`, {
+      return await client(`${BASE_URL}/api/tracks`, authToken, {
         method: "POST",
         headers: { contentType: "application/json" },
         body: { title, artist, track_name, mimetype, size_in_kb },
@@ -113,12 +123,13 @@ export function useCreateTrack() {
 }
 
 export function useDeleteTrack() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string }>();
 
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      return await client(`${BASE_URL}/api/tracks/${id}`, {
+      return await client(`${BASE_URL}/api/tracks/${id}`, authToken, {
         method: "DELETE",
       });
     },

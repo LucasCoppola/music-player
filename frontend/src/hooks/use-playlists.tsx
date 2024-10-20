@@ -4,6 +4,7 @@ import { useClient } from "./use-client";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Track } from "./use-tracks";
 import { BASE_URL, queryKeys } from "@/lib/consts";
+import { useAuth } from "@/context/auth-context";
 
 export type Playlist = {
   id: string;
@@ -18,32 +19,38 @@ export type Playlist = {
 };
 
 export function usePlaylists() {
+  const authToken = useAuth().authState?.token;
   const client = useClient<Playlist[]>();
+
   return useQuery({
     queryKey: queryKeys.playlists(),
-    queryFn: () => client(`${BASE_URL}/api/playlists`, { method: "GET" }),
+    queryFn: () => client(`${BASE_URL}/api/playlists`, authToken, { method: "GET" }),
+    enabled: !!authToken,
   });
 }
 
 export function usePlaylistById(playlistId: string) {
+  const authToken = useAuth().authState?.token;
   const client = useClient<Playlist>();
+
   return useQuery({
     queryKey: queryKeys.playlist(playlistId),
     queryFn: () =>
-      client(`${BASE_URL}/api/playlists/${playlistId}`, {
+      client(`${BASE_URL}/api/playlists/${playlistId}`, authToken, {
         method: "GET",
       }),
-    enabled: !!playlistId,
+    enabled: !!authToken && !!playlistId,
   });
 }
 
 export function useCreatePlaylist() {
+  const authToken = useAuth().authState?.token;
   const client = useClient<{ message: string }>();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, title }: { id: string; title: string }) =>
-      client(`${BASE_URL}/api/playlists`, {
+      client(`${BASE_URL}/api/playlists`, authToken, {
         method: "POST",
         headers: { contentType: "application/json" },
         body: { id, title, type: "regular" },
@@ -60,12 +67,13 @@ export function useCreatePlaylist() {
 }
 
 export function useUpdatePlaylistTitle() {
+  const authToken = useAuth().authState?.token;
   const client = useClient<{ message: string; playlistId: string }>();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, title }: { id: string; title: string }) =>
-      client(`${BASE_URL}/api/playlists/${id}`, {
+      client(`${BASE_URL}/api/playlists/${id}`, authToken, {
         method: "PATCH",
         headers: { contentType: "application/json" },
         body: { title },
@@ -85,6 +93,7 @@ export function useUpdatePlaylistTitle() {
 }
 
 export function useDeletePlaylist() {
+  const authToken = useAuth().authState?.token;
   const client = useClient<{ message: string; playlistId: string }>();
   const queryClient = useQueryClient();
   const navigate = useNavigate({ from: "/p/$playlistId" });
@@ -92,7 +101,7 @@ export function useDeletePlaylist() {
 
   return useMutation({
     mutationFn: ({ id }: { id: string }) =>
-      client(`${BASE_URL}/api/playlists/${id}`, {
+      client(`${BASE_URL}/api/playlists/${id}`, authToken, {
         method: "DELETE",
       }),
     onSuccess: (data) => {
@@ -111,6 +120,7 @@ export function useDeletePlaylist() {
 }
 
 export function useAddTrackToPlaylist() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; playlistId: string }>();
 
@@ -122,7 +132,7 @@ export function useAddTrackToPlaylist() {
       playlistId: string;
       trackId: string;
     }) =>
-      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, {
+      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, authToken, {
         method: "POST",
         headers: {
           contentType: "application/json",
@@ -142,6 +152,7 @@ export function useAddTrackToPlaylist() {
 }
 
 export function useRemoveTrackFromPlaylist() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; playlistId: string }>();
 
@@ -153,7 +164,7 @@ export function useRemoveTrackFromPlaylist() {
       trackId: string;
       playlistId: string;
     }) =>
-      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, {
+      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, authToken, {
         method: "DELETE",
         headers: {
           contentType: "application/json",
@@ -175,6 +186,7 @@ export function useRemoveTrackFromPlaylist() {
 }
 
 export function useUploadPlaylistCover() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; playlistId: string }>();
 
@@ -191,7 +203,7 @@ export function useUploadPlaylistCover() {
 
       return await client(
         `${BASE_URL}/api/playlists/${playlistId}/upload/image`,
-        {
+        authToken, {
           method: "POST",
           headers: {
             contentType: undefined,
@@ -214,12 +226,13 @@ export function useUploadPlaylistCover() {
 }
 
 export function useAddTrackToFavorites() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
     mutationFn: ({ trackId }: { trackId: string }) =>
-      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, {
+      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, authToken, {
         method: "POST",
         headers: {
           contentType: "application/json",
@@ -240,12 +253,13 @@ export function useAddTrackToFavorites() {
 }
 
 export function useRemoveTrackFromFavorites() {
+  const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string; playlistId: string }>();
 
   return useMutation({
     mutationFn: ({ trackId }: { trackId: string }) =>
-      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, {
+      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, authToken, {
         method: "DELETE",
         headers: {
           contentType: "application/json",

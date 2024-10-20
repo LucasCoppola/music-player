@@ -8,10 +8,11 @@ interface ClientOptions {
 }
 
 export function useClient<T>() {
-  const { authState } = useAuth();
-  const authToken = authState?.token;
-
-  return async (url: string, options: ClientOptions): Promise<T> => {
+  return async (
+    url: string,
+    authToken: string | undefined | null,
+    options: ClientOptions,
+  ): Promise<T> => {
     const isFormData = options.body instanceof FormData;
 
     const response = await fetch(url, {
