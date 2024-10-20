@@ -4,4 +4,5 @@ export const queryKeys = {
   playlists: () => ["playlists"],
   playlist: (id: string) => ["playlist", id],
   tracks: () => ["tracks"],
+  track: (id: string) => ["track", id],
 };

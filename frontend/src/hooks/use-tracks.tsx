@@ -36,6 +36,20 @@ export function useTracks(query: string) {
   });
 }
 
+export function useTrackById(trackId: string) {
+  const authToken = useAuth().authState?.token;
+  const client = useClient<Track>();
+
+  return useQuery({
+    queryKey: queryKeys.track(trackId),
+    queryFn: () =>
+      client(`${BASE_URL}/api/tracks/${trackId}`, authToken, {
+        method: "GET",
+      }),
+    enabled: !!authToken && !!trackId,
+  });
+}
+
 export function useUploadTrackFile() {
   const authToken = useAuth().authState?.token;
   const client = useClient<UploadTrack>();
@@ -59,7 +73,7 @@ export function useUploadTrackFile() {
 export function useUploadTrackCoverImage() {
   const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
-  const client = useClient<{ message: string; image_name: string }>();
+  const client = useClient<{ message: string; trackId: string }>();
 
   return useMutation({
     mutationFn: async ({ file, trackId }: { file: File; trackId: string }) => {
@@ -76,7 +90,12 @@ export function useUploadTrackCoverImage() {
       );
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.track(data.trackId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tracks(),
+      });
       toast.success(data.message || "Track cover image uploaded successfully.");
     },
     onError: (e) => {

@@ -3,7 +3,8 @@ import { createContext, useContext } from "react";
 
 type PlaybackContextType = {
   isPlaying: boolean;
-  currentTrack: Track | null;
+  currentTrack: Track | undefined;
+  currentTrackId: string | null;
   currentTime: number;
   duration: number;
   togglePlayPause: () => void;
@@ -12,12 +13,8 @@ type PlaybackContextType = {
   playPreviousTrack: () => void;
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
-  setPlaylist: (tracks: Track[]) => void;
+  setPlaylist: (playlist: Track[]) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
-  currentImageUrl: string;
-  setCurrentImageUrl: (image_name: string) => void;
-  isCurrentFavorite: boolean;
-  setIsCurrentFavorite: (isFavorite: boolean) => void;
 };
 
 export const PlaybackContext = createContext<PlaybackContextType | undefined>(

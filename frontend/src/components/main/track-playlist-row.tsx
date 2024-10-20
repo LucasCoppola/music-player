@@ -52,13 +52,7 @@ export default function TrackPlaylistRow({
   );
   const [isHovered, setIsHovered] = useState(false);
 
-  const {
-    currentTrack,
-    playTrack,
-    togglePlayPause,
-    isPlaying,
-    setIsCurrentFavorite,
-  } = usePlayback();
+  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
@@ -172,7 +166,6 @@ export default function TrackPlaylistRow({
                 className="text-xs"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsCurrentFavorite(false);
                   removeFromFavorites({ trackId: track.id });
                 }}
               >

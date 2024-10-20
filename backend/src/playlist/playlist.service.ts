@@ -271,7 +271,11 @@ export class PlaylistService {
 
       await this.trackService.toggleFavorite(track_id, user_id, true);
 
-      return { message: 'Track added to Favorites', playlistId: playlist.id };
+      return {
+        message: 'Track added to Favorites',
+        playlistId: playlist.id,
+        trackId: track.id,
+      };
     } catch (error) {
       console.log('Error adding track to favorites: ', error);
       throw new InternalServerErrorException(
@@ -323,6 +327,7 @@ export class PlaylistService {
       return {
         message: 'Track removed from Favorites',
         playlistId: playlist.id,
+        trackId: track.id,
       };
     } catch (error) {
       console.log('Error removed track from favorites: ', error);

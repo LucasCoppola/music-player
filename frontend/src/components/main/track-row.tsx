@@ -53,14 +53,7 @@ export default function TrackRow({
   query?: string;
 }) {
   const { data: playlists } = usePlaylists();
-  const {
-    currentTrack,
-    playTrack,
-    togglePlayPause,
-    isPlaying,
-    setIsCurrentFavorite,
-    isCurrentFavorite,
-  } = usePlayback();
+  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const { mutate: deleteTrack } = useDeleteTrack();
 
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
@@ -181,12 +174,11 @@ export default function TrackRow({
                         ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                {isCurrentFavorite ? (
+                {track.favorite ? (
                   <DropdownMenuItem
                     className="text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsCurrentFavorite(false);
                       removeFromFavorites({ trackId: track.id });
                     }}
                   >
@@ -198,7 +190,6 @@ export default function TrackRow({
                     className="text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsCurrentFavorite(true);
                       addTrackToFavorites({ trackId: track.id });
                     }}
                   >

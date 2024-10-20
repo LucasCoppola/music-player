@@ -5,27 +5,19 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import { Track } from "@/hooks/use-tracks";
+import { Track, useTrackById } from "@/hooks/use-tracks";
 import { PlaybackContext } from "@/context/playback-context";
-import { getCoverTrackImage } from "@/lib/utils";
+import { BASE_URL } from "@/lib/consts";
 
 export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
+  const [playlist, setPlaylist] = useState<Track[]>();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playlist, setPlaylist] = useState<Track[]>([]);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const [currentImageUrl, setCurrentImageUrl] = useState("");
-  const [isCurrentFavorite, setIsCurrentFavorite] = useState(false);
-
-  useEffect(() => {
-    if (currentTrack) {
-      setCurrentImageUrl(getCoverTrackImage(currentTrack.image_name));
-      setIsCurrentFavorite(currentTrack.favorite);
-    }
-  }, [currentTrack]);
+  const { data: currentTrack } = useTrackById(currentTrackId || "");
 
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
@@ -39,7 +31,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, [isPlaying]);
 
   const playTrack = useCallback((track: Track) => {
-    setCurrentTrack(track);
+    setCurrentTrackId(track.id);
     setIsPlaying(true);
     setCurrentTime(0);
     if (audioRef.current) {
@@ -49,7 +41,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const playNextTrack = useCallback(() => {
-    if (currentTrack && playlist.length > 0) {
+    if (currentTrack && playlist && playlist.length > 0) {
       const currentIndex = playlist.findIndex(
         (track) => track.id === currentTrack.id,
       );
@@ -59,7 +51,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, [currentTrack, playlist, playTrack]);
 
   const playPreviousTrack = useCallback(() => {
-    if (currentTrack && playlist.length > 0) {
+    if (currentTrack && playlist && playlist.length > 0) {
       const currentIndex = playlist.findIndex(
         (track) => track.id === currentTrack.id,
       );
@@ -70,7 +62,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, [currentTrack, playlist, playTrack]);
 
   const getAudioSrc = (track_name: string) => {
-    return `${import.meta.env.VITE_BASE_URL}/tracks/${track_name}`;
+    return `${BASE_URL}/tracks/${track_name}`;
   };
 
   useEffect(() => {
@@ -96,6 +88,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
       value={{
         isPlaying,
         currentTrack,
+        currentTrackId,
         currentTime,
         duration,
         togglePlayPause,
@@ -106,10 +99,6 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         setDuration,
         setPlaylist,
         audioRef,
-        currentImageUrl,
-        setCurrentImageUrl,
-        isCurrentFavorite,
-        setIsCurrentFavorite,
       }}
     >
       {children}

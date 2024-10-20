@@ -5,42 +5,19 @@ import {
   useRemoveTrackFromFavorites,
   useAddTrackToFavorites,
 } from "@/hooks/use-playlists";
-import { useLocation } from "@tanstack/react-router";
+import { getCoverTrackImage } from "@/lib/utils";
 
 export default function TrackInfo() {
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const {
-    currentTrack,
-    currentImageUrl,
-    setIsCurrentFavorite,
-    isCurrentFavorite,
-  } = usePlayback();
-
-  const playlistId = pathname.split("/")[2];
-  const { mutate: addTrackToFavorites } = useAddTrackToFavorites(playlistId);
-  const { mutate: removeTrackFromFavorites } =
-    useRemoveTrackFromFavorites(playlistId);
-
-  function handleAddToFavorites() {
-    setIsCurrentFavorite(true);
-    if (currentTrack?.id) {
-      addTrackToFavorites({ trackId: currentTrack.id });
-    }
-  }
-
-  function handleRemoveFromFavorites() {
-    setIsCurrentFavorite(false);
-    if (currentTrack?.id) {
-      removeTrackFromFavorites({ trackId: currentTrack.id });
-    }
-  }
+  const { currentTrack } = usePlayback();
+  const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
+  const { mutate: removeTrackFromFavorites } = useRemoveTrackFromFavorites();
 
   return (
     <div className="flex items-center w-1/3 space-x-2">
       {currentTrack && (
         <>
           <img
-            src={currentImageUrl}
+            src={getCoverTrackImage(currentTrack.image_name)}
             alt="Track thumbnail"
             className="w-10 h-10 object-cover mr-2"
           />
@@ -53,12 +30,16 @@ export default function TrackInfo() {
                 {currentTrack.artist}
               </div>
             </div>
-            {isCurrentFavorite ? (
+            {currentTrack.favorite ? (
               <Button
                 variant="ghost"
                 size="icon"
                 className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
-                onClick={handleRemoveFromFavorites}
+                onClick={() => {
+                  if (currentTrack?.id) {
+                    removeTrackFromFavorites({ trackId: currentTrack.id });
+                  }
+                }}
               >
                 <HeartIcon className="size-4 fill-primary" />
               </Button>
@@ -67,7 +48,11 @@ export default function TrackInfo() {
                 variant="ghost"
                 size="icon"
                 className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
-                onClick={handleAddToFavorites}
+                onClick={() => {
+                  if (currentTrack?.id) {
+                    addTrackToFavorites({ trackId: currentTrack.id });
+                  }
+                }}
               >
                 <HeartIcon className="size-4" />
               </Button>

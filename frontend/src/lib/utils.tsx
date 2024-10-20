@@ -43,9 +43,5 @@ export function getCoverTrackImage(image_name: string | null): string {
 }
 
 export function getCoverPlaylistImage(image_name: string): string {
-  if (image_name) {
-    return `${BASE_URL}/images/${image_name}`;
-  } else {
-    return `${BASE_URL}/images/defaults/default_cover_track_image.png`;
-  }
+  return `${BASE_URL}/images/${image_name}`;
 }

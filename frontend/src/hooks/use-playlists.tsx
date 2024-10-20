@@ -24,7 +24,8 @@ export function usePlaylists() {
 
   return useQuery({
     queryKey: queryKeys.playlists(),
-    queryFn: () => client(`${BASE_URL}/api/playlists`, authToken, { method: "GET" }),
+    queryFn: () =>
+      client(`${BASE_URL}/api/playlists`, authToken, { method: "GET" }),
     enabled: !!authToken,
   });
 }
@@ -132,12 +133,16 @@ export function useAddTrackToPlaylist() {
       playlistId: string;
       trackId: string;
     }) =>
-      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, authToken, {
-        method: "POST",
-        headers: {
-          contentType: "application/json",
+      client(
+        `${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
+        authToken,
+        {
+          method: "POST",
+          headers: {
+            contentType: "application/json",
+          },
         },
-      }),
+      ),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.playlist(data.playlistId),
@@ -164,12 +169,16 @@ export function useRemoveTrackFromPlaylist() {
       trackId: string;
       playlistId: string;
     }) =>
-      client(`${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`, authToken, {
-        method: "DELETE",
-        headers: {
-          contentType: "application/json",
+      client(
+        `${BASE_URL}/api/playlists/${playlistId}/tracks/${trackId}`,
+        authToken,
+        {
+          method: "DELETE",
+          headers: {
+            contentType: "application/json",
+          },
         },
-      }),
+      ),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.playlist(data.playlistId),
@@ -203,7 +212,8 @@ export function useUploadPlaylistCover() {
 
       return await client(
         `${BASE_URL}/api/playlists/${playlistId}/upload/image`,
-        authToken, {
+        authToken,
+        {
           method: "POST",
           headers: {
             contentType: undefined,
@@ -228,18 +238,28 @@ export function useUploadPlaylistCover() {
 export function useAddTrackToFavorites() {
   const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
-  const client = useClient<{ message: string; playlistId: string }>();
+  const client = useClient<{
+    message: string;
+    playlistId: string;
+    trackId: string;
+  }>();
 
   return useMutation({
     mutationFn: ({ trackId }: { trackId: string }) =>
-      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, authToken, {
-        method: "POST",
-        headers: {
-          contentType: "application/json",
+      client(
+        `${BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
+        authToken,
+        {
+          method: "POST",
+          headers: {
+            contentType: "application/json",
+          },
         },
-      }),
+      ),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.track(data.trackId),
+      });
       queryClient.invalidateQueries({
         queryKey: queryKeys.playlist(data.playlistId),
       });
@@ -255,18 +275,28 @@ export function useAddTrackToFavorites() {
 export function useRemoveTrackFromFavorites() {
   const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
-  const client = useClient<{ message: string; playlistId: string }>();
+  const client = useClient<{
+    message: string;
+    playlistId: string;
+    trackId: string;
+  }>();
 
   return useMutation({
     mutationFn: ({ trackId }: { trackId: string }) =>
-      client(`${BASE_URL}/api/playlists/favorites/tracks/${trackId}`, authToken, {
-        method: "DELETE",
-        headers: {
-          contentType: "application/json",
+      client(
+        `${BASE_URL}/api/playlists/favorites/tracks/${trackId}`,
+        authToken,
+        {
+          method: "DELETE",
+          headers: {
+            contentType: "application/json",
+          },
         },
-      }),
+      ),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.track(data.trackId),
+      });
       queryClient.invalidateQueries({
         queryKey: queryKeys.playlist(data.playlistId),
       });

@@ -61,7 +61,7 @@ export class TrackService {
 
       return {
         message: 'Track cover image uploaded successfully',
-        image_name,
+        trackId: id,
       };
     } catch (error) {
       console.error('Error uploading track cover image: ', error);
