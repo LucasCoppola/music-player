@@ -1,11 +1,12 @@
+import React, { useCallback, useState, useRef } from "react";
 import { Playlist, useDeletePlaylist } from "@/hooks/use-playlists";
 import { Link, useLocation } from "@tanstack/react-router";
 import { MoreVertical, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,16 +18,32 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
 
 export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
-  const { mutate } = useDeletePlaylist();
+  const { mutate: deletePlaylist } = useDeletePlaylist();
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
+
+  const handleDeleteClick = useCallback((event: Event) => {
+    event.preventDefault();
+    setIsAlertDialogOpen(true);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    deletePlaylist({ id: playlist.id });
+    setIsAlertDialogOpen(false);
+    menuTriggerRef.current?.focus();
+  }, [deletePlaylist, playlist.id]);
+
+  const handleDeleteCancel = useCallback(() => {
+    setIsAlertDialogOpen(false);
+    menuTriggerRef.current?.focus();
+  }, []);
 
   return (
     <li className="group relative">
@@ -42,32 +59,33 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
 
       {playlist.type !== "favorite" && (
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100">
-          <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                ref={menuTriggerRef}
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5 rounded-sm"
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
               >
                 <MoreVertical className="size-4" />
                 <span className="sr-only">Playlist options</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48 dark">
-              <DropdownMenuItem
-                className="text-xs"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setIsAlertDialogOpen(true);
-                }}
-              >
-                <Trash className="mr-2 size-3" />
-                Delete
-              </DropdownMenuItem>
               <AlertDialog
                 open={isAlertDialogOpen}
                 onOpenChange={setIsAlertDialogOpen}
               >
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={handleDeleteClick}
+                    className="text-xs"
+                  >
+                    <Trash className="mr-2 size-3" />
+                    Delete
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
                 <AlertDialogContent className="dark text-foreground">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Playlist?</AlertDialogTitle>
@@ -77,21 +95,12 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsAlertDialogOpen(false);
-                      }}
-                    >
+                    <AlertDialogCancel onClick={handleDeleteCancel}>
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-red-600 hover:bg-red-500 text-foreground"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsAlertDialogOpen(false);
-                        mutate({ id: playlist.id });
-                      }}
+                      onClick={handleDeleteConfirm}
                     >
                       Delete
                     </AlertDialogAction>

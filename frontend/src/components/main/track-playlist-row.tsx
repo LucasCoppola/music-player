@@ -1,6 +1,7 @@
+import React, { useCallback, useState } from "react";
 import {
-  Download,
   Ellipsis,
+  Heart,
   HeartOff,
   Pause,
   Play,
@@ -19,6 +20,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  useAddTrackToFavorites,
   useAddTrackToPlaylist,
   usePlaylists,
   useRemoveTrackFromFavorites,
@@ -28,62 +30,72 @@ import { Track } from "@/hooks/use-tracks";
 import { formatDuration } from "@/lib/utils";
 import { useParams } from "@tanstack/react-router";
 import { usePlayback } from "@/context/playback-context";
-import { useCallback, useState } from "react";
+
+interface TrackPlaylistRowProps {
+  track: Track;
+  imageUrl: string;
+  index: number;
+}
 
 export default function TrackPlaylistRow({
   track,
   imageUrl,
   index,
-}: {
-  track: Track;
-  imageUrl: string;
-  index: number;
-}) {
+}: TrackPlaylistRowProps) {
   const { playlistId } = useParams({
     from: "/p/$playlistId",
   });
-  const { data } = usePlaylists();
+  const { data: playlists } = usePlaylists();
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: removeTrackFromPlaylist } = useRemoveTrackFromPlaylist();
+  const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
   const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
 
-  const playlists = data?.filter(
+  const availablePlaylists = playlists?.filter(
     (p) => p.id !== playlistId && p.type === "regular",
   );
-  const [isHovered, setIsHovered] = useState(false);
+  const isFavoritePlaylist =
+    playlists?.find((p) => p.id === playlistId)?.type === "favorite";
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
 
+  const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-  function onClickTrackRow(e: React.MouseEvent) {
-    e.preventDefault();
-    if (isCurrentTrack) {
-      togglePlayPause();
-    } else {
-      playTrack(track);
-    }
-  }
-
-  function onKeyDownTrackRow(e: React.KeyboardEvent<HTMLTableRowElement>) {
-    if (e.key === "Enter" || e.key === " ") {
+  const handleTrackAction = useCallback(
+    (e: React.MouseEvent) => {
       e.preventDefault();
       if (isCurrentTrack) {
         togglePlayPause();
       } else {
         playTrack(track);
       }
-    }
-  }
+    },
+    [isCurrentTrack, togglePlayPause, playTrack, track],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTableRowElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (isCurrentTrack) {
+          togglePlayPause();
+        } else {
+          playTrack(track);
+        }
+      }
+    },
+    [isCurrentTrack, togglePlayPause, playTrack, track],
+  );
 
   return (
     <tr
       className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
       tabIndex={0}
-      onClick={onClickTrackRow}
-      onKeyDown={onKeyDownTrackRow}
+      onClick={handleTrackAction}
+      onKeyDown={handleKeyDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -132,6 +144,7 @@ export default function TrackPlaylistRow({
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5 text-gray-400 hover:text-white focus:text-white"
+                onClick={(e) => e.stopPropagation()}
               >
                 <Ellipsis className="size-4" />
                 <span className="sr-only">Track options</span>
@@ -144,13 +157,12 @@ export default function TrackPlaylistRow({
                   Add to Playlist
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-48">
-                  {playlists &&
-                    playlists.map((playlist) => (
+                  {availablePlaylists &&
+                    availablePlaylists.map((playlist) => (
                       <DropdownMenuItem
                         className="text-xs"
                         key={playlist.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onSelect={() => {
                           addTrackToPlaylist({
                             trackId: track.id,
                             playlistId: playlist.id,
@@ -162,20 +174,37 @@ export default function TrackPlaylistRow({
                     ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem
-                className="text-xs"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFromFavorites({ trackId: track.id });
-                }}
-              >
-                <HeartOff className="mr-2 size-3 fill-primary" />
-                Remove from Favorites
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-xs">
-                <Download className="mr-2 size-3" />
-                Download Track
-              </DropdownMenuItem>
+              {isFavoritePlaylist ? (
+                <DropdownMenuItem
+                  className="text-xs"
+                  onSelect={() => {
+                    removeFromFavorites({ trackId: track.id });
+                  }}
+                >
+                  <HeartOff className="mr-2 size-3 fill-primary" />
+                  Remove from Favorites
+                </DropdownMenuItem>
+              ) : track.favorite ? (
+                <DropdownMenuItem
+                  className="text-xs"
+                  onSelect={() => {
+                    removeFromFavorites({ trackId: track.id });
+                  }}
+                >
+                  <HeartOff className="mr-2 size-3 fill-primary" />
+                  Remove from Favorites
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="text-xs"
+                  onSelect={() => {
+                    addTrackToFavorites({ trackId: track.id });
+                  }}
+                >
+                  <Heart className="mr-2 size-3" />
+                  Add to Favorites
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-xs"
