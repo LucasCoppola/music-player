@@ -1,24 +1,49 @@
-- [] Integration tests for Playlists
-- [] Integration tests for Tracks
-- [] Issue with dropdowns and dialogs causing focus loss
+## Integration tests for Playlists
+  - [] Playlist Creation Flow
+  - [] Add/Remove Track to/from Playlist
+  - [] Upload Playlist Image
+  - [] Retrieve Playlists (with Tracks)
+  - [] Favorites Playlist
+   
+## Integration tests for Tracks
 
-- [] Download track
+## Auth integration test: 
+  - [] Add the test for the favorite playlist (register)
 
-- [] Listening History
-- [] Track play count
+## FFmpeg: 
+  - [] Waveforms
+    - Generate visual audio waveforms to display for each track.
 
-## Streaming and Playback
+  - [] Volume Normalization
+    - Normalize the volume across tracks for a consistent listening experience.
 
-  - [ ] Stream song via API
-  - [ ] Implement song playback using ffmpeg
-  - [ ] Support different audio formats
-  - [ ] Handle real-time streaming (e.g., buffering, seek, etc.)
-  - [ ] Implement playback controls (play, pause, stop)
+  - [] Crossfading
+    - Smooth transitions between tracks with automatic crossfading.
 
-## ffmpeg integration
+  - [] Trim or Clip Audio
+    - Allow users to trim or clip sections of a track for customization or previews.
 
-  - [ ] Install and configure ffmpeg
-  - [ ] Set up ffmpeg for audio processing
-  - [ ] Implement audio transcoding (convert formats)
-  - [ ] Implement audio normalization (volume leveling)
-  - [ ] Generate waveforms or visualizations (optional)
+  - [] Change Audio Quality
+    - Adjust bitrates, sample rates, or downsample for user preferences or storage optimization.
+
+  - [] Audio Effects (Fade In/Out)
+    - Add fade-in or fade-out effects for smoother track starts or endings.
+
+  - [] Metadata Management
+    - Edit or display track metadata like artist name, album, and genre.
+
+  - [] Audio Speed and Pitch Manipulation
+    - Change playback speed or pitch, enabling features like time-stretching or pitch shifting.
+
+  - [] Resample for Different Playback Devices
+    - Optimize tracks by resampling to match specific devices’ requirements.
+
+  - [] Audio Format Conversion
+    - Convert between formats (MP3, FLAC, AAC) for better compatibility or compression.
+
+  - [] Audio Mixing
+    - Mix multiple audio streams, such as adding background effects or overlaying tracks.
+
+  - [] Audio Filters
+    - Apply EQ or other filters for users to customize their listening experience.
+
