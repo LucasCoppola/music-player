@@ -68,6 +68,37 @@ describe('AuthModule (e2e)', () => {
 
       expect(response.body.message).toContain('Email already in use');
     });
+
+    it('should have created the favorite playlist', async () => {
+      const registerUserDto = {
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'test123',
+      };
+
+      const favoritePlaylist = {
+        id: expect.any(String),
+        title: 'Favorites',
+        image_name: 'heart.png',
+        type: 'favorite',
+        mimetype: null,
+        size_in_kb: null,
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(registerUserDto)
+        .expect(201);
+
+      const playlistsResponse = await request(app.getHttpServer())
+        .get('/api/playlists')
+        .set('Authorization', `Bearer ${response.body.access_token}`)
+        .expect(200);
+
+      expect(playlistsResponse.body[0]).toEqual(favoritePlaylist);
+    });
   });
 
   describe('/api/auth/login (POST)', () => {
