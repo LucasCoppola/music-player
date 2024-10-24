@@ -34,6 +34,30 @@ export default function NowPlaying() {
     }
   }
 
+  function getQualityLabel(bit_rate: number): string {
+    const bit_rate_kbps = bit_rate / 1000;
+
+    if (bit_rate_kbps <= 64) {
+      return "Low";
+    } else if (bit_rate_kbps > 64 && bit_rate_kbps <= 128) {
+      return "Standard";
+    } else if (bit_rate_kbps > 128 && bit_rate_kbps <= 192) {
+      return "Good";
+    } else if (bit_rate_kbps > 192 && bit_rate_kbps <= 256) {
+      return "High";
+    } else if (bit_rate_kbps > 256 && bit_rate_kbps <= 320) {
+      return "Very High";
+    } else if (bit_rate_kbps > 320 && bit_rate_kbps <= 500) {
+      return "CD Quality";
+    } else if (bit_rate_kbps > 500 && bit_rate_kbps <= 1000) {
+      return "Lossless";
+    } else if (bit_rate_kbps > 1000 && bit_rate_kbps <= 5000) {
+      return "Hi-Res Audio";
+    }
+
+    return "-";
+  }
+
   return (
     <div className="hidden md:block w-56 h-[100dvh] p-4 bg-[#121212]">
       <h2 className="mb-3 text-sm font-semibold text-gray-200">Now Playing</h2>
@@ -87,11 +111,10 @@ export default function NowPlaying() {
           <p className="text-xs truncate ">{currentTrack.artist}</p>
         </div>
         <div className="space-y-0.5 group">
-          <p className="text-xs text-muted-foreground">Bit Rate</p>
+          <p className="text-xs text-muted-foreground">Audio Quality</p>
           <p className="text-xs truncate ">
-            {currentTrack.bit_rate
-              ? `${Math.round(currentTrack.bit_rate / 1000)} kbps`
-              : "-"}
+            {getQualityLabel(currentTrack.bit_rate)} (
+            {Math.floor(currentTrack.bit_rate / 1000)} kbps)
           </p>
         </div>
       </div>

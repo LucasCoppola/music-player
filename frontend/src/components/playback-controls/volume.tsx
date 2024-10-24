@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { usePlayback } from "@/context/playback-context";
 import { useEffect, useState } from "react";
 import { Slider } from "../ui/slider";
+import { DEFAULT_VOLUME } from "@/lib/consts";
 
 export default function Volume() {
   const { audioRef, currentTrack } = usePlayback();
-  const [prevVolume, setPrevVolume] = useState(0.15);
-  const [volume, setVolume] = useState(0.15);
+  const [prevVolume, setPrevVolume] = useState(DEFAULT_VOLUME);
+  const [volume, setVolume] = useState(DEFAULT_VOLUME);
   const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
