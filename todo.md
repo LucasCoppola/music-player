@@ -1,52 +1,8 @@
-## Auth tests:
-
-- [] Add the test for the favorite playlist (register)
-
-## FFmpeg:
-
-- [] Waveforms
-
-  - Generate visual audio waveforms to display for each track.
-
-- [] Volume Normalization
-
-  - Normalize the volume across tracks for a consistent listening experience.
-
-- [] Crossfading
-
-  - Smooth transitions between tracks with automatic crossfading.
-
-- [] Trim or Clip Audio
-
-  - Allow users to trim or clip sections of a track for customization or previews.
-
 - [] Change Audio Quality
+  Adjust bitrates, sample rates, or downsample for user preferences or storage optimization.
 
-  - Adjust bitrates, sample rates, or downsample for user preferences or storage optimization.
-
-- [] Audio Effects (Fade In/Out)
-
-  - Add fade-in or fade-out effects for smoother track starts or endings.
-
-- [] Metadata Management
-
-  - Edit or display track metadata like artist name, album, and genre.
-
-- [] Audio Speed and Pitch Manipulation
-
-  - Change playback speed or pitch, enabling features like time-stretching or pitch shifting.
-
-- [] Resample for Different Playback Devices
-
-  - Optimize tracks by resampling to match specific devices’ requirements.
-
-- [] Audio Format Conversion
-
-  - Convert between formats (MP3, FLAC, AAC) for better compatibility or compression.
-
-- [] Audio Mixing
-
-  - Mix multiple audio streams, such as adding background effects or overlaying tracks.
-
-- [] Audio Filters
-  - Apply EQ or other filters for users to customize their listening experience.
+- [] User-based directories for images and tracks.
+- [] Serve static files that are for all the users (e.g. defaults images)
+- [] Serve user specific tracks from protected route.
+- [] Serve user specific images from protected route.
+- [] Compress image files?

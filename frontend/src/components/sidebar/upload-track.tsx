@@ -50,7 +50,7 @@ export default function UploadTrack({
         file: selectedFile,
       }));
 
-      const limitSize = 5 * 1024 * 1024; // 5 MB
+      const limitSize = 10 * 1024 * 1024; // 10 MB
       setIsFileSizeOk(selectedFile.size <= limitSize);
     }
   }
@@ -132,7 +132,7 @@ export default function UploadTrack({
                       Select an audio file
                     </span>
                     <span className="mt-1 text-sm text-muted-foreground">
-                      Max. 5 MB
+                      Max. 10 MB
                     </span>
                   </div>
                   <input
