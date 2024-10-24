@@ -8,13 +8,39 @@ import TracksTable from "./tracks-table";
 import { usePlaylistById } from "@/hooks/use-playlists";
 import { PlaylistLoadingSkeleton } from "../skeletons";
 import { formatDuration } from "@/lib/utils";
+import { usePlayback } from "@/context/playback-context";
+import { useEffect, useState } from "react";
 
 export default function Playlist() {
+  const { setPlaylist, playTrack } = usePlayback();
   const { playlistId } = useParams({ from: "/p/$playlistId" });
   const { data: playlist, isLoading } = usePlaylistById(playlistId);
+  const [playRandom, setPlayRandom] = useState(() => {
+    const savedPlayRandom = localStorage.getItem(`playRandom_${playlistId}`);
+    return savedPlayRandom === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(`playRandom_${playlistId}`, playRandom.toString());
+  }, [playRandom, playlistId]);
 
   if (isLoading) {
     return <PlaylistLoadingSkeleton />;
+  }
+
+  function PlayAll() {
+    if (playlist) {
+      if (playRandom) {
+        const shuffledPlaylist = [...playlist.tracks].sort(
+          () => Math.random() - 0.5,
+        );
+        setPlaylist(shuffledPlaylist);
+        playTrack(shuffledPlaylist[0]);
+      } else {
+        setPlaylist(playlist.tracks);
+        playTrack(playlist.tracks[0]);
+      }
+    }
   }
 
   return (
@@ -23,7 +49,7 @@ export default function Playlist() {
         <div className="flex-1 flex flex-col overflow-hidden bg-[#0A0A0A] pb-[69px]">
           <div className="flex items-center justify-between p-3 bg-[#0A0A0A]">
             <div className="flex items-center space-x-1">
-              <Link to="/" search={{ q: "" }}>
+              <Link to=".." search={{ q: "" }}>
                 <Button variant="ghost" size="icon" className="h-7 w-7">
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -37,11 +63,21 @@ export default function Playlist() {
               <Button
                 variant="secondary"
                 className="h-7 text-xs bg-[#282828] hover:bg-[#3E3E3E] text-white"
+                onClick={PlayAll}
               >
                 Play All
               </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Shuffle className="w-4 h-4" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setPlayRandom((prevState) => !prevState)}
+              >
+                {playRandom ? (
+                  <Shuffle className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Shuffle className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </div>
