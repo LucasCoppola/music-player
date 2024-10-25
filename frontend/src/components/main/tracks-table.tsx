@@ -48,7 +48,7 @@ export default function TracksTable({
               tracks.map((track, i) => (
                 <TrackComponent
                   track={track}
-                  imageUrl={getCoverTrackImage(track.image_name)}
+                  imageUrl={getCoverTrackImage(track.image_name, track.user_id)}
                   key={i}
                   index={i + 1}
                   query={query}

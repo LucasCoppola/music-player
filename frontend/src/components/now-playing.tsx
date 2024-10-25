@@ -67,7 +67,10 @@ export default function NowPlaying() {
         onMouseLeave={handleMouseLeave}
       >
         <img
-          src={getCoverTrackImage(currentTrack.image_name)}
+          src={getCoverTrackImage(
+            currentTrack.image_name,
+            currentTrack.user_id,
+          )}
           alt="Album cover"
           className="w-full h-full object-cover"
         />

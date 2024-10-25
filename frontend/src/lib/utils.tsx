@@ -34,14 +34,24 @@ export function highlightText(text: string, query: string | undefined) {
   );
 }
 
-export function getCoverTrackImage(image_name: string | null): string {
+export function getCoverTrackImage(
+  image_name: string | null,
+  userId: string,
+): string {
   if (image_name) {
-    return `${BASE_URL}/images/${image_name}`;
+    return `${BASE_URL}/${userId}/images/${image_name}`;
   } else {
-    return `${BASE_URL}/images/defaults/default_cover_track_image.png`;
+    return `${BASE_URL}/public/images/default_cover_track_image.png`;
   }
 }
 
-export function getCoverPlaylistImage(image_name: string): string {
-  return `${BASE_URL}/images/${image_name}`;
+export function getCoverPlaylistImage(
+  image_name: string,
+  userId: string,
+): string {
+  if (image_name === "heart.png") {
+    return `${BASE_URL}/public/images/${image_name}`;
+  } else {
+    return `${BASE_URL}/${userId}/images/${image_name}`;
+  }
 }

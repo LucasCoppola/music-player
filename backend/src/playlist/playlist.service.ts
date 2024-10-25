@@ -14,8 +14,6 @@ import { FileService } from '../file/file.service';
 
 @Injectable()
 export class PlaylistService {
-  private readonly uploadImagesPath = './uploads/images';
-
   constructor(
     @InjectRepository(Playlist)
     private playlistRepository: Repository<Playlist>,
@@ -24,21 +22,34 @@ export class PlaylistService {
     private fileService: FileService,
   ) {}
 
-  async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
+  async uploadImage({
+    file,
+    id,
+    user_id,
+  }: {
+    file: Express.Multer.File;
+    id: string;
+    user_id: string;
+  }) {
+    const uploadImagesPath = `./uploads/${user_id}/images`;
     const fileSizeInKb = Math.floor(file.size / 1024);
     const image_name = `${Date.now()}-${file.originalname}`;
 
     await this.fileService.writeFile({
-      directory: this.uploadImagesPath,
+      directory: uploadImagesPath,
       filename: image_name,
       buffer: file.buffer,
     });
 
-    await this.update(id, user_id, {
-      image_name,
-      mimetype: file.mimetype,
-      size_in_kb: fileSizeInKb,
-      title: null,
+    await this.update({
+      id,
+      user_id,
+      updatePlaylistDto: {
+        image_name,
+        mimetype: file.mimetype,
+        size_in_kb: fileSizeInKb,
+        title: null,
+      },
     });
 
     return {
@@ -47,7 +58,13 @@ export class PlaylistService {
     };
   }
 
-  async create(user_id: string, createPlaylistDto: CreatePlaylistDto) {
+  async create({
+    user_id,
+    createPlaylistDto,
+  }: {
+    user_id: string;
+    createPlaylistDto: CreatePlaylistDto;
+  }) {
     const { id, title, image_name, type } = createPlaylistDto;
 
     const user = await this.usersService.findOneById(user_id);
@@ -60,7 +77,7 @@ export class PlaylistService {
         .values({
           id,
           title,
-          owner_id: user.id,
+          user_id: user.id,
           image_name,
           type,
         })
@@ -73,7 +90,7 @@ export class PlaylistService {
     }
   }
 
-  async findAll(user_id: string): Promise<Playlist[]> {
+  async findAll({ user_id }: { user_id: string }): Promise<Playlist[]> {
     const user = await this.usersService.findOneById(user_id);
 
     try {
@@ -94,10 +111,15 @@ export class PlaylistService {
     }
   }
 
-  async findOne(
-    user_id: string,
-    id: string,
-  ): Promise<Playlist & { track_count: number; duration: number }> {
+  async findOne({
+    user_id,
+    id,
+  }: {
+    user_id: string;
+    id: string;
+  }): Promise<
+    Playlist & { track_count: number; duration: number; user_id: string }
+  > {
     const user = await this.usersService.findOneById(user_id);
 
     try {
@@ -120,6 +142,7 @@ export class PlaylistService {
 
       return {
         ...playlist,
+        user_id,
         track_count,
         duration,
       };
@@ -158,13 +181,18 @@ export class PlaylistService {
     }
   }
 
-  async update(
-    id: string,
-    user_id: string,
-    updatePlaylistDto: UpdatePlaylistDto,
-  ) {
+  async update({
+    id,
+    user_id,
+    updatePlaylistDto,
+  }: {
+    id: string;
+    user_id: string;
+    updatePlaylistDto: UpdatePlaylistDto;
+  }) {
     const { title, image_name, mimetype, size_in_kb } = updatePlaylistDto;
-    const playlist = await this.findOne(user_id, id);
+    const uploadImagesPath = `./uploads/${user_id}/images`;
+    const playlist = await this.findOne({ user_id, id });
 
     try {
       const updateFields: Partial<Playlist> = {};
@@ -190,7 +218,7 @@ export class PlaylistService {
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
         await this.fileService.removeFile({
-          filePath: `${this.uploadImagesPath}/${oldImageName}`,
+          filePath: `${uploadImagesPath}/${oldImageName}`,
         });
       }
 
@@ -205,7 +233,11 @@ export class PlaylistService {
   }
 
   async remove(id: string, user_id: string) {
-    const playlist = await this.findOne(user_id, id);
+    const uploadImagesPath = `./uploads/${user_id}/images`;
+    const [user, playlist] = await Promise.all([
+      this.usersService.findOneById(user_id),
+      this.findOne({ user_id, id }),
+    ]);
 
     try {
       const result = await this.playlistRepository
@@ -213,13 +245,13 @@ export class PlaylistService {
         .delete()
         .from(Playlist)
         .where('id = :id', { id: playlist.id })
-        .andWhere('user_id = :user_id', { user_id })
+        .andWhere('user_id = :user_id', { user_id: user.id })
         .returning('id, image_name')
         .execute();
 
       if (result.raw[0].image_name) {
         await this.fileService.removeFile({
-          filePath: `${this.uploadImagesPath}/${result.raw[0].image_name}`,
+          filePath: `${uploadImagesPath}/${result.raw[0].image_name}`,
         });
       }
 
@@ -235,8 +267,8 @@ export class PlaylistService {
 
   async addTrack(id: string, user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
-      this.findOne(user_id, id),
-      this.trackService.findOne(track_id, user_id),
+      this.findOne({ user_id, id }),
+      this.trackService.findOne({ id: track_id, user_id }),
     ]);
 
     try {
@@ -259,7 +291,7 @@ export class PlaylistService {
   async addTrackToFavorites(user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
       this.findFavoritePlaylist(user_id),
-      this.trackService.findOne(track_id, user_id),
+      this.trackService.findOne({ id: track_id, user_id }),
     ]);
 
     try {
@@ -269,7 +301,11 @@ export class PlaylistService {
         .of(playlist.id)
         .add(track.id);
 
-      await this.trackService.toggleFavorite(track_id, user_id, true);
+      await this.trackService.toggleFavorite({
+        id: track_id,
+        user_id,
+        isFavorite: true,
+      });
 
       return {
         message: 'Track added to Favorites',
@@ -286,8 +322,8 @@ export class PlaylistService {
 
   async removeTrack(id: string, user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
-      this.findOne(user_id, id),
-      this.trackService.findOne(track_id, user_id),
+      this.findOne({ user_id, id }),
+      this.trackService.findOne({ id: track_id, user_id }),
     ]);
 
     try {
@@ -312,7 +348,7 @@ export class PlaylistService {
   async removeTrackFromFavorites(user_id: string, track_id: string) {
     const [playlist, track] = await Promise.all([
       this.findFavoritePlaylist(user_id),
-      this.trackService.findOne(track_id, user_id),
+      this.trackService.findOne({ id: track_id, user_id }),
     ]);
 
     try {
@@ -322,7 +358,11 @@ export class PlaylistService {
         .of(playlist.id)
         .remove(track.id);
 
-      await this.trackService.toggleFavorite(track_id, user_id, false);
+      await this.trackService.toggleFavorite({
+        id: track_id,
+        user_id,
+        isFavorite: false,
+      });
 
       return {
         message: 'Track removed from Favorites',

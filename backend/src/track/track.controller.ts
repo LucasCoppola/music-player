@@ -44,8 +44,9 @@ export class TrackController {
       }),
     )
     file: Express.Multer.File,
+    @Req() req: Request,
   ) {
-    return await this.trackService.uploadTrack(file);
+    return await this.trackService.uploadTrack({ file, user_id: req.user.sub });
   }
 
   @Post(':id/upload/image')
@@ -69,30 +70,37 @@ export class TrackController {
     @Param('id') id: string,
     @Req() req: Request,
   ) {
-    return await this.trackService.uploadImage(file, id, req.user.sub);
+    return await this.trackService.uploadImage({
+      file,
+      id,
+      user_id: req.user.sub,
+    });
   }
 
   @Post()
   async create(@Body() createTrackDto: CreateTrackDto, @Req() req: Request) {
-    return await this.trackService.create(createTrackDto, req.user.sub);
+    return await this.trackService.create({
+      createTrackDto,
+      user_id: req.user.sub,
+    });
   }
 
   @Get()
   async findAll(@Req() req: Request, @Query('q') query: string) {
     if (query) {
-      return await this.trackService.search(query, req.user.sub);
+      return await this.trackService.search({ query, user_id: req.user.sub });
     } else {
-      return await this.trackService.findAll(req.user.sub);
+      return await this.trackService.findAll({ user_id: req.user.sub });
     }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req: Request) {
-    return await this.trackService.findOne(id, req.user.sub);
+    return await this.trackService.findOne({ id, user_id: req.user.sub });
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() req: Request) {
-    return await this.trackService.remove(id, req.user.sub);
+    return await this.trackService.remove({ id, user_id: req.user.sub });
   }
 }

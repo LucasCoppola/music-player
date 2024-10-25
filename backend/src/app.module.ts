@@ -23,12 +23,12 @@ import { FileModule } from './file/file.module';
   imports: [
     ServeStaticModule.forRoot(
       {
-        rootPath: join(__dirname, '..', '..', 'uploads', 'images'),
-        serveRoot: '/images',
+        rootPath: join(__dirname, '..', '..', 'uploads', 'public', 'images'),
+        serveRoot: '/public/images',
       },
       {
-        rootPath: join(__dirname, '..', '..', 'uploads', 'tracks'),
-        serveRoot: '/tracks',
+        rootPath: join(__dirname, '..', '..', 'uploads', 'public', 'tracks'),
+        serveRoot: '/public/tracks',
       },
     ),
     ConfigModule.forRoot({

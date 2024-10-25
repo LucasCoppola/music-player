@@ -29,12 +29,15 @@ export class PlaylistController {
 
   @Post()
   create(@Req() req: Request, @Body() createPlaylistDto: CreatePlaylistDto) {
-    return this.playlistService.create(req.user.sub, createPlaylistDto);
+    return this.playlistService.create({
+      user_id: req.user.sub,
+      createPlaylistDto,
+    });
   }
 
   @Get()
   findAll(@Req() req: Request) {
-    return this.playlistService.findAll(req.user.sub);
+    return this.playlistService.findAll({ user_id: req.user.sub });
   }
 
   @Post('favorites/tracks/:trackId')
@@ -55,7 +58,7 @@ export class PlaylistController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: Request) {
-    return this.playlistService.findOne(req.user.sub, id);
+    return this.playlistService.findOne({ user_id: req.user.sub, id });
   }
 
   @Patch(':id')
@@ -64,7 +67,11 @@ export class PlaylistController {
     @Req() req: Request,
     @Body() updatePlaylistDto: UpdatePlaylistDto,
   ) {
-    return this.playlistService.update(id, req.user.sub, updatePlaylistDto);
+    return this.playlistService.update({
+      id,
+      user_id: req.user.sub,
+      updatePlaylistDto,
+    });
   }
 
   @Delete(':id')
@@ -93,7 +100,11 @@ export class PlaylistController {
     @Param('id') id: string,
     @Req() req: Request,
   ) {
-    return await this.playlistService.uploadImage(file, id, req.user.sub);
+    return await this.playlistService.uploadImage({
+      file,
+      id,
+      user_id: req.user.sub,
+    });
   }
 
   @Post(':id/tracks/:trackId')

@@ -20,7 +20,7 @@ export class FileService {
 
     try {
       if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory);
+        fs.mkdirSync(directory, { recursive: true });
       }
 
       await fs.promises.writeFile(filePath, buffer);

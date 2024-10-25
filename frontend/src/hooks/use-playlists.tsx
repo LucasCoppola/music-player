@@ -16,6 +16,7 @@ export type Playlist = {
   track_count: number;
   duration: number;
   tracks: Track[];
+  user_id: string;
 };
 
 export function usePlaylists() {

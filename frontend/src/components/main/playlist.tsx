@@ -7,7 +7,7 @@ import { EditableTitle } from "./editable-title";
 import TracksTable from "./tracks-table";
 import { usePlaylistById } from "@/hooks/use-playlists";
 import { PlaylistLoadingSkeleton } from "../skeletons";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, getCoverPlaylistImage } from "@/lib/utils";
 import { usePlayback } from "@/context/playback-context";
 import { useEffect, useState } from "react";
 
@@ -86,7 +86,10 @@ export default function Playlist() {
             {playlist?.type === "favorite" ? (
               <div className="w-16 h-16 sm:w-20 sm:h-20">
                 <img
-                  src={`${import.meta.env.VITE_BASE_URL}/images/defaults/${playlist.image_name}`}
+                  src={getCoverPlaylistImage(
+                    playlist.image_name,
+                    playlist.user_id,
+                  )}
                   alt="Favorite playlist cover"
                   className="w-full h-full object-cover"
                 />
@@ -95,6 +98,7 @@ export default function Playlist() {
               <CoverImage
                 coverImage={playlist.image_name ?? null}
                 playlistId={playlist.id}
+                userId={playlist.user_id}
               />
             )}
             <div>

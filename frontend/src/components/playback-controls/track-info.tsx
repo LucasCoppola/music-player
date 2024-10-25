@@ -17,7 +17,10 @@ export default function TrackInfo() {
       {currentTrack && (
         <>
           <img
-            src={getCoverTrackImage(currentTrack.image_name)}
+            src={getCoverTrackImage(
+              currentTrack.image_name,
+              currentTrack.user_id,
+            )}
             alt="Track thumbnail"
             className="w-10 h-10 object-cover mr-2"
           />

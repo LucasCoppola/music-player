@@ -35,7 +35,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     setIsPlaying(true);
     setCurrentTime(0);
     if (audioRef.current) {
-      audioRef.current.src = getAudioSrc(track.track_name);
+      audioRef.current.src = getAudioSrc(track.track_name, track.user_id);
       audioRef.current.play();
     }
   }, []);
@@ -61,9 +61,9 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTrack, playlist, playTrack]);
 
-  const getAudioSrc = (track_name: string) => {
-    return `${BASE_URL}/tracks/${track_name}`;
-  };
+  function getAudioSrc(track_name: string, userId: string) {
+    return `${BASE_URL}/${userId}/tracks/${track_name}`;
+  }
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {

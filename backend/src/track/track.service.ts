@@ -14,9 +14,6 @@ import { FileService } from '../file/file.service';
 
 @Injectable()
 export class TrackService {
-  private readonly uploadTracksPath = './uploads/tracks';
-  private readonly uploadImagesPath = './uploads/images';
-
   constructor(
     @InjectRepository(Track)
     private tracksRepository: Repository<Track>,
@@ -24,12 +21,19 @@ export class TrackService {
     private fileService: FileService,
   ) {}
 
-  async uploadTrack(file: Express.Multer.File) {
+  async uploadTrack({
+    file,
+    user_id,
+  }: {
+    file: Express.Multer.File;
+    user_id: string;
+  }) {
+    const uploadTracksPath = `./uploads/${user_id}/tracks`;
     const fileSizeInKb = Math.floor(file.size / 1024);
     const track_name = `${Date.now()}-${file.originalname}`;
 
     await this.fileService.writeFile({
-      directory: this.uploadTracksPath,
+      directory: uploadTracksPath,
       filename: track_name,
       buffer: file.buffer,
     });
@@ -42,21 +46,34 @@ export class TrackService {
     };
   }
 
-  async uploadImage(file: Express.Multer.File, id: string, user_id: string) {
+  async uploadImage({
+    file,
+    id,
+    user_id,
+  }: {
+    file: Express.Multer.File;
+    id: string;
+    user_id: string;
+  }) {
+    const uploadImagesPath = `./uploads/${user_id}/images`;
     const fileSizeInKb = Math.floor(file.size / 1024);
     const image_name = `${Date.now()}-${file.originalname}`;
 
     await this.fileService.writeFile({
-      directory: this.uploadImagesPath,
+      directory: uploadImagesPath,
       filename: image_name,
       buffer: file.buffer,
     });
 
     try {
-      await this.update(id, user_id, {
-        image_name,
-        mimetype: file.mimetype,
-        size_in_kb: fileSizeInKb,
+      await this.update({
+        id,
+        user_id,
+        updateTrackDto: {
+          image_name,
+          mimetype: file.mimetype,
+          size_in_kb: fileSizeInKb,
+        },
       });
 
       return {
@@ -69,7 +86,15 @@ export class TrackService {
     }
   }
 
-  async toggleFavorite(id: string, user_id: string, isFavorite: boolean) {
+  async toggleFavorite({
+    id,
+    user_id,
+    isFavorite,
+  }: {
+    id: string;
+    user_id: string;
+    isFavorite: boolean;
+  }) {
     try {
       await this.tracksRepository
         .createQueryBuilder()
@@ -86,7 +111,7 @@ export class TrackService {
     }
   }
 
-  async search(query: string, user_id: string) {
+  async search({ query, user_id }: { query: string; user_id: string }) {
     try {
       const tracks = await this.tracksRepository
         .createQueryBuilder('track')
@@ -102,13 +127,19 @@ export class TrackService {
     }
   }
 
-  async create(createTrackDto: CreateTrackDto, user_id: string) {
+  async create({
+    createTrackDto,
+    user_id,
+  }: {
+    createTrackDto: CreateTrackDto;
+    user_id: string;
+  }) {
     const { title, artist, track_name, size_in_kb, mimetype } = createTrackDto;
 
     try {
       const [user, { duration, bit_rate }] = await Promise.all([
         this.usersService.findOneById(user_id),
-        this.getAudioMetadata(track_name),
+        this.getAudioMetadata({ user_id, track_name }),
       ]);
 
       await this.tracksRepository
@@ -134,7 +165,7 @@ export class TrackService {
     }
   }
 
-  async findAll(user_id: string): Promise<Track[]> {
+  async findAll({ user_id }: { user_id: string }): Promise<Track[]> {
     const user = await this.usersService.findOneById(user_id);
 
     try {
@@ -151,7 +182,13 @@ export class TrackService {
     }
   }
 
-  async findOne(id: string, user_id: string): Promise<Track> {
+  async findOne({
+    id,
+    user_id,
+  }: {
+    id: string;
+    user_id: string;
+  }): Promise<Track> {
     const user = await this.usersService.findOneById(user_id);
 
     try {
@@ -176,9 +213,18 @@ export class TrackService {
     }
   }
 
-  async update(id: string, user_id: string, updateTrackDto: UpdateTrackDto) {
+  async update({
+    id,
+    user_id,
+    updateTrackDto,
+  }: {
+    id: string;
+    user_id: string;
+    updateTrackDto: UpdateTrackDto;
+  }) {
     const { image_name, mimetype, size_in_kb } = updateTrackDto;
-    const track = await this.findOne(id, user_id);
+    const uploadImagesPath = `./uploads/${user_id}/images`;
+    const track = await this.findOne({ id, user_id });
     const oldImageName = track.image_name;
 
     try {
@@ -197,7 +243,7 @@ export class TrackService {
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
         await this.fileService.removeFile({
-          filePath: `${this.uploadImagesPath}/${oldImageName}`,
+          filePath: `${uploadImagesPath}/${oldImageName}`,
         });
       }
 
@@ -210,19 +256,21 @@ export class TrackService {
     }
   }
 
-  async remove(id: string, user_id: string) {
+  async remove({ id, user_id }: { id: string; user_id: string }) {
+    const uploadImagesPath = `./uploads/${user_id}/images`;
+    const uploadTracksPath = `./uploads/${user_id}/tracks`;
     const [user, track] = await Promise.all([
       this.usersService.findOneById(user_id),
-      this.findOne(id, user_id),
+      this.findOne({ id, user_id }),
     ]);
 
     await this.fileService.removeFile({
-      filePath: `${this.uploadTracksPath}/${track.track_name}`,
+      filePath: `${uploadTracksPath}/${track.track_name}`,
     });
 
     if (track.image_name) {
       await this.fileService.removeFile({
-        filePath: `${this.uploadImagesPath}/${track.image_name}`,
+        filePath: `${uploadImagesPath}/${track.image_name}`,
       });
     }
 
@@ -244,10 +292,15 @@ export class TrackService {
     }
   }
 
-  async getAudioMetadata(
-    track_name: string,
-  ): Promise<{ duration: number; bit_rate: number }> {
-    const track_file_path = `${this.uploadTracksPath}/${track_name}`;
+  async getAudioMetadata({
+    user_id,
+    track_name,
+  }: {
+    user_id: string;
+    track_name: string;
+  }): Promise<{ duration: number; bit_rate: number }> {
+    const uploadTracksPath = `./uploads/${user_id}/tracks`;
+    const track_file_path = `${uploadTracksPath}/${track_name}`;
 
     return new Promise((resolve, reject) => {
       ffmpeg.ffprobe(track_file_path, (err, metadata) => {
