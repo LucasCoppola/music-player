@@ -2,11 +2,52 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  StreamableFile,
 } from '@nestjs/common';
 import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class FileService {
+  streamFile({
+    user_id,
+    filename,
+    resource,
+  }: {
+    user_id: string;
+    filename: string;
+    resource: 'tracks' | 'images';
+  }): StreamableFile {
+    const filePath = join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'uploads',
+      user_id,
+      resource,
+      filename,
+    );
+
+    try {
+      if (!fs.existsSync(filePath)) {
+        throw new NotFoundException(
+          `File ${filename} in ${resource} not found`,
+        );
+      }
+
+      const file = fs.createReadStream(filePath);
+      return new StreamableFile(file);
+    } catch (error) {
+      console.error('Error streaming file: ', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Failed to stream file');
+      }
+    }
+  }
+
   async writeFile({
     directory,
     filename,
