@@ -6,6 +6,8 @@ export const DEFAULT_COVER_TRACK_IMAGE = `${BASE_URL}/public/images/default_cove
 
 export const DEFAULT_FAVORITE_COVER = `${BASE_URL}/public/images/heart.png`;
 
+export const NOT_FOUND_IMAGE = `${BASE_URL}/public/images/confused-travolta.gif`;
+
 export const queryKeys = {
   playlists: () => ["playlists"],
   playlist: (id: string) => ["playlist", id],

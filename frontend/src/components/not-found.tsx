@@ -1,13 +1,14 @@
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import { Link } from "@tanstack/react-router";
+import { NOT_FOUND_IMAGE } from "@/lib/consts";
 
 export function NotFound() {
   return (
     <div className="flex justify-center items-center mt-16 bg-[#0A0A0A] text-white">
       <div className="text-center space-y-4">
         <img
-          src="https://res.cloudinary.com/dotpfjpno/image/upload/v1716302397/confused-travolta_bmqc1k.gif"
+          src={NOT_FOUND_IMAGE}
           alt="Confused Travolta GIF"
           className="mb-4"
         />
@@ -16,6 +17,7 @@ export function NotFound() {
         </p>
         <Link
           to="/"
+          search={{ q: "" }}
           className={cn(
             buttonVariants({
               variant: "outline",
