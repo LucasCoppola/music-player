@@ -139,11 +139,14 @@ describe('AuthService', () => {
         password: 'hashedpassword',
         username: registerDto.username,
       });
-      expect(playlistService.create).toHaveBeenCalledWith(mockNewUser.id, {
-        id: expect.any(String),
-        title: 'Favorites',
-        image_name: 'heart.png',
-        type: 'favorite',
+      expect(playlistService.create).toHaveBeenCalledWith({
+        user_id: mockNewUser.id,
+        createPlaylistDto: {
+          id: expect.any(String),
+          title: 'Favorites',
+          image_name: 'heart.png',
+          type: 'favorite',
+        },
       });
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: mockNewUser.id,

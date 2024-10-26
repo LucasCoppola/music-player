@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { AudioModule } from './audio/audio.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { TrackModule } from './track/track.module';
 import configuration from '../config/configuration';
@@ -56,7 +55,6 @@ import { FileModule } from './file/file.module';
     }),
     AuthModule,
     UsersModule,
-    AudioModule,
     PlaylistModule,
     TrackModule,
     FileModule,
