@@ -14,7 +14,7 @@ type PlaybackContextType = {
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
   setPlaylist: (playlist: Track[]) => void;
-  setCurrentTrackId: (id: string | null) => void;
+  stopPlayback: (trackId: string) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
 };
 

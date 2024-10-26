@@ -74,6 +74,21 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTrack, playlist, playTrack]);
 
+  const stopPlayback = useCallback(
+    (trackId: string) => {
+      if (trackId === currentTrackId && audioRef.current) {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.src = "";
+          setIsPlaying(false);
+          setCurrentTrackId(null);
+          setCurrentTime(0);
+        }
+      }
+    },
+    [currentTrackId],
+  );
+
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === " " && e.target === document.body) {
@@ -98,7 +113,6 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         isPlaying,
         currentTrack,
         currentTrackId,
-        setCurrentTrackId,
         currentTime,
         duration,
         togglePlayPause,
@@ -108,6 +122,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         setCurrentTime,
         setDuration,
         setPlaylist,
+        stopPlayback,
         audioRef,
       }}
     >

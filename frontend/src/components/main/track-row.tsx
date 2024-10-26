@@ -50,7 +50,8 @@ interface TrackRowProps {
 
 export default function TrackRow({ track, index, query }: TrackRowProps) {
   const { data: playlists } = usePlaylists();
-  const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
+  const { currentTrack, playTrack, togglePlayPause, isPlaying, stopPlayback } =
+    usePlayback();
   const { mutate: deleteTrack } = useDeleteTrack();
 
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
@@ -106,9 +107,10 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       deleteTrack({ id: track.id });
+      stopPlayback(track.id);
       setIsAlertOpen(false);
     },
-    [deleteTrack, track.id],
+    [deleteTrack, stopPlayback, track.id],
   );
 
   const handleDeleteCancel = useCallback((e: React.MouseEvent) => {
