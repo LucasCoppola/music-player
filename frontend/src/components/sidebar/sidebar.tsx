@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import Auth from "../auth/auth";
 import SearchInput from "./search";
 import { buttonVariants } from "@/components/ui/button";
-import UploadTrack from "./upload-track";
+import UploadTrack from "./upload/upload-track";
 import UserDropdown from "./user-dropdown";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/auth-context";

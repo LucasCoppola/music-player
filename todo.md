@@ -1,6 +1,4 @@
-- [] Remove audio ref while is playing
-- [] Compress image files?
-
+- [-] Update upload track form to include cover image and album?
 - [] Keyboard Shorcuts
 
   - [] <C-Left/Right> to play next/prev track

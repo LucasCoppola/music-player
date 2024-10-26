@@ -74,7 +74,7 @@ export default function NowPlaying() {
       >
         <img
           src={imageUrl}
-          alt="Album cover"
+          alt="Track cover"
           className="w-full h-full object-cover"
         />
         <form className="absolute inset-0" onSubmit={handleSubmit}>
