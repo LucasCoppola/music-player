@@ -73,7 +73,11 @@ export function useUploadTrackFile() {
 export function useUploadTrackCoverImage() {
   const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
-  const client = useClient<{ message: string; trackId: string }>();
+  const client = useClient<{
+    message: string;
+    trackId: string;
+    image_name: string;
+  }>();
 
   return useMutation({
     mutationFn: async ({ file, trackId }: { file: File; trackId: string }) => {
@@ -95,6 +99,9 @@ export function useUploadTrackCoverImage() {
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.tracks(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["image-file", data.image_name],
       });
       toast.success(data.message || "Track cover image uploaded successfully.");
     },

@@ -7,9 +7,10 @@ import { EditableTitle } from "./editable-title";
 import TracksTable from "./tracks-table";
 import { usePlaylistById } from "@/hooks/use-playlists";
 import { PlaylistLoadingSkeleton } from "../skeletons";
-import { formatDuration, getCoverPlaylistImage } from "@/lib/utils";
+import { formatDuration } from "@/lib/utils";
 import { usePlayback } from "@/context/playback-context";
 import { useEffect, useState } from "react";
+import { DEFAULT_FAVORITE_COVER } from "@/lib/consts";
 
 export default function Playlist() {
   const { setPlaylist, playTrack } = usePlayback();
@@ -86,19 +87,15 @@ export default function Playlist() {
             {playlist?.type === "favorite" ? (
               <div className="w-16 h-16 sm:w-20 sm:h-20">
                 <img
-                  src={getCoverPlaylistImage(
-                    playlist.image_name,
-                    playlist.user_id,
-                  )}
+                  src={DEFAULT_FAVORITE_COVER}
                   alt="Favorite playlist cover"
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
               <CoverImage
-                coverImage={playlist.image_name ?? null}
+                image_name={playlist.image_name ?? null}
                 playlistId={playlist.id}
-                userId={playlist.user_id}
               />
             )}
             <div>

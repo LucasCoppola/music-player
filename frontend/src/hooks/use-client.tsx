@@ -1,5 +1,3 @@
-import { useAuth } from "@/context/auth-context";
-
 interface ClientOptions {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: { contentType?: string };

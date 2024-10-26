@@ -1,6 +1,8 @@
 import { usePlayback } from "@/context/playback-context";
+import { useImageFile } from "@/hooks/use-files";
 import { useUploadTrackCoverImage } from "@/hooks/use-tracks";
-import { cn, getCoverTrackImage } from "@/lib/utils";
+import { DEFAULT_COVER_TRACK_IMAGE } from "@/lib/consts";
+import { cn, getUrlFromBlob } from "@/lib/utils";
 import { Loader, Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -9,8 +11,12 @@ export default function NowPlaying() {
   const { mutate: uploadTrackCoverImage, isPending } =
     useUploadTrackCoverImage();
   const { currentTrack } = usePlayback();
-  const [isHovered, setIsHovered] = useState(false);
+  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const imageUrl = imageBlob
+    ? getUrlFromBlob(imageBlob)
+    : DEFAULT_COVER_TRACK_IMAGE;
 
+  const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
@@ -67,10 +73,7 @@ export default function NowPlaying() {
         onMouseLeave={handleMouseLeave}
       >
         <img
-          src={getCoverTrackImage(
-            currentTrack.image_name,
-            currentTrack.user_id,
-          )}
+          src={imageUrl}
           alt="Album cover"
           className="w-full h-full object-cover"
         />

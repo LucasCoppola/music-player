@@ -1,21 +1,21 @@
+import { useImageFile } from "@/hooks/use-files";
 import { useUploadPlaylistCover } from "@/hooks/use-playlists";
-import { cn, getCoverPlaylistImage } from "@/lib/utils";
+import { cn, getUrlFromBlob } from "@/lib/utils";
 import { Upload, Loader, Pencil } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 export function CoverImage({
-  coverImage,
+  image_name,
   playlistId,
-  userId,
 }: {
-  coverImage: string | null;
+  image_name: string | null;
   playlistId: string;
-  userId: string;
 }) {
   const { mutate: uploadPlaylistCover, isPending } = useUploadPlaylistCover();
-  const [isHovered, setIsHovered] = useState(false);
+  const { data: imageBlob } = useImageFile(image_name ?? "");
 
+  const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
@@ -35,14 +35,14 @@ export function CoverImage({
     }
   }
 
-  return coverImage ? (
+  return imageBlob ? (
     <div
       className="relative w-16 h-16 sm:w-20 sm:h-20 cursor-pointer group"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <img
-        src={getCoverPlaylistImage(coverImage, userId)}
+        src={getUrlFromBlob(imageBlob)}
         alt="Playlist cover"
         className="w-full h-full object-cover"
       />

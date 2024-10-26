@@ -27,21 +27,19 @@ import {
   useRemoveTrackFromPlaylist,
 } from "@/hooks/use-playlists";
 import { Track } from "@/hooks/use-tracks";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, getUrlFromBlob } from "@/lib/utils";
 import { useParams } from "@tanstack/react-router";
 import { usePlayback } from "@/context/playback-context";
-
-interface TrackPlaylistRowProps {
-  track: Track;
-  imageUrl: string;
-  index: number;
-}
+import { useImageFile } from "@/hooks/use-files";
+import { DEFAULT_COVER_TRACK_IMAGE } from "@/lib/consts";
 
 export default function TrackPlaylistRow({
   track,
-  imageUrl,
   index,
-}: TrackPlaylistRowProps) {
+}: {
+  track: Track;
+  index: number;
+}) {
   const { playlistId } = useParams({
     from: "/p/$playlistId",
   });
@@ -59,6 +57,10 @@ export default function TrackPlaylistRow({
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
+  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const imageUrl = imageBlob
+    ? getUrlFromBlob(imageBlob)
+    : DEFAULT_COVER_TRACK_IMAGE;
 
   const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);

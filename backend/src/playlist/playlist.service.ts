@@ -142,7 +142,6 @@ export class PlaylistService {
 
       return {
         ...playlist,
-        user_id,
         track_count,
         duration,
       };

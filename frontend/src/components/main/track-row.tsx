@@ -37,22 +37,18 @@ import {
   useRemoveTrackFromFavorites,
 } from "@/hooks/use-playlists";
 import { Track, useDeleteTrack } from "@/hooks/use-tracks";
-import { formatDuration, highlightText } from "@/lib/utils";
+import { formatDuration, getUrlFromBlob, highlightText } from "@/lib/utils";
 import { usePlayback } from "@/context/playback-context";
+import { useImageFile } from "@/hooks/use-files";
+import { DEFAULT_COVER_TRACK_IMAGE } from "@/lib/consts";
 
 interface TrackRowProps {
   track: Track;
-  imageUrl: string;
   index: number;
   query?: string;
 }
 
-export default function TrackRow({
-  track,
-  imageUrl,
-  index,
-  query,
-}: TrackRowProps) {
+export default function TrackRow({ track, index, query }: TrackRowProps) {
   const { data: playlists } = usePlaylists();
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const { mutate: deleteTrack } = useDeleteTrack();
@@ -60,6 +56,10 @@ export default function TrackRow({
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
   const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
+  const { data: imageBlob } = useImageFile(track.image_name);
+  const imageUrl = imageBlob
+    ? getUrlFromBlob(imageBlob)
+    : DEFAULT_COVER_TRACK_IMAGE;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

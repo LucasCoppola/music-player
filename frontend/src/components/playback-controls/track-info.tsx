@@ -5,22 +5,25 @@ import {
   useRemoveTrackFromFavorites,
   useAddTrackToFavorites,
 } from "@/hooks/use-playlists";
-import { getCoverTrackImage } from "@/lib/utils";
+import { useImageFile } from "@/hooks/use-files";
+import { getUrlFromBlob } from "@/lib/utils";
+import { DEFAULT_COVER_TRACK_IMAGE } from "@/lib/consts";
 
 export default function TrackInfo() {
   const { currentTrack } = usePlayback();
   const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
   const { mutate: removeTrackFromFavorites } = useRemoveTrackFromFavorites();
+  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const imageUrl = imageBlob
+    ? getUrlFromBlob(imageBlob)
+    : DEFAULT_COVER_TRACK_IMAGE;
 
   return (
     <div className="flex items-center w-1/3 space-x-2">
       {currentTrack && (
         <>
           <img
-            src={getCoverTrackImage(
-              currentTrack.image_name,
-              currentTrack.user_id,
-            )}
+            src={imageUrl}
             alt="Track thumbnail"
             className="w-10 h-10 object-cover mr-2"
           />

@@ -34,24 +34,28 @@ export function highlightText(text: string, query: string | undefined) {
   );
 }
 
-export function getCoverTrackImage(
-  image_name: string | null,
-  userId: string,
-): string {
-  if (image_name) {
-    return `${BASE_URL}/${userId}/images/${image_name}`;
-  } else {
-    return `${BASE_URL}/public/images/default_cover_track_image.png`;
+export async function getAudioBlob(filename: string | undefined) {
+  if (!filename) return;
+
+  const audioUrl = `${BASE_URL}/api/track/${filename}`;
+  const authToken = localStorage.getItem("auth_token");
+
+  const response = await fetch(audioUrl, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch track");
   }
+
+  return await response.blob();
 }
 
-export function getCoverPlaylistImage(
-  image_name: string,
-  userId: string,
-): string {
-  if (image_name === "heart.png") {
-    return `${BASE_URL}/public/images/${image_name}`;
-  } else {
-    return `${BASE_URL}/${userId}/images/${image_name}`;
-  }
+export function getUrlFromBlob(blob: Blob | undefined) {
+  if (!blob) return;
+  return URL.createObjectURL(blob);
 }

@@ -7,7 +7,7 @@ import {
 } from "react";
 import { Track, useTrackById } from "@/hooks/use-tracks";
 import { PlaybackContext } from "@/context/playback-context";
-import { BASE_URL } from "@/lib/consts";
+import { getAudioBlob, getUrlFromBlob } from "@/lib/utils";
 
 export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -19,9 +19,26 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
 
   const { data: currentTrack } = useTrackById(currentTrackId || "");
 
+  useEffect(() => {
+    async function loadAudio() {
+      if (currentTrack?.track_name) {
+        const audioBlob = await getAudioBlob(currentTrack.track_name);
+        if (audioBlob && audioRef.current) {
+          const audioUrl = getUrlFromBlob(audioBlob)!;
+          audioRef.current.src = audioUrl;
+          audioRef.current.currentTime = currentTime;
+          if (isPlaying) audioRef.current.play();
+        }
+      }
+    }
+    loadAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTrack]);
+
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
       if (isPlaying) {
+        setCurrentTime(audioRef.current.currentTime);
         audioRef.current.pause();
       } else {
         audioRef.current.play();
@@ -32,12 +49,8 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
 
   const playTrack = useCallback((track: Track) => {
     setCurrentTrackId(track.id);
-    setIsPlaying(true);
     setCurrentTime(0);
-    if (audioRef.current) {
-      audioRef.current.src = getAudioSrc(track.track_name, track.user_id);
-      audioRef.current.play();
-    }
+    setIsPlaying(true);
   }, []);
 
   const playNextTrack = useCallback(() => {
@@ -60,10 +73,6 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
       playTrack(playlist[previousIndex]);
     }
   }, [currentTrack, playlist, playTrack]);
-
-  function getAudioSrc(track_name: string, userId: string) {
-    return `${BASE_URL}/${userId}/tracks/${track_name}`;
-  }
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -89,6 +98,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         isPlaying,
         currentTrack,
         currentTrackId,
+        setCurrentTrackId,
         currentTime,
         duration,
         togglePlayPause,

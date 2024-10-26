@@ -4,7 +4,6 @@ import TrackRow from "./track-row";
 import TrackPlaylistRow from "./track-playlist-row";
 import { usePlayback } from "@/context/playback-context";
 import { useEffect } from "react";
-import { getCoverTrackImage } from "@/lib/utils";
 
 export default function TracksTable({
   tracks,
@@ -48,7 +47,6 @@ export default function TracksTable({
               tracks.map((track, i) => (
                 <TrackComponent
                   track={track}
-                  imageUrl={getCoverTrackImage(track.image_name, track.user_id)}
                   key={i}
                   index={i + 1}
                   query={query}
