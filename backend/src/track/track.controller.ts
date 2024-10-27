@@ -13,6 +13,7 @@ import {
   Req,
   UseGuards,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -20,6 +21,7 @@ import { memoryStorage } from 'multer';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('tracks')
 @UseGuards(AuthGuard)
@@ -92,6 +94,19 @@ export class TrackController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req: Request) {
     return await this.trackService.findOne({ id, user_id: req.user.sub });
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return await this.trackService.update({
+      id,
+      user_id: req.user.sub,
+      updateTrackDto,
+    });
   }
 
   @Delete(':id')

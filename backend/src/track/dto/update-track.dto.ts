@@ -1,23 +1,28 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTrackDto {
   @IsString()
   @IsNotEmpty()
-  title: string;
+  @IsOptional()
+  title: string | null;
 
   @IsString()
   @IsNotEmpty()
-  artist: string;
+  @IsOptional()
+  artist: string | null;
 
   @IsString()
   @IsNotEmpty()
-  image_name: string;
+  @IsOptional()
+  image_name: string | null;
 
   @IsString()
   @IsNotEmpty()
-  mimetype: string;
+  @IsOptional()
+  mimetype: string | null;
 
   @IsNumber()
   @IsNotEmpty()
-  size_in_kb: number;
+  @IsOptional()
+  size_in_kb: number | null;
 }

@@ -219,26 +219,29 @@ export class TrackService {
     user_id: string;
     updateTrackDto: UpdateTrackDto;
   }) {
-    const { image_name, mimetype, size_in_kb } = updateTrackDto;
+    const { title, artist, image_name, mimetype, size_in_kb } = updateTrackDto;
     const uploadImagesPath = `./uploads/${user_id}/images`;
     const track = await this.findOne({ id, user_id });
     const oldImageName = track.image_name;
+
+    const updateFields: Partial<Track> = {};
+
+    if (title) updateFields.title = title;
+    if (artist) updateFields.artist = artist;
+    if (image_name) {
+      updateFields.image_name = image_name;
+      updateFields.image_mimetype = mimetype;
+      updateFields.image_size_in_kb = size_in_kb;
+    }
 
     try {
       const result = await this.tracksRepository
         .createQueryBuilder()
         .update(Track)
-        .set({
-          // I NEED TO FIX THIS
-          // now you can update artist, title, and image
-          // so this function should call the uploadImage function.
-          image_name,
-          image_mimetype: mimetype,
-          image_size_in_kb: size_in_kb,
-        })
+        .set(updateFields)
         .where('id = :id', { id: track.id })
         .andWhere('user_id = :user_id', { user_id })
-        .returning('image_name')
+        .returning('id, image_name')
         .execute();
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
@@ -249,6 +252,7 @@ export class TrackService {
 
       return {
         message: 'Track updated successfully.',
+        trackId: result.raw[0].id,
       };
     } catch (error) {
       console.log('Error updating track: ', error);
