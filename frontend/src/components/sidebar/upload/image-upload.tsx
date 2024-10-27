@@ -1,7 +1,10 @@
-import { X, ImageIcon, Edit2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Edit2, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { TrackFormData } from "./upload-track";
+import { DEFAULT_COVER_TRACK_IMAGE } from "@/lib/consts";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { formatFileSize } from "@/lib/utils";
 
 export default function ImageUpload({
   trackFormData,
@@ -27,63 +30,67 @@ export default function ImageUpload({
     }
   }
 
-  function handleRemoveImage() {
-    setTrackFormData((prev) => ({ ...prev, image: null }));
-    setIsImageSizeOk(null);
-  }
-
   return (
-    <>
-      <div className="flex items-center space-x-4">
-        <div
-          className="relative w-full h-20 bg-[#1A1A1A] rounded-md flex items-center justify-center cursor-pointer overflow-hidden"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              imageInputRef.current?.click();
-            }
-          }}
-        >
-          {trackFormData.image ? (
-            <>
-              <img
-                src={URL.createObjectURL(trackFormData.image)}
-                alt="Album art preview"
-                className="w-full h-full object-cover rounded-md"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-md">
-                <Edit2 className="text-white" />
-              </div>
-            </>
-          ) : (
-            <ImageIcon className="h-10 w-10 text-foreground" />
-          )}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="hidden"
+    <div className="space-y-2">
+      <Label htmlFor="image-upload" className="text-sm font-medium">
+        Cover Image
+      </Label>
+      <div
+        className="relative h-20 bg-[#1A1A1A] rounded-md flex items-center justify-center cursor-pointer overflow-hidden border border-border"
+        onClick={() => imageInputRef.current?.click()}
+      >
+        {trackFormData.image ? (
+          <img
+            src={URL.createObjectURL(trackFormData.image)}
+            alt="Album art preview"
+            className="w-full h-full object-cover"
           />
-        </div>
-
-        {trackFormData.image && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-black bg-opacity-50 hover:bg-opacity-70"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRemoveImage();
-            }}
-          >
-            <X className="h-4 w-4 text-white" />
-          </Button>
+        ) : (
+          <img
+            src={DEFAULT_COVER_TRACK_IMAGE}
+            alt="Default track cover image"
+            className="w-full h-full object-cover opacity-50"
+          />
         )}
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+          <Edit2 className="text-white" />
+        </div>
       </div>
-      {isImageSizeOk === false && (
-        <p className="text-xs text-red-500">Image size exceeds 5 MB limit.</p>
+      <input
+        ref={imageInputRef}
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="hidden"
+      />
+      {trackFormData.image && (
+        <div className="text-xs space-y-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="truncate max-w-[150px]">
+              {trackFormData.image.name}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={() =>
+                setTrackFormData((prev) => ({ ...prev, image: null }))
+              }
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Remove image</span>
+            </Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Size:</span>
+            <span className={isImageSizeOk ? "text-green-500" : "text-red-500"}>
+              {formatFileSize(trackFormData.image.size)}
+            </span>
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 }
