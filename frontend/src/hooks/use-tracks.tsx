@@ -147,17 +147,62 @@ export function useCreateTrack() {
   });
 }
 
+export function useUpdateTrack() {
+  const authToken = useAuth().authState?.token;
+  const queryClient = useQueryClient();
+  const client = useClient<{ message: string; trackId: string }>();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      title,
+      artist,
+      image_name,
+      mimetype,
+      size_in_kb,
+    }: {
+      id: string;
+      title?: string;
+      artist?: string;
+      image_name?: string;
+      mimetype?: string;
+      size_in_kb?: number;
+    }) =>
+      await client(`${BASE_URL}/api/tracks/${id}`, authToken, {
+        method: "PATCH",
+        headers: { contentType: "application/json" },
+        body: {
+          title: title ?? null,
+          artist: artist ?? null,
+          image_name: image_name ?? null,
+          mimetype: mimetype ?? null,
+          size_in_kb: size_in_kb ?? null,
+        },
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.track(data.trackId),
+      });
+      toast.success(data.message || "Track updated successfully.");
+    },
+    onError: (e) => {
+      console.error("Failed to update track", e);
+      toast.error(e.message || "Failed to update track");
+    },
+  });
+}
+
 export function useDeleteTrack() {
   const authToken = useAuth().authState?.token;
   const queryClient = useQueryClient();
   const client = useClient<{ message: string }>();
 
   return useMutation({
-    mutationFn: async ({ id }: { id: string }) => {
-      return await client(`${BASE_URL}/api/tracks/${id}`, authToken, {
+    mutationFn: async ({ id }: { id: string }) =>
+      await client(`${BASE_URL}/api/tracks/${id}`, authToken, {
         method: "DELETE",
-      });
-    },
+      }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
       toast.success(data.message || "Track deleted successfully.");
