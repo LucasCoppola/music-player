@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useCreateTrack, useUploadTrackFile } from "@/hooks/use-tracks";
+import {
+  useCreateTrack,
+  useUploadTrackCoverImage,
+  useUploadTrackAudioFile,
+  UploadImage,
+} from "@/hooks/use-tracks";
 import { Input } from "@/components/ui/input";
 import { validateTrackArtist, validateTrackTitle } from "@/lib/validation";
 import ImageUpload from "./image-upload";
@@ -41,7 +46,8 @@ export default function UploadTrack({
     artist: "",
   });
 
-  const uploadTrack = useUploadTrackFile();
+  const uploadAudio = useUploadTrackAudioFile();
+  const uploadImage = useUploadTrackCoverImage();
   const createTrack = useCreateTrack();
 
   function validateForm() {
@@ -63,16 +69,26 @@ export default function UploadTrack({
       return;
     }
 
-    const { track_name, mimetype, size_in_kb } = await uploadTrack.mutateAsync({
+    const audio = await uploadAudio.mutateAsync({
       file: trackFormData.file,
     });
+
+    let image: UploadImage | null = null;
+    if (trackFormData.image) {
+      image = await uploadImage.mutateAsync({
+        file: trackFormData.image,
+      });
+    }
 
     createTrack.mutate({
       title: trackFormData.title,
       artist: trackFormData.artist,
-      track_name,
-      mimetype,
-      size_in_kb,
+      track_name: audio.track_name,
+      audio_mimetype: audio.mimetype,
+      audio_size_in_kb: audio.size_in_kb,
+      image_name: image?.image_name ?? null,
+      image_mimetype: image?.mimetype ?? null,
+      image_size_in_kb: image?.size_in_kb ?? null,
     });
 
     setTrackFormData({
@@ -165,13 +181,13 @@ export default function UploadTrack({
             </div>
             <Button
               type="submit"
-              disabled={!trackFormData.file || uploadTrack.isPending}
+              disabled={!trackFormData.file || uploadAudio.isPending}
               className="w-full"
             >
-              {uploadTrack.isPending ? (
+              {uploadAudio.isPending ? (
                 <Loader className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              {uploadTrack.isPending ? "Uploading..." : "Upload Track"}
+              {uploadAudio.isPending ? "Uploading..." : "Upload Track"}
             </Button>
           </form>
         </DialogContent>

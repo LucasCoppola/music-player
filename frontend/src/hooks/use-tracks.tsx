@@ -17,9 +17,16 @@ export type Track = {
   created_at: Date;
 };
 
-type UploadTrack = {
+type UploadAudio = {
   message: string;
   track_name: string;
+  mimetype: string;
+  size_in_kb: number;
+};
+
+export type UploadImage = {
+  message: string;
+  image_name: string;
   mimetype: string;
   size_in_kb: number;
 };
@@ -50,9 +57,9 @@ export function useTrackById(trackId: string) {
   });
 }
 
-export function useUploadTrackFile() {
+export function useUploadTrackAudioFile() {
   const authToken = useAuth().authState?.token;
-  const client = useClient<UploadTrack>();
+  const client = useClient<UploadAudio>();
 
   return useMutation({
     mutationFn: async ({ file }: { file: File }) => {
@@ -72,42 +79,20 @@ export function useUploadTrackFile() {
 
 export function useUploadTrackCoverImage() {
   const authToken = useAuth().authState?.token;
-  const queryClient = useQueryClient();
-  const client = useClient<{
-    message: string;
-    trackId: string;
-    image_name: string;
-  }>();
+  const client = useClient<UploadImage>();
 
   return useMutation({
-    mutationFn: async ({ file, trackId }: { file: File; trackId: string }) => {
+    mutationFn: async ({ file }: { file: File }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      return await client(
-        `${BASE_URL}/api/tracks/${trackId}/upload/image`,
-        authToken,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.track(data.trackId),
+      return await client(`${BASE_URL}/api/tracks/upload/image`, authToken, {
+        method: "POST",
+        body: formData,
       });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.tracks(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["image-file", data.image_name],
-      });
-      toast.success(data.message || "Track cover image uploaded successfully.");
     },
     onError: (e) => {
       console.error("Failed to upload cover image", e);
-      toast.error(e.message || "Failed to upload cover image");
     },
   });
 }
@@ -122,21 +107,35 @@ export function useCreateTrack() {
       title,
       artist,
       track_name,
-      mimetype,
-      size_in_kb,
+      audio_mimetype,
+      audio_size_in_kb,
+      image_name,
+      image_mimetype,
+      image_size_in_kb,
     }: {
       title: string;
       artist: string;
       track_name: string;
-      mimetype: string;
-      size_in_kb: number;
-    }) => {
-      return await client(`${BASE_URL}/api/tracks`, authToken, {
+      audio_mimetype: string;
+      audio_size_in_kb: number;
+      image_name: string | null;
+      image_mimetype: string | null;
+      image_size_in_kb: number | null;
+    }) =>
+      await client(`${BASE_URL}/api/tracks`, authToken, {
         method: "POST",
         headers: { contentType: "application/json" },
-        body: { title, artist, track_name, mimetype, size_in_kb },
-      });
-    },
+        body: {
+          title,
+          artist,
+          track_name,
+          audio_mimetype,
+          audio_size_in_kb,
+          image_name,
+          image_mimetype,
+          image_size_in_kb,
+        },
+      }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
       toast.success(data.message || "Track created successfully.");

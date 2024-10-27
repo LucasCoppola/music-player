@@ -23,10 +23,16 @@ export class Track {
   artist: string;
 
   @Column()
-  mimetype: string;
+  audio_mimetype: string;
 
   @Column()
-  size_in_kb: number;
+  audio_size_in_kb: number;
+
+  @Column({ nullable: true })
+  image_mimetype: string;
+
+  @Column({ nullable: true })
+  image_size_in_kb: number;
 
   @Column({ type: 'float' })
   duration: number;

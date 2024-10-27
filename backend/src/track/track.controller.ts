@@ -49,7 +49,7 @@ export class TrackController {
     return await this.trackService.uploadTrack({ file, user_id: req.user.sub });
   }
 
-  @Post(':id/upload/image')
+  @Post('/upload/image')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: memoryStorage(),
@@ -67,14 +67,9 @@ export class TrackController {
       }),
     )
     file: Express.Multer.File,
-    @Param('id') id: string,
     @Req() req: Request,
   ) {
-    return await this.trackService.uploadImage({
-      file,
-      id,
-      user_id: req.user.sub,
-    });
+    return await this.trackService.uploadImage({ file, user_id: req.user.sub });
   }
 
   @Post()

@@ -48,11 +48,9 @@ export class TrackService {
 
   async uploadImage({
     file,
-    id,
     user_id,
   }: {
     file: Express.Multer.File;
-    id: string;
     user_id: string;
   }) {
     const uploadImagesPath = `./uploads/${user_id}/images`;
@@ -65,26 +63,12 @@ export class TrackService {
       buffer: file.buffer,
     });
 
-    try {
-      await this.update({
-        id,
-        user_id,
-        updateTrackDto: {
-          image_name,
-          mimetype: file.mimetype,
-          size_in_kb: fileSizeInKb,
-        },
-      });
-
-      return {
-        message: 'Track cover image uploaded successfully',
-        trackId: id,
-        filename: image_name,
-      };
-    } catch (error) {
-      console.error('Error uploading track cover image: ', error);
-      throw new InternalServerErrorException('Failed to upload cover image');
-    }
+    return {
+      message: 'Track cover image uploaded successfully',
+      image_name,
+      size_in_kb: fileSizeInKb,
+      mimetype: file.mimetype,
+    };
   }
 
   async toggleFavorite({
@@ -135,7 +119,16 @@ export class TrackService {
     createTrackDto: CreateTrackDto;
     user_id: string;
   }) {
-    const { title, artist, track_name, size_in_kb, mimetype } = createTrackDto;
+    const {
+      title,
+      artist,
+      track_name,
+      audio_mimetype,
+      audio_size_in_kb,
+      image_name,
+      image_mimetype,
+      image_size_in_kb,
+    } = createTrackDto;
 
     try {
       const [user, { duration, bit_rate }] = await Promise.all([
@@ -152,10 +145,13 @@ export class TrackService {
           artist,
           user_id: user.id,
           track_name,
-          size_in_kb,
-          mimetype,
+          audio_size_in_kb,
+          audio_mimetype,
           duration,
           bit_rate,
+          image_name: image_name ?? null,
+          image_mimetype: image_mimetype ?? null,
+          image_size_in_kb: image_size_in_kb ?? null,
         })
         .execute();
 
@@ -233,9 +229,12 @@ export class TrackService {
         .createQueryBuilder()
         .update(Track)
         .set({
+          // I NEED TO FIX THIS
+          // now you can update artist, title, and image
+          // so this function should call the uploadImage function.
           image_name,
-          mimetype,
-          size_in_kb,
+          image_mimetype: mimetype,
+          image_size_in_kb: size_in_kb,
         })
         .where('id = :id', { id: track.id })
         .andWhere('user_id = :user_id', { user_id })

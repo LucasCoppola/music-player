@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTrackDto {
   @IsString()
@@ -15,9 +15,24 @@ export class CreateTrackDto {
 
   @IsString()
   @IsNotEmpty()
-  mimetype: string;
+  audio_mimetype: string;
 
   @IsNotEmpty()
   @IsNumber()
-  size_in_kb: number;
+  audio_size_in_kb: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  image_name: string | null;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  image_mimetype: string | null;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  image_size_in_kb: number | null;
 }

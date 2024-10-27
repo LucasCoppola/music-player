@@ -3,6 +3,14 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class UpdateTrackDto {
   @IsString()
   @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  artist: string;
+
+  @IsString()
+  @IsNotEmpty()
   image_name: string;
 
   @IsString()
