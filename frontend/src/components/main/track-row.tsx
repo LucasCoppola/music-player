@@ -70,60 +70,38 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-  const handleTrackAction = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (isCurrentTrack) {
-        togglePlayPause();
-      } else {
-        playTrack(track);
-      }
-    },
-    [isCurrentTrack, togglePlayPause, playTrack, track],
-  );
+  function handleTrackAction(e: React.MouseEvent) {
+    e.preventDefault();
+    if (isCurrentTrack) {
+      togglePlayPause();
+    } else {
+      playTrack(track);
+    }
+  }
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (isCurrentTrack) {
-          togglePlayPause();
-        } else {
-          playTrack(track);
-        }
-      }
-    },
-    [isCurrentTrack, togglePlayPause, playTrack, track],
-  );
-
-  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+  function handleDeleteClick(e: React.MouseEvent) {
     e.stopPropagation();
     setIsAlertOpen(true);
     setIsMenuOpen(false);
-  }, []);
+  }
 
-  const handleDeleteConfirm = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      deleteTrack({ id: track.id });
-      stopPlayback(track.id);
-      setIsAlertOpen(false);
-    },
-    [deleteTrack, stopPlayback, track.id],
-  );
+  function handleDeleteConfirm(e: React.MouseEvent) {
+    e.stopPropagation();
+    deleteTrack({ id: track.id });
+    stopPlayback(track.id);
+    setIsAlertOpen(false);
+  }
 
-  const handleDeleteCancel = useCallback((e: React.MouseEvent) => {
+  function handleDeleteCancel(e: React.MouseEvent) {
     e.stopPropagation();
     setIsAlertOpen(false);
-  }, []);
+  }
 
   return (
     <tr
       className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
       tabIndex={0}
       onClick={handleTrackAction}
-      onKeyDown={handleKeyDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

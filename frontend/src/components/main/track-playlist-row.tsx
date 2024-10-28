@@ -66,38 +66,20 @@ export default function TrackPlaylistRow({
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-  const handleTrackAction = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (isCurrentTrack) {
-        togglePlayPause();
-      } else {
-        playTrack(track);
-      }
-    },
-    [isCurrentTrack, togglePlayPause, playTrack, track],
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (isCurrentTrack) {
-          togglePlayPause();
-        } else {
-          playTrack(track);
-        }
-      }
-    },
-    [isCurrentTrack, togglePlayPause, playTrack, track],
-  );
+  function handleTrackAction(e: React.MouseEvent) {
+    e.preventDefault();
+    if (isCurrentTrack) {
+      togglePlayPause();
+    } else {
+      playTrack(track);
+    }
+  }
 
   return (
     <tr
       className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
       tabIndex={0}
       onClick={handleTrackAction}
-      onKeyDown={handleKeyDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

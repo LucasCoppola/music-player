@@ -26,7 +26,6 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         if (audioBlob && audioRef.current) {
           const audioUrl = getUrlFromBlob(audioBlob)!;
           audioRef.current.src = audioUrl;
-          audioRef.current.currentTime = currentTime;
           if (isPlaying) audioRef.current.play();
         }
       }
@@ -91,7 +90,13 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === " " && e.target === document.body) {
+      if (e.key === " ") {
+        if (
+          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
+          e.target instanceof HTMLInputElement
+        ) {
+          return;
+        }
         e.preventDefault();
         togglePlayPause();
       } else if (e.key === "/") {

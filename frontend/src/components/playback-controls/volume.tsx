@@ -1,7 +1,7 @@
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlayback } from "@/context/playback-context";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Slider } from "../ui/slider";
 import { DEFAULT_VOLUME } from "@/lib/consts";
 
@@ -16,6 +16,35 @@ export default function Volume() {
       audioRef.current.volume = isMuted ? 0 : volume;
     }
   }, [volume, isMuted, audioRef]);
+
+  const adjustVolume = useCallback(
+    (delta: number) => {
+      const newVolume = Math.max(0, Math.min(1, volume + delta));
+      if (audioRef.current) {
+        audioRef.current.volume = newVolume;
+      }
+      setVolume(newVolume);
+      if (newVolume > 0 && isMuted) {
+        setIsMuted(false);
+      }
+    },
+    [audioRef, isMuted, volume],
+  );
+
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowUp" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        adjustVolume(0.05);
+      } else if (e.key === "ArrowDown" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        adjustVolume(-0.05);
+      }
+    }
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [adjustVolume]);
 
   function handleSliderChange(value: number[]) {
     const newVolume = value[0];

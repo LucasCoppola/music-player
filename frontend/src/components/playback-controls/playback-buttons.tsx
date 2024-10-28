@@ -1,6 +1,7 @@
 import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlayback } from "@/context/playback-context";
+import { useEffect } from "react";
 
 export default function PlaybackButtons() {
   const {
@@ -10,6 +11,21 @@ export default function PlaybackButtons() {
     playNextTrack,
     currentTrack,
   } = usePlayback();
+
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowRight" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        playNextTrack();
+      } else if (e.key === "ArrowLeft" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        playPreviousTrack();
+      }
+    }
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [playNextTrack, playPreviousTrack]);
 
   return (
     <div className="flex items-center space-x-2">

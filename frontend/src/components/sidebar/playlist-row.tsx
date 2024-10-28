@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Playlist, useDeletePlaylist } from "@/hooks/use-playlists";
 import { Link, useLocation } from "@tanstack/react-router";
 import { MoreVertical, Trash } from "lucide-react";
@@ -29,21 +29,21 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
   const { mutate: deletePlaylist } = useDeletePlaylist();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
 
-  const handleDeleteClick = useCallback((event: Event) => {
-    event.preventDefault();
+  function handleDeleteClick(e: Event) {
+    e.preventDefault();
     setIsAlertDialogOpen(true);
-  }, []);
+  }
 
-  const handleDeleteConfirm = useCallback(() => {
+  function handleDeleteConfirm() {
     deletePlaylist({ id: playlist.id });
     setIsAlertDialogOpen(false);
     menuTriggerRef.current?.focus();
-  }, [deletePlaylist, playlist.id]);
+  }
 
-  const handleDeleteCancel = useCallback(() => {
+  function handleDeleteCancel() {
     setIsAlertDialogOpen(false);
     menuTriggerRef.current?.focus();
-  }, []);
+  }
 
   return (
     <li className="group relative">
@@ -66,7 +66,7 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5 rounded-sm"
-                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="size-4" />
                 <span className="sr-only">Playlist options</span>
