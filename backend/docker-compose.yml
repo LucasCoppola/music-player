@@ -3,9 +3,7 @@ services:
     image: postgres:14
     container_name: postgres_db_${NODE_ENV}
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_URL: ${DATABASE_URL}
     ports:
       - '5432:5432'
     volumes:
