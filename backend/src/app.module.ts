@@ -19,11 +19,11 @@ import { FileModule } from './file/file.module';
   imports: [
     ServeStaticModule.forRoot(
       {
-        rootPath: join(__dirname, '..', '..', 'uploads', 'public', 'images'),
+        rootPath: join(process.cwd(), 'public', 'images'),
         serveRoot: '/public/images',
       },
       {
-        rootPath: join(__dirname, '..', '..', 'uploads', 'public', 'tracks'),
+        rootPath: join(process.cwd(), 'public', 'tracks'),
         serveRoot: '/public/tracks',
       },
     ),

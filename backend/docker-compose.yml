@@ -4,11 +4,14 @@ services:
     container_name: postgres_db_${NODE_ENV}
     environment:
       POSTGRES_URL: ${DATABASE_URL}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data_${NODE_ENV}:/var/lib/postgresql/data
 
 volumes:
-  postgres_data_development:
+  postgres_data_dev:
   postgres_data_test:
