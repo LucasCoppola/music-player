@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileService } from '../file/file.service';
+import { parse } from 'path';
 
 @Injectable()
 export class TrackService {
@@ -28,12 +29,12 @@ export class TrackService {
     file: Express.Multer.File;
     user_id: string;
   }) {
-    const uploadTracksPath = `./uploads/${user_id}/tracks`;
-    const fileSizeInKb = Math.floor(file.size / 1024);
+    const upload_tracks_path = `./uploads/${user_id}/tracks`;
     const track_name = `${Date.now()}-${file.originalname}`;
+    const file_size_in_kb = Math.floor(file.size / 1024);
 
     await this.fileService.writeFile({
-      directory: uploadTracksPath,
+      directory: upload_tracks_path,
       filename: track_name,
       buffer: file.buffer,
     });
@@ -41,7 +42,7 @@ export class TrackService {
     return {
       message: 'File uploaded successfully',
       track_name,
-      size_in_kb: fileSizeInKb,
+      size_in_kb: file_size_in_kb,
       mimetype: file.mimetype,
     };
   }
@@ -53,21 +54,34 @@ export class TrackService {
     file: Express.Multer.File;
     user_id: string;
   }) {
-    const uploadImagesPath = `./uploads/${user_id}/images`;
-    const fileSizeInKb = Math.floor(file.size / 1024);
-    const image_name = `${Date.now()}-${file.originalname}`;
+    const upload_images_path = `./uploads/${user_id}/images`;
+    const name_without_ext = parse(file.originalname).name;
+    const image_name = `${Date.now()}-${name_without_ext}`;
 
-    await this.fileService.writeFile({
-      directory: uploadImagesPath,
-      filename: image_name,
-      buffer: file.buffer,
-    });
+    const [largeImage, smallImage] = await Promise.all([
+      this.fileService.compressImage({
+        image_name,
+        outputDir: upload_images_path,
+        buffer: file.buffer,
+        size: 'large',
+      }),
+      this.fileService.compressImage({
+        image_name,
+        outputDir: upload_images_path,
+        buffer: file.buffer,
+        size: 'small',
+      }),
+    ]);
+
+    const large_image_size_in_kb = Math.floor(largeImage.size / 1024);
+    const small_image_size_in_kb = Math.floor(smallImage.size / 1024);
 
     return {
       message: 'Track cover image uploaded successfully',
       image_name,
-      size_in_kb: fileSizeInKb,
-      mimetype: file.mimetype,
+      large_image_size_in_kb: large_image_size_in_kb,
+      small_image_size_in_kb: small_image_size_in_kb,
+      mimetype: largeImage.format,
     };
   }
 
@@ -127,7 +141,8 @@ export class TrackService {
       audio_size_in_kb,
       image_name,
       image_mimetype,
-      image_size_in_kb,
+      small_image_size_in_kb,
+      large_image_size_in_kb,
     } = createTrackDto;
 
     try {
@@ -151,7 +166,8 @@ export class TrackService {
           bit_rate,
           image_name: image_name ?? null,
           image_mimetype: image_mimetype ?? null,
-          image_size_in_kb: image_size_in_kb ?? null,
+          large_image_size_in_kb: large_image_size_in_kb ?? null,
+          small_image_size_in_kb: small_image_size_in_kb ?? null,
         })
         .execute();
 
@@ -219,7 +235,14 @@ export class TrackService {
     user_id: string;
     updateTrackDto: UpdateTrackDto;
   }) {
-    const { title, artist, image_name, mimetype, size_in_kb } = updateTrackDto;
+    const {
+      title,
+      artist,
+      image_name,
+      mimetype,
+      small_image_size_in_kb,
+      large_image_size_in_kb,
+    } = updateTrackDto;
     const uploadImagesPath = `./uploads/${user_id}/images`;
     const track = await this.findOne({ id, user_id });
     const oldImageName = track.image_name;
@@ -231,7 +254,8 @@ export class TrackService {
     if (image_name) {
       updateFields.image_name = image_name;
       updateFields.image_mimetype = mimetype;
-      updateFields.image_size_in_kb = size_in_kb;
+      updateFields.large_image_size_in_kb = large_image_size_in_kb;
+      updateFields.small_image_size_in_kb = small_image_size_in_kb;
     }
 
     try {
@@ -245,9 +269,14 @@ export class TrackService {
         .execute();
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
-        await this.fileService.removeFile({
-          filePath: `${uploadImagesPath}/${oldImageName}`,
-        });
+        await Promise.all([
+          this.fileService.removeFile({
+            filePath: `${uploadImagesPath}/${oldImageName}-small.webp`,
+          }),
+          this.fileService.removeFile({
+            filePath: `${uploadImagesPath}/${oldImageName}-large.webp`,
+          }),
+        ]);
       }
 
       return {

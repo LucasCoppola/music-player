@@ -88,7 +88,8 @@ export default function UploadTrack({
       audio_size_in_kb: audio.size_in_kb,
       image_name: image?.image_name ?? null,
       image_mimetype: image?.mimetype ?? null,
-      image_size_in_kb: image?.size_in_kb ?? null,
+      large_image_size_in_kb: image?.large_image_size_in_kb ?? null,
+      small_image_size_in_kb: image?.small_image_size_in_kb ?? null,
     });
 
     setTrackFormData({

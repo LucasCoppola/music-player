@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { TrackService } from '../track/track.service';
 import { FileService } from '../file/file.service';
+import { parse } from 'path';
 
 @Injectable()
 export class PlaylistService {
@@ -31,26 +32,26 @@ export class PlaylistService {
     id: string;
     user_id: string;
   }) {
-    const uploadImagesPath = `./uploads/${user_id}/images`;
-    const removeFileExt = file.originalname.split('.').slice(0, -1).join('.');
-    const image_name = `${Date.now()}-${removeFileExt}`;
+    const upload_images_path = `./uploads/${user_id}/images`;
+    const name_without_ext = parse(file.originalname).name;
+    const image_name = `${Date.now()}-${name_without_ext}`;
 
-    const { result, filename } = await this.fileService.compressImage({
+    const result = await this.fileService.compressImage({
       image_name,
-      outputDir: uploadImagesPath,
+      outputDir: upload_images_path,
       buffer: file.buffer,
       size: 'medium',
     });
 
-    const fileSizeInKb = Math.floor(file.size / 1024);
+    const file_size_in_kb = Math.floor(result.size / 1024);
 
     await this.update({
       id,
       user_id,
       updatePlaylistDto: {
-        image_name: filename,
+        image_name: image_name,
         mimetype: result.format,
-        size_in_kb: fileSizeInKb,
+        size_in_kb: file_size_in_kb,
         title: null,
       },
     });
@@ -220,7 +221,7 @@ export class PlaylistService {
 
       if (oldImageName && oldImageName !== result.raw[0].image_name) {
         await this.fileService.removeFile({
-          filePath: `${uploadImagesPath}/${oldImageName}`,
+          filePath: `${uploadImagesPath}/${oldImageName}-medium.webp`,
         });
       }
 

@@ -57,7 +57,10 @@ export default function TrackPlaylistRow({
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.title === track.title;
-  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const filename = currentTrack?.image_name
+    ? `${currentTrack.image_name}-small.webp`
+    : null;
+  const { data: imageBlob } = useImageFile(filename);
   const imageUrl = imageBlob
     ? getUrlFromBlob(imageBlob)
     : DEFAULT_COVER_TRACK_IMAGE;

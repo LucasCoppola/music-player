@@ -13,7 +13,8 @@ export function CoverImage({
   playlistId: string;
 }) {
   const { mutate: uploadPlaylistCover, isPending } = useUploadPlaylistCover();
-  const { data: imageBlob } = useImageFile(image_name ?? "");
+  const filename = image_name ? `${image_name}-medium.webp` : null;
+  const { data: imageBlob } = useImageFile(filename);
 
   const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);

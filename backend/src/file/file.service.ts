@@ -95,45 +95,42 @@ export class FileService {
    * - 'large' (~200x200)
    */
   async compressImage({
+    buffer,
     image_name,
     outputDir,
     size,
-    filePath,
-    buffer,
   }: {
+    buffer: Buffer;
     image_name: string;
     outputDir: string;
     size: 'small' | 'medium' | 'large';
-    filePath?: string;
-    buffer?: Buffer;
   }) {
-    const output_image_name = `${image_name}-${size}.webp`;
-    const output_path = `${outputDir}/${output_image_name}`;
+    const output_path = `${outputDir}/${image_name}-${size}.webp`;
     let quality: number;
     let target_size: { width: number; height: number };
 
     switch (size) {
       case 'small':
-        quality = 60;
+        quality = 75;
         target_size = { width: 40, height: 40 };
         break;
       case 'medium':
-        quality = 75;
+        quality = 90;
         target_size = { width: 80, height: 80 };
         break;
       case 'large':
-        quality = 85;
-        target_size = { width: 200, height: 200 };
+        quality = 100;
+        target_size = { width: 192, height: 192 };
         break;
     }
 
     try {
-      const result = await sharp(filePath || buffer)
-        .resize({ ...target_size, fit: 'cover', position: 'center' })
+      const result = await sharp(buffer)
+        .resize({ ...target_size })
         .webp({ quality })
         .toFile(output_path);
 
-      return { result: result, filename: output_image_name };
+      return result;
     } catch (error) {
       console.error('Error compressing image:', error);
       throw new InternalServerErrorException('Failed to compress image');

@@ -32,7 +32,10 @@ export class Track {
   image_mimetype: string;
 
   @Column({ nullable: true })
-  image_size_in_kb: number;
+  large_image_size_in_kb: number;
+
+  @Column({ nullable: true })
+  small_image_size_in_kb: number;
 
   @Column({ type: 'float' })
   duration: number;

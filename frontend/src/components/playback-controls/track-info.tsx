@@ -13,7 +13,10 @@ export default function TrackInfo() {
   const { currentTrack } = usePlayback();
   const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
   const { mutate: removeTrackFromFavorites } = useRemoveTrackFromFavorites();
-  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const filename = currentTrack?.image_name
+    ? `${currentTrack.image_name}-large.webp`
+    : null;
+  const { data: imageBlob } = useImageFile(filename);
   const imageUrl = imageBlob
     ? getUrlFromBlob(imageBlob)
     : DEFAULT_COVER_TRACK_IMAGE;

@@ -27,8 +27,9 @@ type UploadAudio = {
 export type UploadImage = {
   message: string;
   image_name: string;
+  large_image_size_in_kb: number;
+  small_image_size_in_kb: number;
   mimetype: string;
-  size_in_kb: number;
 };
 
 export function useTracks(query: string) {
@@ -111,7 +112,8 @@ export function useCreateTrack() {
       audio_size_in_kb,
       image_name,
       image_mimetype,
-      image_size_in_kb,
+      large_image_size_in_kb,
+      small_image_size_in_kb,
     }: {
       title: string;
       artist: string;
@@ -120,7 +122,8 @@ export function useCreateTrack() {
       audio_size_in_kb: number;
       image_name: string | null;
       image_mimetype: string | null;
-      image_size_in_kb: number | null;
+      large_image_size_in_kb: number | null;
+      small_image_size_in_kb: number | null;
     }) =>
       await client(`${BASE_URL}/api/tracks`, authToken, {
         method: "POST",
@@ -133,7 +136,8 @@ export function useCreateTrack() {
           audio_size_in_kb,
           image_name,
           image_mimetype,
-          image_size_in_kb,
+          large_image_size_in_kb,
+          small_image_size_in_kb,
         },
       }),
     onSuccess: (data) => {
@@ -159,14 +163,16 @@ export function useUpdateTrack() {
       artist,
       image_name,
       mimetype,
-      size_in_kb,
+      large_image_size_in_kb,
+      small_image_size_in_kb,
     }: {
       id: string;
       title?: string;
       artist?: string;
       image_name?: string;
       mimetype?: string;
-      size_in_kb?: number;
+      large_image_size_in_kb?: number;
+      small_image_size_in_kb?: number;
     }) =>
       await client(`${BASE_URL}/api/tracks/${id}`, authToken, {
         method: "PATCH",
@@ -176,7 +182,8 @@ export function useUpdateTrack() {
           artist: artist ?? null,
           image_name: image_name ?? null,
           mimetype: mimetype ?? null,
-          size_in_kb: size_in_kb ?? null,
+          small_image_size_in_kb: small_image_size_in_kb ?? null,
+          large_image_size_in_kb: large_image_size_in_kb ?? null,
         },
       }),
     onSuccess: (data) => {

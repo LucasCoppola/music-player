@@ -12,7 +12,10 @@ export default function NowPlaying() {
   const uploadImage = useUploadTrackCoverImage();
   const updateTrack = useUpdateTrack();
   const { currentTrack } = usePlayback();
-  const { data: imageBlob } = useImageFile(currentTrack?.image_name ?? "");
+  const filename = currentTrack?.image_name
+    ? `${currentTrack.image_name}-large.webp`
+    : null;
+  const { data: imageBlob } = useImageFile(filename);
   const imageUrl = imageBlob
     ? getUrlFromBlob(imageBlob)
     : DEFAULT_COVER_TRACK_IMAGE;
@@ -41,7 +44,8 @@ export default function NowPlaying() {
             id: currentTrack.id,
             image_name: image?.image_name,
             mimetype: image?.mimetype,
-            size_in_kb: image?.size_in_kb,
+            small_image_size_in_kb: image?.small_image_size_in_kb,
+            large_image_size_in_kb: image?.large_image_size_in_kb,
           });
         }
       } else {

@@ -57,7 +57,8 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
   const { mutate: addTrackToPlaylist } = useAddTrackToPlaylist();
   const { mutate: addTrackToFavorites } = useAddTrackToFavorites();
   const { mutate: removeFromFavorites } = useRemoveTrackFromFavorites();
-  const { data: imageBlob } = useImageFile(track.image_name);
+  const filename = track.image_name ? `${track.image_name}-small.webp` : null;
+  const { data: imageBlob } = useImageFile(filename);
   const imageUrl = imageBlob
     ? getUrlFromBlob(imageBlob)
     : DEFAULT_COVER_TRACK_IMAGE;

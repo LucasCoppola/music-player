@@ -21,8 +21,13 @@ export class UpdateTrackDto {
   @IsOptional()
   mimetype: string | null;
 
-  @IsNumber()
   @IsNotEmpty()
+  @IsNumber()
   @IsOptional()
-  size_in_kb: number | null;
+  large_image_size_in_kb: number | null;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsOptional()
+  small_image_size_in_kb: number | null;
 }

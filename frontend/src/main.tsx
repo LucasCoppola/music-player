@@ -9,7 +9,11 @@ import { routeTree } from "./routeTree.gen";
 import { NotFound } from "./components/not-found.tsx";
 import { PlaybackProvider } from "./providers/playback-provider.tsx";
 
-const router = createRouter({ routeTree, defaultNotFoundComponent: NotFound });
+const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFound,
+  defaultPreload: "intent",
+});
 const queryClient = new QueryClient();
 
 declare module "@tanstack/react-router" {
