@@ -5,6 +5,7 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import * as fs from 'fs';
+import * as sharp from 'sharp';
 import { join } from 'path';
 
 @Injectable()
@@ -84,6 +85,58 @@ export class FileService {
         console.error('Error deleting file:', error);
         throw new InternalServerErrorException('Failed to delete file');
       }
+    }
+  }
+
+  /**
+   * @param size
+   * -- 'small' (~40x40)
+   * - 'medium' (~80x80)
+   * - 'large' (~200x200)
+   */
+  async compressImage({
+    image_name,
+    outputDir,
+    size,
+    filePath,
+    buffer,
+  }: {
+    image_name: string;
+    outputDir: string;
+    size: 'small' | 'medium' | 'large';
+    filePath?: string;
+    buffer?: Buffer;
+  }) {
+    const output_image_name = `${image_name}-${size}.webp`;
+    const output_path = `${outputDir}/${output_image_name}`;
+    let quality: number;
+    let target_size: { width: number; height: number };
+
+    switch (size) {
+      case 'small':
+        quality = 60;
+        target_size = { width: 40, height: 40 };
+        break;
+      case 'medium':
+        quality = 75;
+        target_size = { width: 80, height: 80 };
+        break;
+      case 'large':
+        quality = 85;
+        target_size = { width: 200, height: 200 };
+        break;
+    }
+
+    try {
+      const result = await sharp(filePath || buffer)
+        .resize({ ...target_size, fit: 'cover', position: 'center' })
+        .webp({ quality })
+        .toFile(output_path);
+
+      return { result: result, filename: output_image_name };
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      throw new InternalServerErrorException('Failed to compress image');
     }
   }
 }

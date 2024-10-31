@@ -32,21 +32,24 @@ export class PlaylistService {
     user_id: string;
   }) {
     const uploadImagesPath = `./uploads/${user_id}/images`;
-    const fileSizeInKb = Math.floor(file.size / 1024);
-    const image_name = `${Date.now()}-${file.originalname}`;
+    const removeFileExt = file.originalname.split('.').slice(0, -1).join('.');
+    const image_name = `${Date.now()}-${removeFileExt}`;
 
-    await this.fileService.writeFile({
-      directory: uploadImagesPath,
-      filename: image_name,
+    const { result, filename } = await this.fileService.compressImage({
+      image_name,
+      outputDir: uploadImagesPath,
       buffer: file.buffer,
+      size: 'medium',
     });
+
+    const fileSizeInKb = Math.floor(file.size / 1024);
 
     await this.update({
       id,
       user_id,
       updatePlaylistDto: {
-        image_name,
-        mimetype: file.mimetype,
+        image_name: filename,
+        mimetype: result.format,
         size_in_kb: fileSizeInKb,
         title: null,
       },

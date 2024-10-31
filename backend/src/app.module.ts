@@ -38,7 +38,6 @@ import { FileModule } from './file/file.module';
       entities: [User, Track, Playlist],
       synchronize: configuration().environment !== 'prod',
       autoLoadEntities: true,
-      logging: true,
     }),
     AuthModule,
     UsersModule,

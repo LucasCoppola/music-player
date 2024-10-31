@@ -91,7 +91,7 @@ export class PlaylistController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5 MB
           new FileTypeValidator({
-            fileType: 'image/jpeg|image/png|image/gif',
+            fileType: 'image/jpeg|image/png|image/webp',
           }),
         ],
       }),
