@@ -1,7 +1,7 @@
-import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, Res, UseGuards } from '@nestjs/common';
 import { FileService } from './file.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @UseGuards(AuthGuard)
 @Controller()
@@ -9,12 +9,21 @@ export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Get('images/:filename')
-  getImage(@Req() req: Request, @Param('filename') filename: string) {
-    return this.fileService.streamFile({
+  async getImage(
+    @Res() res: Response,
+    @Req() req: Request,
+    @Param('filename') filename: string,
+  ) {
+    const file = await this.fileService.readFile({
       user_id: req.user.sub,
       filename,
-      resource: 'images',
     });
+
+    res.set({
+      'Content-Type': 'image/webp',
+    });
+
+    return res.send(file);
   }
 
   @Get('track/:filename')
@@ -22,7 +31,6 @@ export class FileController {
     return this.fileService.streamFile({
       user_id: req.user.sub,
       filename,
-      resource: 'tracks',
     });
   }
 }

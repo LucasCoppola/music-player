@@ -10,14 +10,37 @@ import { join } from 'path';
 
 @Injectable()
 export class FileService {
+  async readFile({ user_id, filename }: { user_id: string; filename: string }) {
+    const filePath = join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'uploads',
+      user_id,
+      'images',
+      filename,
+    );
+
+    try {
+      const file = await fs.promises.readFile(filePath);
+      return file;
+    } catch (error) {
+      console.error('Error reading file: ', error);
+      if (error.code === 'ENOENT') {
+        throw new NotFoundException(`Image ${filename} not found`);
+      } else {
+        throw new InternalServerErrorException('Failed to read file');
+      }
+    }
+  }
+
   streamFile({
     user_id,
     filename,
-    resource,
   }: {
     user_id: string;
     filename: string;
-    resource: 'tracks' | 'images';
   }): StreamableFile {
     const filePath = join(
       __dirname,
@@ -26,23 +49,17 @@ export class FileService {
       '..',
       'uploads',
       user_id,
-      resource,
+      'tracks',
       filename,
     );
 
     try {
-      if (!fs.existsSync(filePath)) {
-        throw new NotFoundException(
-          `File ${filename} in ${resource} not found`,
-        );
-      }
-
       const file = fs.createReadStream(filePath);
       return new StreamableFile(file);
     } catch (error) {
       console.error('Error streaming file: ', error);
-      if (error instanceof NotFoundException) {
-        throw error;
+      if (error.code === 'ENOENT') {
+        throw new NotFoundException(`Track ${filename} not found`);
       } else {
         throw new InternalServerErrorException('Failed to stream file');
       }
