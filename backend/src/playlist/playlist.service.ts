@@ -12,6 +12,7 @@ import { UsersService } from '../users/users.service';
 import { TrackService } from '../track/track.service';
 import { FileService } from '../file/file.service';
 import { parse } from 'path';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class PlaylistService {
@@ -125,6 +126,10 @@ export class PlaylistService {
     Playlist & { track_count: number; duration: number; user_id: string }
   > {
     const user = await this.usersService.findOneById(user_id);
+
+    if (!isUUID(id)) {
+      throw new NotFoundException('Playlist not found, invalid id');
+    }
 
     try {
       const playlist = await this.playlistRepository

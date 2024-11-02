@@ -15,7 +15,7 @@ import { DEFAULT_FAVORITE_COVER } from "@/lib/consts";
 export default function Playlist() {
   const { setPlaylist, playTrack } = usePlayback();
   const { playlistId } = useParams({ from: "/p/$playlistId" });
-  const { data: playlist, isLoading } = usePlaylistById(playlistId);
+  const { data: playlist, isLoading, error } = usePlaylistById(playlistId);
   const [playRandom, setPlayRandom] = useState(() => {
     const savedPlayRandom = localStorage.getItem(`playRandom_${playlistId}`);
     return savedPlayRandom === "true";
@@ -27,6 +27,22 @@ export default function Playlist() {
 
   if (isLoading) {
     return <PlaylistLoadingSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <main className="flex flex-col items-center justify-center mt-40 bg-background text-foreground">
+        <h1 className="text-2xl font-bold mb-2">Playlist Not Found</h1>
+        <p className="text-sm text-muted-foreground mb-6">
+          Sorry, we couldn't find the playlist you're looking for.
+        </p>
+        <Button asChild>
+          <Link to="/" search={{ q: "" }}>
+            Go Home
+          </Link>
+        </Button>
+      </main>
+    );
   }
 
   function PlayAll() {
