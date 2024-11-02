@@ -16,23 +16,24 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [previousTrackId, setPreviousTrackId] = useState<string | null>(null);
 
   const { data: currentTrack } = useTrackById(currentTrackId || "");
 
   useEffect(() => {
     async function loadAudio() {
-      if (currentTrack?.track_name) {
+      if (currentTrack?.track_name && currentTrackId !== previousTrackId) {
         const audioBlob = await getAudioBlob(currentTrack.track_name);
         if (audioBlob && audioRef.current) {
           const audioUrl = getUrlFromBlob(audioBlob)!;
           audioRef.current.src = audioUrl;
           if (isPlaying) audioRef.current.play();
         }
+        setPreviousTrackId(currentTrackId);
       }
     }
     loadAudio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTrack]);
+  }, [currentTrack, currentTrackId, isPlaying, previousTrackId]);
 
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
@@ -46,11 +47,16 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     }
   }, [isPlaying]);
 
-  const playTrack = useCallback((track: Track) => {
-    setCurrentTrackId(track.id);
-    setCurrentTime(0);
-    setIsPlaying(true);
-  }, []);
+  const playTrack = useCallback(
+    (track: Track) => {
+      if (currentTrackId !== track.id) {
+        setCurrentTrackId(track.id);
+        setCurrentTime(0);
+        setIsPlaying(true);
+      }
+    },
+    [currentTrackId],
+  );
 
   const playNextTrack = useCallback(() => {
     if (currentTrack && playlist && playlist.length > 0) {
