@@ -142,6 +142,10 @@ export class FileService {
     }
 
     try {
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+
       const result = await sharp(buffer)
         .resize({ ...target_size })
         .webp({ quality })
