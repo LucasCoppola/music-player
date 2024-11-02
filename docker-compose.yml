@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env.prod
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env.local
+
+volumes:
+  uploads:
