@@ -12,6 +12,8 @@ RUN npm run build
 FROM node:18
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y ffmpeg
+
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/public ./public
 COPY --from=build /app/package.json .
