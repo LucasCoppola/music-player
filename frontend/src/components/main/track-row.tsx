@@ -66,7 +66,7 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const isCurrentTrack = currentTrack?.title === track.title;
+  const isCurrentTrack = currentTrack?.id === track.id;
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
@@ -100,7 +100,9 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
 
   return (
     <tr
-      className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
+      className={`group cursor-pointer hover:bg-[#1A1A1A] select-none relative ${
+        isCurrentTrack ? "bg-[#2A2A2A] hover:bg-[#2A2A2A]" : ""
+      }`}
       tabIndex={0}
       onClick={handleTrackAction}
       onMouseEnter={handleMouseEnter}
@@ -115,9 +117,9 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
           )
         ) : isCurrentTrack && isPlaying ? (
           <div className="flex items-end justify-center space-x-[2px] size-[0.65rem] mx-auto">
-            <div className="w-1 bg-neutral-600 animate-now-playing-1"></div>
-            <div className="w-1 bg-neutral-600 animate-now-playing-2 [animation-delay:0.2s]"></div>
-            <div className="w-1 bg-neutral-600 animate-now-playing-3 [animation-delay:0.4s]"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-1"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-2 [animation-delay:0.2s]"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-3 [animation-delay:0.4s]"></div>
           </div>
         ) : (
           <span className="text-gray-400">{index}</span>

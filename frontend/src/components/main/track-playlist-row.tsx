@@ -56,7 +56,7 @@ export default function TrackPlaylistRow({
     playlists?.find((p) => p.id === playlistId)?.type === "favorite";
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
-  const isCurrentTrack = currentTrack?.title === track.title;
+  const isCurrentTrack = currentTrack?.id === track.id;
   const filename = currentTrack?.image_name
     ? `${currentTrack.image_name}-small.webp`
     : null;
@@ -80,7 +80,9 @@ export default function TrackPlaylistRow({
 
   return (
     <tr
-      className="group cursor-pointer hover:bg-[#1A1A1A] select-none relative"
+      className={`group cursor-pointer hover:bg-[#1A1A1A] select-none relative ${
+        isCurrentTrack ? "bg-[#2A2A2A] hover:bg-[#2A2A2A]" : ""
+      }`}
       tabIndex={0}
       onClick={handleTrackAction}
       onMouseEnter={handleMouseEnter}
@@ -95,9 +97,9 @@ export default function TrackPlaylistRow({
           )
         ) : isCurrentTrack && isPlaying ? (
           <div className="flex items-end justify-center space-x-[2px] size-[0.65rem] mx-auto">
-            <div className="w-1 bg-neutral-600 animate-now-playing-1"></div>
-            <div className="w-1 bg-neutral-600 animate-now-playing-2 [animation-delay:0.2s]"></div>
-            <div className="w-1 bg-neutral-600 animate-now-playing-3 [animation-delay:0.4s]"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-1"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-2 [animation-delay:0.2s]"></div>
+            <div className="w-1 bg-neutral-400 animate-now-playing-3 [animation-delay:0.4s]"></div>
           </div>
         ) : (
           <span className="text-gray-400">{index}</span>
