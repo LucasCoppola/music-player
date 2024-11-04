@@ -11,22 +11,10 @@ import configuration from '../config/configuration';
 import { User } from './entities/user.entity';
 import { Track } from './entities/track.entity';
 import { Playlist } from './entities/playlist.entity';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot(
-      {
-        rootPath: join(process.cwd(), 'public', 'images'),
-        serveRoot: '/public/images',
-      },
-      {
-        rootPath: join(process.cwd(), 'public', 'tracks'),
-        serveRoot: '/public/tracks',
-      },
-    ),
     ConfigModule.forRoot({
       envFilePath: `.env.${configuration().environment}`,
       isGlobal: true,
