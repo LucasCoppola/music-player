@@ -10,6 +10,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useCreatePlaylist, usePlaylists } from "@/hooks/use-playlists";
 import PlaylistRow from "./playlist-row";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Sidebar() {
   const { authState, logout } = useAuth();
@@ -18,7 +19,7 @@ export default function Sidebar() {
   const { mutate: createPlaylist } = useCreatePlaylist();
 
   const newPlaylist = {
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     title: "New Playlist",
   };
 
