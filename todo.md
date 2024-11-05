@@ -1,9 +1,8 @@
-- [-] Update upload track form to include cover image and album?
-- [] Keyboard Shorcuts
+- [-] Deploy
 
-  - [] <C-Left/Right> to play next/prev track
-  - [] <C-Up/Down> to increase/decrease the volume
+  - [] Setup Continuous Deployment
+  - [] Mobile design
 
-- [] Deploy
+- [] When it can't find the auth token or the user it should logout.
 - [] Playlist tests
 - [] Track tests

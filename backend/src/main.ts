@@ -5,7 +5,10 @@ import configuration from 'config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: 'https://music-player.run.place',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('api', {
     exclude: [{ path: 'healthz', method: RequestMethod.GET }],
