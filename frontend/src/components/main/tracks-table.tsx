@@ -35,9 +35,7 @@ export default function TracksTable({
             <tr className="text-left text-gray-400">
               <th className="py-2 pl-3 pr-2 font-medium w-10">#</th>
               <th className="py-2 px-2 font-medium">Title</th>
-              <th className="py-2 px-2 font-medium hidden sm:table-cell">
-                Artist
-              </th>
+              <th className="py-2 px-2 font-medium">Artist</th>
               <th className="py-2 px-2 font-medium">Duration</th>
               <th className="py-2 px-2 font-medium w-8"></th>
             </tr>

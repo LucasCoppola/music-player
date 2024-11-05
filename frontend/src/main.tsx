@@ -28,7 +28,7 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <PlaybackProvider>
           <RouterProvider router={router} />
-          <Toaster richColors theme="dark" />
+          <Toaster richColors closeButton theme="dark" position="top-right" />
         </PlaybackProvider>
       </AuthProvider>
     </QueryClientProvider>

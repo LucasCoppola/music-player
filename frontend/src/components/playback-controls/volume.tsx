@@ -84,7 +84,7 @@ export default function Volume() {
   }
 
   return (
-    <div className="w-1/3 pr-8">
+    <div className="w-1/3 pr-2 sm:pr-8">
       {currentTrack && (
         <div className="group flex justify-end items-center">
           <Button
@@ -99,7 +99,7 @@ export default function Volume() {
           <Slider
             value={[volume]}
             onValueChange={handleSliderChange}
-            className="w-24 cursor-pointer py-1.5"
+            className="w-16 sm:w-24 cursor-pointer py-1.5"
             max={1}
             step={0.01}
             disabled={!currentTrack}

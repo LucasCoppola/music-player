@@ -28,14 +28,14 @@ export default function TrackInfo() {
           <img
             src={imageUrl}
             alt="Track thumbnail"
-            className="w-10 h-10 object-cover mr-2"
+            className="w-8 h-8 sm:w-10 sm:h-10 object-cover sm:mr-2"
           />
           <div className="flex items-center">
             <div>
-              <div className="text-sm font-medium truncate max-w-[120px] sm:max-w-[200px] text-gray-200">
+              <div className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[200px] text-gray-200">
                 {currentTrack.title}
               </div>
-              <div className="text-xs text-gray-400 truncate max-w-[120px] sm:max-w-[200px]">
+              <div className="text-[10px] sm:text-xs text-gray-400 truncate max-w-[80px] sm:max-w-[200px]">
                 {currentTrack.artist}
               </div>
             </div>
@@ -43,7 +43,7 @@ export default function TrackInfo() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+                className="hidden sm:block size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
                 onClick={() => {
                   if (currentTrack?.id) {
                     removeTrackFromFavorites({ trackId: currentTrack.id });
@@ -56,7 +56,7 @@ export default function TrackInfo() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+                className="hidden sm:block size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
                 onClick={() => {
                   if (currentTrack?.id) {
                     addTrackToFavorites({ trackId: currentTrack.id });
