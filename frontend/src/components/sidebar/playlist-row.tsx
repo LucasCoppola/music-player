@@ -21,7 +21,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
+export default function PlaylistRow({
+  playlist,
+  setIsSidebarOpen,
+}: {
+  playlist: Playlist;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const pathname = useLocation({
     select: (location) => location.pathname,
   });
@@ -53,6 +59,7 @@ export default function PlaylistRow({ playlist }: { playlist: Playlist }) {
           focus:outline-none focus:ring-[0.5px] focus:ring-gray-400
           ${pathname === `/p/${playlist.id}` ? "bg-[#1A1A1A]" : ""}`}
         tabIndex={0}
+        onClick={() => setIsSidebarOpen(false)}
       >
         {playlist.title}
       </Link>
