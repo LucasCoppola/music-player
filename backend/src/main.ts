@@ -6,7 +6,7 @@ import configuration from 'config/configuration';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: 'https://music-player.run.place',
+    origin: ['https://music-player.run.place', 'http://localhost:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   app.useGlobalPipes(new ValidationPipe());

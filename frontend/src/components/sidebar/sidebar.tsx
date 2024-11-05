@@ -43,7 +43,7 @@ export default function Sidebar() {
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-56 bg-[#121212] flex-col h-full transform transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-40 w-56 bg-[#121212] flex flex-col h-full transform transition-transform duration-300 ease-in-out",
           "sm:relative sm:transform-none",
           isSidebarOpen
             ? "translate-x-0"
