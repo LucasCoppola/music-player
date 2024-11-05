@@ -302,9 +302,14 @@ export class TrackService {
     });
 
     if (track.image_name) {
-      await this.fileService.removeFile({
-        filePath: `${uploadImagesPath}/${track.image_name}`,
-      });
+      await Promise.all([
+        await this.fileService.removeFile({
+          filePath: `${uploadImagesPath}/${track.image_name}-small.webp`,
+        }),
+        await this.fileService.removeFile({
+          filePath: `${uploadImagesPath}/${track.image_name}-large.webp`,
+        }),
+      ]);
     }
 
     try {
