@@ -7,6 +7,7 @@ export type AuthContext = {
   register: (formData: RegisterFormData) => Promise<void>;
   login: (formData: LoginFormData) => Promise<void>;
   logout: () => void;
+  isAuthLoading: boolean;
 };
 
 export type AuthState = {
@@ -23,6 +24,7 @@ export const AuthContext = createContext<AuthContext>({
   register: () => Promise.resolve(),
   login: () => Promise.resolve(),
   logout: () => {},
+  isAuthLoading: false,
 });
 
 export function useAuth() {

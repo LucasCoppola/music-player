@@ -15,7 +15,7 @@ import { useState } from "react";
 import { CloseSidebarIcon, OpenSidebarIcon } from "../ui/icons";
 
 export default function Sidebar() {
-  const { authState, logout } = useAuth();
+  const { authState, logout, isAuthLoading } = useAuth();
   const pathname = useLocation({ select: (location) => location.pathname });
   const { data: playlists } = usePlaylists();
   const { mutate: createPlaylist } = useCreatePlaylist();
@@ -52,7 +52,9 @@ export default function Sidebar() {
       >
         <div className="m-4 mb-6">
           <div className="space-y-2">
-            {authState?.isAuthenticated ? (
+            {isAuthLoading ? (
+              <div className="h-8 w-full bg-primary/10 rounded-md animate-pulse" />
+            ) : authState?.isAuthenticated ? (
               <UserDropdown authState={authState} logout={logout} />
             ) : (
               <Auth />

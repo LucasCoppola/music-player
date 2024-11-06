@@ -7,6 +7,7 @@ const TOKEN_KEY = "auth_token";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   const getProfile = useCallback(async () => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
@@ -40,17 +41,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (isTokenInvalid(storedToken)) {
       logout();
+      setIsAuthLoading(false);
     } else {
-      getProfile().then((data) => {
-        setAuthState({
-          username: data.username,
-          email: data.email,
-          imageUrl: data.imageUrl,
-          userId: data.sub,
-          token: storedToken,
-          isAuthenticated: true,
-        });
-      });
+      getProfile()
+        .then((data) => {
+          setAuthState({
+            username: data.username,
+            email: data.email,
+            imageUrl: data.imageUrl,
+            userId: data.sub,
+            token: storedToken,
+            isAuthenticated: true,
+          });
+        })
+        .finally(() => setIsAuthLoading(false));
     }
   }, [getProfile]);
 
@@ -128,7 +132,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ authState, register, login, logout }}>
+    <AuthContext.Provider
+      value={{ authState, register, login, logout, isAuthLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
