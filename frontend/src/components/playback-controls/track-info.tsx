@@ -32,10 +32,10 @@ export default function TrackInfo() {
           />
           <div className="flex items-center">
             <div>
-              <div className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-[200px] text-gray-200">
+              <div className="text-xs sm:text-sm font-medium truncate max-w-[100px] sm:max-w-[200px] text-gray-200">
                 {currentTrack.title}
               </div>
-              <div className="text-[10px] sm:text-xs text-gray-400 truncate max-w-[80px] sm:max-w-[200px]">
+              <div className="text-[11px] sm:text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[200px]">
                 {currentTrack.artist}
               </div>
             </div>

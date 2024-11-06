@@ -126,13 +126,13 @@ export default function TrackPlaylistRow({
         {formatDuration(track.duration)}
       </td>
       <td className="py-[2px] px-2 text-right">
-        <div className="opacity-0 group-hover:opacity-100">
+        <div className="sm:opacity-0 sm:group-hover:opacity-100 flex items-center space-x-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 text-gray-400 hover:text-white focus:text-white"
+                className="h-5 w-5 text-muted-foreground sm:text-primary/90 sm:hover:text-primary focus:text-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Ellipsis className="size-4" />
@@ -141,7 +141,10 @@ export default function TrackPlaylistRow({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 dark">
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-xs">
+                <DropdownMenuSubTrigger
+                  className="text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Plus className="mr-2 size-3" />
                   Add to Playlist
                 </DropdownMenuSubTrigger>

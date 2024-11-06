@@ -65,14 +65,14 @@ export default function PlaylistRow({
       </Link>
 
       {playlist.type !== "favorite" && (
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100">
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 sm:opacity-0 sm:group-hover:opacity-100">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 ref={menuTriggerRef}
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 rounded-sm"
+                className="h-5 w-5 text-muted-foreground sm:text-primary/90 sm:hover:text-primary focus:text-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="size-4" />
@@ -93,7 +93,7 @@ export default function PlaylistRow({
                     Delete
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="dark text-foreground">
+                <AlertDialogContent className="max-w-sm dark text-foreground">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Playlist?</AlertDialogTitle>
                     <AlertDialogDescription>

@@ -146,14 +146,14 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
         {formatDuration(track.duration)}
       </td>
       <td className="py-[2px] px-2 text-right">
-        <div className="opacity-0 group-hover:opacity-100 flex items-center space-x-1">
+        <div className="sm:opacity-0 sm:group-hover:opacity-100 flex items-center space-x-1">
           <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-5 w-5 text-primary/90 hover:text-primary focus:text-primary"
+                  className="h-5 w-5 text-muted-foreground sm:text-primary/90 sm:hover:text-primary focus:text-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Ellipsis className="size-4" />
@@ -162,7 +162,10 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 dark">
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="text-xs">
+                  <DropdownMenuSubTrigger
+                    className="text-xs"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Plus className="mr-2 size-3" />
                     Add to Playlist
                   </DropdownMenuSubTrigger>
@@ -222,7 +225,7 @@ export default function TrackRow({ track, index, query }: TrackRowProps) {
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
-            <AlertDialogContent className="dark text-foreground">
+            <AlertDialogContent className="max-w-sm dark text-foreground">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Track?</AlertDialogTitle>
                 <AlertDialogDescription>

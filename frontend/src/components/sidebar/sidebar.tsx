@@ -31,7 +31,7 @@ export default function Sidebar() {
       <button
         className={cn(
           "fixed bottom-20 left-4 z-50 p-2 rounded-md transition-all duration-200 ease-in-out",
-          "bg-[#121212] hover:bg-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-gray-400",
+          "bg-[#181818] border border-[#282828] focus:outline-none focus:ring-1 focus:ring-gray-400",
           "sm:hidden",
           isSidebarOpen && "left-[232px]",
         )}

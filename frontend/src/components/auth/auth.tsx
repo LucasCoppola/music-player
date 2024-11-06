@@ -28,7 +28,7 @@ export default function Auth() {
             Login / Sign Up
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-[400px] dark text-foreground">
+        <DialogContent className="max-w-sm sm:w-[400px] dark text-foreground">
           <DialogDescription className="sr-only">
             Sign up or login to your account.
           </DialogDescription>
