@@ -95,6 +95,16 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.addEventListener("ended", playNextTrack);
+      return () => {
+        audio.removeEventListener("ended", playNextTrack);
+      };
+    }
+  }, [playNextTrack]);
+
+  useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === " ") {
         if (
