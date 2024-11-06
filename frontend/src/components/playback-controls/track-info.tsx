@@ -43,7 +43,7 @@ export default function TrackInfo() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:block size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+                className="hidden sm:flex size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
                 onClick={() => {
                   if (currentTrack?.id) {
                     removeTrackFromFavorites({ trackId: currentTrack.id });
@@ -56,7 +56,7 @@ export default function TrackInfo() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:block size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
+                className="hidden sm:flex size-7 text-primary/90 hover:text-primary focus:text-primary ml-4"
                 onClick={() => {
                   if (currentTrack?.id) {
                     addTrackToFavorites({ trackId: currentTrack.id });
