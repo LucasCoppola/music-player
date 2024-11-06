@@ -8,8 +8,11 @@ import {
 import { Track, useTrackById } from "@/hooks/use-tracks";
 import { PlaybackContext } from "@/context/playback-context";
 import { getAudioBlob, getUrlFromBlob } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
+import { demoTracks } from "@/lib/consts";
 
 export function PlaybackProvider({ children }: { children: ReactNode }) {
+  const isAuthenticated = useAuth().authState?.isAuthenticated;
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState<string | null>(null);
   const [playlist, setPlaylist] = useState<Track[]>();
@@ -18,22 +21,41 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [previousTrackId, setPreviousTrackId] = useState<string | null>(null);
 
-  const { data: currentTrack } = useTrackById(currentTrackId || "");
+  const { data: serverTrack } = useTrackById(currentTrackId || "");
+  const demoTrack = demoTracks.find((track) => track.id === currentTrackId);
+  const currentTrack = isAuthenticated ? serverTrack : demoTrack;
 
   useEffect(() => {
     async function loadAudio() {
+      let audioUrl: string | null = null;
+
       if (currentTrack?.track_name && currentTrackId !== previousTrackId) {
-        const audioBlob = await getAudioBlob(currentTrack.track_name);
-        if (audioBlob && audioRef.current) {
-          const audioUrl = getUrlFromBlob(audioBlob)!;
-          audioRef.current.src = audioUrl;
-          if (isPlaying) audioRef.current.play();
+        if (isAuthenticated) {
+          const audioBlob = await getAudioBlob(currentTrack.track_name);
+
+          if (audioBlob) {
+            audioUrl = getUrlFromBlob(audioBlob)!;
+          }
+        } else {
+          audioUrl = currentTrack.track_name;
         }
+
         setPreviousTrackId(currentTrackId);
+      }
+
+      if (audioUrl && audioRef.current) {
+        audioRef.current.src = audioUrl;
+        if (isPlaying) audioRef.current.play();
       }
     }
     loadAudio();
-  }, [currentTrack, currentTrackId, isPlaying, previousTrackId]);
+  }, [
+    currentTrack,
+    currentTrackId,
+    isAuthenticated,
+    isPlaying,
+    previousTrackId,
+  ]);
 
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
