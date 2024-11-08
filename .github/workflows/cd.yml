@@ -8,33 +8,24 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-          known-hosts: ${{ secrets.EC2_KNOWN_HOSTS }}
-
-      - name: Deploy to EC2
-        env:
-          SSH_USER: "ec2-user"
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          GIT_REPO: "https://github.com/LucasCoppola/music-player.git"
+      - name: Start docker if needed and pull latest code
         run: |
-          ssh -o StrictHostKeyChecking=no $SSH_USER@$EC2_HOST << 'EOF'
-            # Is docker running?
-            sudo systemctl start docker
+          sudo systemctl start docker || true
 
-            cd music-player || exit 1
-            git pull origin main
+          cd music-player
 
-            docker-compose down
-            docker-compose up -d --build 
+          git pull origin main
 
-            docker system prune -f
-          EOF
+      - name: Deploy Application with Docker
+        run: |
+          cd music-player
+          docker-compose down
+          docker-compose up -d --build
+
+          docker system prune -f
