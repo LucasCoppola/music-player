@@ -1,0 +1,40 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          known-hosts: ${{ secrets.EC2_KNOWN_HOSTS }}
+
+      - name: Deploy to EC2
+        env:
+          SSH_USER: "ec2-user"
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          GIT_REPO: "https://github.com/LucasCoppola/music-player.git"
+        run: |
+          ssh -o StrictHostKeyChecking=no $SSH_USER@$EC2_HOST << 'EOF'
+            # Is docker running?
+            sudo systemctl start docker
+
+            cd music-player || exit 1
+            git pull origin main
+
+            docker-compose down
+            docker-compose up -d --build 
+
+            docker system prune -f
+          EOF
