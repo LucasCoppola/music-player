@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: CD
 
 on:
   push:
@@ -17,8 +17,14 @@ jobs:
       - name: Start docker if needed and pull latest code
         run: |
           sudo systemctl start docker || true
-
-          cd music-player
+          echo "Current directory: $(pwd)"
+          ls -la  
+          if [ -d "music-player" ]; then
+            cd music-player
+          else
+            echo "'music-player' directory not found. Exiting."
+            exit 1
+          fi
 
           git pull origin main
 
