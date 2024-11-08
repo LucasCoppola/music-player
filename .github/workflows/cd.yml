@@ -17,20 +17,10 @@ jobs:
       - name: Start docker if needed and pull latest code
         run: |
           sudo systemctl start docker || true
-          echo "Current directory: $(pwd)"
-          ls -la  
-          if [ -d "music-player" ]; then
-            cd music-player
-          else
-            echo "'music-player' directory not found. Exiting."
-            exit 1
-          fi
-
           git pull origin main
 
       - name: Deploy Application with Docker
         run: |
-          cd music-player
           docker-compose down
           docker-compose up -d --build
 
