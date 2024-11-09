@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   push:
@@ -42,10 +42,13 @@ jobs:
       - name: Create .env.test file
         working-directory: ./backend
         run: |
-          echo "PORT=8080" >> .env.test
-          echo "NODE_ENV=test" >> .env.test
+          echo "NODE_ENV=test" > .env.test
+          echo "PORT=${{ secrets.PORT }}" >> .env.test
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.test
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env.test
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env.test
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env.test
 
       - name: Start Docker containers
         working-directory: ./backend
