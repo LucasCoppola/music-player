@@ -14,6 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create backend .env
+        run: |
+          echo "NODE_ENV=prod" > backend/.env.prod
+          echo "PORT=${{ secrets.PORT }}" >> backend/.env.prod
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> backend/.env.prod
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend/.env.prod
+
+      - name: Create frontend .env
+        run: |
+          echo "VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}" > frontend/.env.local
+
       - name: Start docker if needed and pull latest code
         run: |
           sudo systemctl start docker || true
