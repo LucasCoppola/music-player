@@ -18,7 +18,7 @@ jobs:
         run: |
           echo "NODE_ENV=prod" > backend/.env.prod
           echo "PORT=${{ secrets.PORT }}" >> backend/.env.prod
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> backend/.env.prod
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL_PROD }}" >> backend/.env.prod
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> backend/.env.prod
 
       - name: Create frontend .env
@@ -30,9 +30,26 @@ jobs:
           sudo systemctl start docker || true
           git pull origin main
 
-      - name: Deploy Application with Docker
+      - name: Deploy Backend
         run: |
-          docker-compose down
-          docker-compose up -d --build
+          docker-compose up -d --no-deps --build backend
 
-          docker system prune -f
+      - name: Deploy Frontend
+        run: |
+          docker-compose up -d --no-deps --build frontend
+
+      - name: Verify deployment
+        run: |
+          echo "Checking services status:"
+          docker-compose ps
+
+      - name: Cleanup old images
+        run: |
+          docker image prune -f --filter "dangling=true"
+
+      - name: Log deployment result
+        if: always()
+        run: |
+          echo "Deployment finished with status: ${{ job.status }}"
+          echo "Recent logs:"
+          docker-compose logs --tail=50
