@@ -63,5 +63,5 @@ The frontend is built with React and TypeScript, the backend uses NestJS with Po
 ### DevOps
 
 - **Docker**: For containerization and deployment.
-- **GitHub Actions**: For continuous integration and deployment.
+- **GitHub Actions and GitHub Runners**: For CI/CD.
 - **AWS EC2**: For hosting the application on a virtual private server.
