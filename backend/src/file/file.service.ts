@@ -129,15 +129,15 @@ export class FileService {
     switch (size) {
       case 'small':
         quality = 75;
-        target_size = { width: 40, height: 40 };
+        target_size = { width: 128, height: 128 };
         break;
       case 'medium':
         quality = 90;
-        target_size = { width: 80, height: 80 };
+        target_size = { width: 256, height: 256 };
         break;
       case 'large':
         quality = 100;
-        target_size = { width: 192, height: 192 };
+        target_size = { width: 512, height: 512 };
         break;
     }
 
@@ -147,7 +147,12 @@ export class FileService {
       }
 
       const result = await sharp(buffer)
-        .resize({ ...target_size })
+        .resize({
+          width: target_size.width,
+          height: target_size.height,
+          fit: 'cover',
+          kernel: 'lanczos3',
+        })
         .webp({ quality })
         .toFile(output_path);
 
