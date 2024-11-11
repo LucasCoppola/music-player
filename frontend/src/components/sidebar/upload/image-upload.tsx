@@ -85,7 +85,11 @@ export default function ImageUpload({
           </div>
           <div className="flex items-center justify-between">
             <span>Size:</span>
-            <span className={isImageSizeOk ? "text-green-500" : "text-red-500"}>
+            <span
+              className={
+                isImageSizeOk !== false ? "text-green-500" : "text-red-500"
+              }
+            >
               {formatFileSize(trackFormData.image.size)}
             </span>
           </div>

@@ -4,6 +4,7 @@ import { formatFileSize } from "@/lib/utils";
 import { useRef, useState } from "react";
 import { TrackFormData } from "./upload-track";
 import { Label } from "@/components/ui/label";
+import { PictureType } from "jsmediatags/types";
 
 export default function AudioUpload({
   trackFormData,
@@ -19,10 +20,27 @@ export default function AudioUpload({
     const selectedFile = event.target.files?.[0];
 
     if (selectedFile) {
-      setTrackFormData((prevState) => ({
-        ...prevState,
-        file: selectedFile,
-      }));
+      window.jsmediatags.read(selectedFile, {
+        onSuccess: (tag) => {
+          const { title, picture, artist } = tag.tags;
+
+          setTrackFormData({
+            artist: artist ?? "",
+            title: title ?? "",
+            image: createFileFromPictureData(picture, selectedFile.name),
+            file: selectedFile,
+          });
+        },
+        onError: function (error) {
+          console.error("Error reading tags: ", error);
+          setTrackFormData({
+            artist: "",
+            title: "",
+            image: null,
+            file: selectedFile,
+          });
+        },
+      });
 
       const limitSize = 10 * 1024 * 1024; // 10 MB
       setIsFileSizeOk(selectedFile.size <= limitSize);
@@ -93,4 +111,16 @@ export default function AudioUpload({
       </div>
     </div>
   );
+}
+
+function createFileFromPictureData(
+  picture: PictureType | undefined,
+  filename: string,
+) {
+  if (!picture || !picture.data || !picture.format) return null;
+
+  const byteArray = new Uint8Array(picture.data);
+  const blob = new Blob([byteArray], { type: picture.format });
+
+  return new File([blob], filename, { type: picture.format });
 }
