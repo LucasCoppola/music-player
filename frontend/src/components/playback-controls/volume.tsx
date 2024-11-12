@@ -86,24 +86,26 @@ export default function Volume() {
   return (
     <div className="w-1/3 pr-2 sm:pr-8">
       {currentTrack && (
-        <div className="group flex justify-end items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7 hover:bg-[#181818]"
-            onClick={toggleMute}
-          >
-            {displayVolumeIcon()}
-          </Button>
+        <div className="flex justify-end items-center">
+          <div className="flex group">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7 hover:bg-[#181818]"
+              onClick={toggleMute}
+            >
+              {displayVolumeIcon()}
+            </Button>
 
-          <Slider
-            value={[volume]}
-            onValueChange={handleSliderChange}
-            className="w-16 sm:w-24 cursor-pointer py-1.5"
-            max={1}
-            step={0.01}
-            disabled={!currentTrack}
-          />
+            <Slider
+              value={[volume]}
+              onValueChange={handleSliderChange}
+              className="w-16 sm:w-24 cursor-pointer py-1.5"
+              max={1}
+              step={0.01}
+              disabled={!currentTrack}
+            />
+          </div>
         </div>
       )}
     </div>
