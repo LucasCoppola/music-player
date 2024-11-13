@@ -37,7 +37,7 @@ export function useTracks(query: string) {
   const client = useClient<Track[]>();
 
   return useQuery({
-    queryKey: queryKeys.tracks(),
+    queryKey: queryKeys.tracks(query),
     queryFn: () =>
       client(`${BASE_URL}/api/tracks?q=${query}`, authToken, { method: "GET" }),
     enabled: !!authToken,
@@ -141,7 +141,7 @@ export function useCreateTrack() {
         },
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks("") });
       toast.success(data.message || "Track created successfully.");
     },
     onError: (e) => {
@@ -187,7 +187,7 @@ export function useUpdateTrack() {
         },
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks("") });
       queryClient.invalidateQueries({
         queryKey: queryKeys.track(data.trackId),
       });
@@ -211,7 +211,7 @@ export function useDeleteTrack() {
         method: "DELETE",
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracks() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tracks("") });
       toast.success(data.message || "Track deleted successfully.");
     },
     onError: (e) => {

@@ -14,6 +14,8 @@ export default function SearchInput() {
   useEffect(() => {
     if (debouncedQuery) {
       navigate({ to: `/?q=${encodeURIComponent(debouncedQuery)}` });
+    } else {
+      navigate({ to: "/", search: { q: "" } });
     }
   }, [navigate, debouncedQuery]);
 
@@ -26,6 +28,7 @@ export default function SearchInput() {
         placeholder="Search"
         value={value}
         onChange={(e) => {
+          if (e.currentTarget.value === " ") return;
           setValue(e.currentTarget.value);
         }}
       />

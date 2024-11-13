@@ -23,7 +23,7 @@ export const NOT_FOUND_IMAGE = travolta;
 export const queryKeys = {
   playlists: () => ["playlists"],
   playlist: (id: string) => ["playlist", id],
-  tracks: () => ["tracks"],
+  tracks: (query: string) => ["tracks", query],
   track: (id: string) => ["track", id],
 };
 
