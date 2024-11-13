@@ -57,9 +57,7 @@ export default function TrackPlaylistRow({
 
   const { currentTrack, playTrack, togglePlayPause, isPlaying } = usePlayback();
   const isCurrentTrack = currentTrack?.id === track.id;
-  const filename = currentTrack?.image_name
-    ? `${currentTrack.image_name}-small.webp`
-    : null;
+  const filename = track?.image_name ? `${track.image_name}-small.webp` : null;
   const { data: imageBlob } = useImageFile(filename);
   const imageUrl = imageBlob
     ? getUrlFromBlob(imageBlob)
