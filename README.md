@@ -1,6 +1,6 @@
 # Music Player
 
-## Overview
+![ci](https://github.com/LucasCoppola/music-player/actions/workflows/ci.yml/badge.svg)
 
 This is a music player where you can upload, organize, and play your own tracks.
 The frontend is built with React and TypeScript, the backend uses NestJS with PostgreSQL.
