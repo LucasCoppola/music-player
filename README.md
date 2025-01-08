@@ -5,6 +5,8 @@
 This is a music player where you can upload, organize, and play your own tracks.
 The frontend is built with React and TypeScript, the backend uses NestJS with PostgreSQL.
 
+https://github.com/user-attachments/assets/51db2e58-d04a-49dc-a355-8a73d2c5eeac
+
 ## Features
 
 ### Storage
