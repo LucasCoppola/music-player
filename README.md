@@ -7,6 +7,9 @@ The frontend is built with React and TypeScript, the backend uses NestJS with Po
 
 https://github.com/user-attachments/assets/51db2e58-d04a-49dc-a355-8a73d2c5eeac
 
+## Diagram
+![Image](https://github.com/user-attachments/assets/115223a4-d5e0-4adf-be1b-e0fc79403dcd)
+
 ## Features
 
 ### Storage
